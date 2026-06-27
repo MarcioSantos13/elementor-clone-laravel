@@ -1,0 +1,357 @@
+<?php
+
+namespace App\Services\PageBuilder\Core;
+
+use App\Models\Page;
+use App\Models\Element;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
+
+class Renderer
+{
+    protected WidgetManager $widgetManager;
+    protected string $theme = 'default';
+
+    public function __construct(WidgetManager $widgetManager)
+    {
+        $this->widgetManager = $widgetManager;
+    }
+
+    public function render(Page $page, array $options = []): string
+    {
+        $this->theme = $options['theme'] ?? 'default';
+
+        $pageSettings = $page->settings ?? [];
+
+        $containerWidth = $pageSettings['container_width'] ?? $options['container_width'] ?? '1140px';
+        $pageBackground = $pageSettings['page_background'] ?? '#ffffff';
+        $contentPadding = $pageSettings['content_padding'] ?? '0px';
+
+        $html = $this->renderElements($page->elements);
+
+        $wrapperClass = $options['wrapper_class'] ?? 'page-builder-wrapper';
+        $pageStyle = "background-color: {$pageBackground};";
+        $innerStyle = "max-width: {$containerWidth}; margin: 0 auto; padding: {$contentPadding};";
+
+        $content = <<<HTML
+<div class="{$wrapperClass}" style="{$pageStyle}">
+    <div class="pb-page-inner" style="{$innerStyle}">
+        {$html}
+    </div>
+</div>
+HTML;
+
+        if ($options['with_container'] ?? true) {
+            $lang = $options['lang'] ?? 'en';
+            $title = $page->title;
+            $renderStyles = $this->renderStyles($page);
+            $renderScripts = $this->renderScripts($page);
+            $content = <<<HTML
+<!DOCTYPE html>
+<html lang="{$lang}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$title}</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        * { box-sizing: border-box; }
+    </style>
+    {$renderStyles}
+    {$renderScripts}
+</head>
+<body>
+    {$content}
+</body>
+</html>
+HTML;
+        }
+
+        return $content;
+    }
+
+    public function renderElements($elements, array $options = []): string
+    {
+        $html = '';
+
+        foreach ($elements as $element) {
+            $html .= $this->renderElement($element, $options);
+        }
+
+        return $html;
+    }
+
+    public function renderElement(Element $element, array $options = []): string
+    {
+        $widget = $this->widgetManager->getWidget($element->type);
+
+        if (!$widget) {
+            return "<!-- Unknown widget type: {$element->type} -->";
+        }
+
+        $childrenHtml = '';
+        if ($element->children->isNotEmpty()) {
+            $childrenHtml = $this->renderElements($element->children, $options);
+        }
+
+        $innerHtml = $widget->render(
+            $element->settings ?? [],
+            array_merge($element->content ?? [], ['children' => $childrenHtml]),
+            $element->styles ?? []
+        );
+
+        $attributes = $this->buildAttributes($element);
+        $styles = $this->buildStyleString($element->styles ?? []);
+        $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
+
+        return <<<HTML
+<div{$cssId} class="pb-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}" data-element-id="{$element->id}" data-element-type="{$element->type}"{$attributes}>
+    {$innerHtml}
+</div>
+HTML;
+    }
+
+    public function renderEditor(Page $page): string
+    {
+        $html = '';
+
+        foreach ($page->elements as $element) {
+            $html .= $this->renderElementEditor($element);
+        }
+
+        return $html;
+    }
+
+    public function renderElementEditor(Element $element): string
+    {
+        $widget = $this->widgetManager->getWidget($element->type);
+
+        if (!$widget) {
+            return '<div class="pb-editor-error">Unknown widget</div>';
+        }
+
+        $childrenHtml = '';
+        if ($element->children->isNotEmpty()) {
+            $childrenHtml = $this->renderElementEditor($element->children);
+        }
+
+        $innerHtml = $widget->renderEditor(
+            $element->settings ?? [],
+            array_merge($element->content ?? [], ['children' => $childrenHtml]),
+            $element->styles ?? []
+        );
+
+        $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
+        $classes = "pb-editor-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}";
+
+        return <<<HTML
+<div{$cssId} class="{$classes}" data-element-id="{$element->id}" data-element-type="{$element->type}" draggable="true">
+    <div class="pb-element-toolbar">
+        <span class="pb-element-name">{$element->name}</span>
+        <div class="pb-element-actions">
+            <button class="pb-btn-duplicate" title="Duplicate">⧉</button>
+            <button class="pb-btn-edit" title="Edit">✎</button>
+            <button class="pb-btn-delete" title="Delete">✕</button>
+        </div>
+    </div>
+    <div class="pb-element-content">
+        {$innerHtml}
+    </div>
+</div>
+HTML;
+    }
+
+    protected function buildAttributes(Element $element): string
+    {
+        $attrs = [];
+
+        if ($element->css_id) {
+            $attrs['data-css-id'] = $element->css_id;
+        }
+
+        if ($element->animation) {
+            $attrs['data-animation'] = json_encode($element->animation);
+        }
+
+        if ($element->effects) {
+            $attrs['data-effects'] = json_encode($element->effects);
+        }
+
+        if ($element->responsive_settings) {
+            $attrs['data-responsive'] = json_encode($element->responsive_settings);
+        }
+
+        if (empty($attrs)) {
+            return '';
+        }
+
+        $html = '';
+        foreach ($attrs as $key => $value) {
+            $html .= " {$key}=\"" . htmlspecialchars($value, ENT_QUOTES) . '"';
+        }
+
+        return $html;
+    }
+
+    protected function buildStyleString(array $styles): string
+    {
+        if (empty($styles)) {
+            return '';
+        }
+
+        $css = '';
+        foreach ($styles as $property => $value) {
+            $cssProperty = Str::kebab($property);
+            $css .= "{$cssProperty}: {$value}; ";
+        }
+
+        return $css;
+    }
+
+    protected function buildInlineStyles(array $styles): string
+    {
+        if (empty($styles)) {
+            return '';
+        }
+
+        $css = $this->buildStyleString($styles);
+
+        return " style=\"{$css}\"";
+    }
+
+    protected function getCssClasses(Element $element): string
+    {
+        $classes = [];
+
+        if ($element->css_classes) {
+            $classes = array_merge($classes, $element->css_classes);
+        }
+
+        return implode(' ', $classes);
+    }
+
+    protected function renderStyles(Page $page): string
+    {
+        $css = '';
+
+        if ($page->settings['custom_css'] ?? false) {
+            $css .= "\n<style>\n{$page->settings['custom_css']}\n</style>\n";
+        }
+
+        if ($page->settings['google_fonts'] ?? false) {
+            $fonts = $page->settings['google_fonts'];
+            foreach ($fonts as $font) {
+                $css .= "\n<link href=\"https://fonts.googleapis.com/css2?family={$font}:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n";
+            }
+        }
+
+        return $css;
+    }
+
+    protected function renderScripts(Page $page): string
+    {
+        $scripts = '';
+
+        if ($page->settings['custom_js'] ?? false) {
+            $scripts .= "\n<script>\n{$page->settings['custom_js']}\n</script>\n";
+        }
+
+        if ($page->settings['custom_js_footer'] ?? false) {
+            $scripts .= "\n<script>\n{$page->settings['custom_js_footer']}\n</script>\n";
+        }
+
+        return $scripts;
+    }
+
+    public function renderSingleElement(Element $element): string
+    {
+        $widget = $this->widgetManager->getWidget($element->type);
+
+        if (!$widget) {
+            return "<!-- Unknown widget type: {$element->type} -->";
+        }
+
+        $childrenHtml = '';
+        if ($element->children->isNotEmpty()) {
+            foreach ($element->children as $child) {
+                $childrenHtml .= $this->renderSingleElement($child);
+            }
+        }
+
+        $innerHtml = $widget->render(
+            $element->settings ?? [],
+            array_merge($element->content ?? [], ['children' => $childrenHtml]),
+            $element->styles ?? []
+        );
+
+        $attributes = $this->buildAttributes($element);
+        $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
+
+        return <<<HTML
+<div{$cssId} class="pb-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}" data-element-id="{$element->id}" data-element-type="{$element->type}"{$attributes}>
+    <div class="pb-element-toolbar">
+        <span class="pb-el-name">{$element->name}</span>
+        <span class="pb-el-type">{$element->type}</span>
+    </div>
+    <div class="pb-el-content">{$innerHtml}</div>
+</div>
+HTML;
+    }
+
+    public function getWidgetControls(string $type): ?array
+    {
+        $widget = $this->widgetManager->getWidget($type);
+        if (!$widget) return null;
+
+        return [
+            'type' => $widget->getType(),
+            'label' => $widget->getLabel(),
+            'icon' => $widget->getIcon(),
+            'categories' => $widget->getCategories(),
+            'is_container' => $widget->isContainer(),
+            'default_settings' => $widget->getDefaultSettings(),
+            'controls' => $widget->getControls(),
+        ];
+    }
+
+    public function renderJson(Page $page): array
+    {
+        return [
+            'id' => $page->id,
+            'title' => $page->title,
+            'slug' => $page->slug,
+            'settings' => $page->settings,
+            'meta_data' => $page->meta_data,
+            'elements' => $this->renderElementsJson($page->elements),
+        ];
+    }
+
+    protected function renderElementsJson($elements): array
+    {
+        $result = [];
+
+        foreach ($elements as $element) {
+            $data = [
+                'id' => $element->uuid,
+                'type' => $element->type,
+                'name' => $element->name,
+                'settings' => $element->settings,
+                'content' => $element->content,
+                'styles' => $element->styles,
+                'responsive_settings' => $element->responsive_settings,
+                'animation' => $element->animation,
+                'effects' => $element->effects,
+                'column_size' => $element->column_size,
+            ];
+
+            if ($element->children->isNotEmpty()) {
+                $data['children'] = $this->renderElementsJson($element->children);
+            }
+
+            $result[] = $data;
+        }
+
+        return $result;
+    }
+}
