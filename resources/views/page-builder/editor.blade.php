@@ -211,6 +211,10 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     <div style="width:1px;height:20px;background:var(--pb-border)"></div>
     <button onclick="editor.showPageSettings()" title="Page Settings" id="btn-page-settings">&#9881; Page</button>
     <a href="{{ route('page-builder.render', $page) }}" target="_blank">&#128065; Preview</a>
+    <div style="width:1px;height:20px;background:var(--pb-border)"></div>
+    <button onclick="editor.exportPage()" title="Export as JSON">&#128229; Export</button>
+    <button onclick="editor.copyHtml()" title="Copy page HTML">&#128203; Copy HTML</button>
+    <div style="width:1px;height:20px;background:var(--pb-border)"></div>
     <button onclick="editor.save()" style="background:var(--pb-primary);color:#fff;border-color:var(--pb-primary)">&#128190; Save</button>
     <button onclick="editor.publish()" style="background:var(--pb-success);color:#1e1e2e;border-color:var(--pb-success)">&#128752; Publish</button>
 </div>
@@ -811,6 +815,28 @@ const editor = {
     hidePageSettings() {
         document.getElementById('page-settings-form').style.display = 'none';
         document.getElementById('settings-empty').style.display = '';
+    },
+
+    exportPage() {
+        window.open('/page-builder/pages/' + this.pageId + '/export', '_blank');
+    },
+
+    copyHtml() {
+        fetch('/page-builder/pages/' + this.pageId + '/render?format=inner')
+            .then(r => r.text())
+            .then(html => {
+                navigator.clipboard.writeText(html).then(() => {
+                    this.showToast('HTML copied!');
+                }).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = html;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    ta.remove();
+                    this.showToast('HTML copied!');
+                });
+            });
     },
 
     renderPageSettings() {

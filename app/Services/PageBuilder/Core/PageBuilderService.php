@@ -40,7 +40,7 @@ class PageBuilderService
             $page = new Page();
             $page->fill($data);
             $page->user_id = auth()->id();
-            $page->slug = Str::slug($data['title']);
+            $page->slug = $this->generateUniqueSlug($data['title']);
             $page->save();
 
             // Criar revisÃ£o inicial
@@ -55,6 +55,20 @@ class PageBuilderService
             DB::rollBack();
             throw $e;
         }
+    }
+
+    protected function generateUniqueSlug(string $title, ?int $excludeId = null): string
+    {
+        $slug = Str::slug($title);
+        $base = $slug;
+        $counter = 1;
+
+        while (Page::withTrashed()->where('slug', $slug)->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))->exists()) {
+            $slug = $base . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     /**

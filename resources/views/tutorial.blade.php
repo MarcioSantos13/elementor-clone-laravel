@@ -25,6 +25,7 @@
             <a href="#duplicate-delete">Duplicar &amp; Excluir</a>
             <a href="#showcase">Template Showcase Completo</a>
             <a href="#project-structure">Estrutura do Projeto</a>
+            <a href="#moodle">Uso com Moodle 4.5+</a>
         </div>
 
         {{-- OVERVIEW --}}
@@ -232,11 +233,37 @@
                 <p>Dois botões na barra de ferramentas do editor permitem persistir seu trabalho:</p>
                 <table class="widget-table">
                     <tr><th>Botão</th><th>O que faz</th></tr>
-                    <tr><td><strong>Salvar Rascunho</strong></td><td>Salva o estado atual sem alterar a versão publicada. Sua página permanece como "rascunho" ou mantém seu estado publicado anterior.</td></tr>
-                    <tr><td><strong>Publicar</strong></td><td>Salva e publica imediatamente a página — ela se torna visível para visitantes.</td></tr>
+                    <tr><td><strong>Salvar (Save)</strong></td><td>Envia os dados atuais da página para o servidor via requisição <code>PUT /page-builder/pages/{id}</code> com status <code>draft</code>. O editor exibe um toast "Page saved!" e o badge de status permanece como "draft".</td></tr>
+                    <tr><td><strong>Publicar (Publish)</strong></td><td>Exibe uma confirmação: <em>"Publish this page?"</em>. Se confirmado, envia um <code>POST /page-builder/pages/{id}/publish</code> que altera o campo <code>status</code> da página no banco de dados para <code>published</code>. Após a resposta, exibe um toast "Page published!" e <strong>recarrega</strong> a página do editor para refletir o novo status.</td></tr>
                 </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Fluxo detalhado do Publish</h3>
+                <ol>
+                    <li>O usuário clica no botão <strong>Publish</strong> (ícone &#128752;).</li>
+                    <li>Uma caixa de diálogo <code>confirm()</code> pergunta: <em>"Publish this page?"</em>.</li>
+                    <li>Se o usuário cancelar, nada acontece.</li>
+                    <li>Se confirmar, o JavaScript envia uma requisição <code>POST</code> para a rota <code>/page-builder/pages/{id}/publish</code> com o token CSRF.</li>
+                    <li>No servidor, o controller <code>PageController@publish()</code> (arquivo <code>app/Http/Controllers/PageBuilder/PageController.php:405</code>) executa:
+                        <ul>
+                            <li><code>$page->status = 'published'</code> — altera o status no model Eloquent.</li>
+                            <li><code>$page->save()</code> — persiste a alteração no banco de dados.</li>
+                            <li>Retorna um JSON: <code>{"message": "Page published successfully", "page": {...}}</code>.</li>
+                        </ul>
+                    </li>
+                    <li>O JavaScript recebe a resposta, exibe um toast "Page published!" e chama <code>location.reload()</code>.</li>
+                    <li>Após o recarregamento, o badge na barra de ferramentas do editor mostra <strong>published</strong> em verde.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Diferença entre Salvar e Publicar</h3>
+                <ul>
+                    <li><strong>Salvar</strong> apenas persiste os dados. O status da página não é alterado — permanece como estava (draft ou published).</li>
+                    <li><strong>Publicar</strong> altera o status para <code>published</code> e também recarrega o editor para refletir visualmente a mudança.</li>
+                    <li>Não há diferença de visibilidade no front-end público: todas as rotas de renderização são protegidas por <code>auth</code>, então apenas usuários logados podem ver qualquer página, seja rascunho ou publicada.</li>
+                    <li>O status <code>published</code> vs <code>draft</code> serve como indicador de progresso e pode ser usado por integrações externas para saber quais páginas estão prontas para exibição.</li>
+                </ul>
+
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> O editor também faz <strong>salvamento automático</strong> a cada 60 segundos, para que você não perca trabalho se esquecer de salvar manualmente.
+                    <strong>&#128161; Dica:</strong> O editor também faz <strong>salvamento automático</strong> a cada 60 segundos (via <code>setInterval</code> no JavaScript), para que você não perca trabalho se esquecer de salvar manualmente. O auto-save usa o mesmo fluxo do botão "Save" — ou seja, não publica automaticamente.
                 </div>
             </div>
         </section>
@@ -253,16 +280,22 @@
 
         {{-- DUPLICATE / DELETE --}}
         <section id="duplicate-delete" class="step">
-            <h2>12. Duplicar &amp; Excluir</h2>
+            <h2>12. Ações nas Páginas (Listagem)</h2>
             <div class="step-body">
-                <p>Na lista de páginas, cada página tem botões de ação:</p>
+                <p>Na lista de páginas, cada página tem os seguintes botões de ação:</p>
                 <table class="widget-table">
                     <tr><th>Ação</th><th>Como funciona</th></tr>
-                    <tr><td><strong>Duplicar</strong></td><td>Cria uma cópia exata da página (incluindo todos os elementos) com "(cópia)" anexado ao título.</td></tr>
-                    <tr><td><strong>Exportar</strong></td><td>Baixa a página como um arquivo <code>.json</code> — você pode compartilhar ou fazer backup.</td></tr>
-                    <tr><td><strong>Importar</strong></td><td>Envie um arquivo <code>.json</code> previamente exportado para recriar a página.</td></tr>
-                    <tr><td><strong>Excluir</strong></td><td>Remove permanentemente a página e todos os seus elementos. Uma mensagem de confirmação aparece após a exclusão.</td></tr>
+                    <tr><td><strong>Editar (Edit)</strong></td><td>Abre o editor visual em tela cheia para modificar o layout e conteúdo da página.</td></tr>
+                    <tr><td><strong>Visualizar (View)</strong></td><td>Abre uma prévia limpa da página em uma nova aba, como os visitantes a veriam.</td></tr>
+                    <tr><td><strong>Duplicar (Duplicate)</strong></td><td>Cria uma cópia exata da página (incluindo todos os elementos) com "(cópia)" anexado ao título. A página duplicada inicia como rascunho.</td></tr>
+                    <tr><td><strong>Exportar (Export)</strong></td><td>Baixa a página como um arquivo <code>.json</code> — você pode compartilhar ou fazer backup. O nome do arquivo é baseado no título da página.</td></tr>
+                    <tr><td><strong>Copiar HTML (Copy HTML)</strong></td><td>Copia o HTML renderizado da página para a área de transferência. Ideal para colar o conteúdo em outras ferramentas ou sistemas (como o Moodle).</td></tr>
+                    <tr><td><strong>Importar (Import)</strong></td><td>Abre um modal para selecionar um arquivo <code>.json</code> previamente exportado. A página importada é recriada no sistema com novo ID.</td></tr>
+                    <tr><td><strong>Excluir (Delete)</strong></td><td>Remove permanentemente a página e todos os seus elementos. Uma confirmação é solicitada antes da exclusão.</td></tr>
                 </table>
+                <div class="tip" style="margin-top:1rem">
+                    <strong>&#128161; Dica:</strong> Use <strong>Exportar</strong> para fazer backup das suas páginas ou transferi-las entre instalações. Use <strong>Copiar HTML</strong> para colar o conteúdo renderizado em sistemas externos como Moodle, WordPress ou editores HTML.
+                </div>
             </div>
         </section>
 
@@ -512,6 +545,52 @@
                     <li><strong>Salvar</strong> envia a árvore completa de elementos como JSON para o servidor, que sincroniza com o banco de dados</li>
                     <li><strong>Templates</strong> são conjuntos predefinidos de PageElements que podem ser aplicados a páginas novas ou existentes</li>
                 </ol>
+            </div>
+        </section>
+
+        {{-- MOODLE --}}
+        <section id="moodle" class="step">
+            <h2>15. Uso com Moodle 4.5+</h2>
+            <div class="step-body">
+                <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções de uso.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">15.1 Copiar HTML para o Moodle</h3>
+                <ol>
+                    <li>Crie sua página no Page Builder normalmente (use templates prontos ou comece do zero).</li>
+                    <li>Na lista de páginas, clique em <strong>"Copy HTML"</strong> (ou no editor, clique no botão <strong>"Copy HTML"</strong> da barra de ferramentas).</li>
+                    <li>O HTML renderizado da página será copiado para a área de transferência.</li>
+                    <li>No Moodle, edite um recurso do tipo <strong>Página (Page)</strong> ou <strong>Livro (Book)</strong>, ou um bloco HTML.</li>
+                    <li>No editor do Moodle, mude para o modo <strong>HTML</strong> (código fonte) e cole o conteúdo (<kbd>Ctrl+V</kbd>).</li>
+                    <li>Salve as alterações. O conteúdo será exibido com os estilos inline preservados.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">15.2 Exportar e Importar entre Moodle e Page Builder</h3>
+                <ol>
+                    <li><strong>Exportar:</strong> Na lista de páginas, clique em <strong>"Export"</strong> para baixar um arquivo <code>.json</code> com toda a estrutura da página.</li>
+                    <li><strong>Importar:</strong> Em qualquer instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, selecione o arquivo <code>.json</code> exportado e a página será recriada.</li>
+                    <li>Isso permite transferir páginas entre diferentes instalações ou fazer backup antes de modificar.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">15.3 Renderização como Página Moodle</h3>
+                <ol>
+                    <li>O Page Builder pode ser incorporado ao Moodle como um <strong>recurso externo</strong> ou via <strong>iframe</strong>.</li>
+                    <li>Use o parâmetro <code>?format=inner</code> na URL de renderização (<code>/page-builder/pages/{id}/render?format=inner</code>) para obter apenas o HTML do conteúdo, sem a estrutura completa da página (ideal para incorporação).</li>
+                    <li>Você também pode usar <code>?format=inner&theme=none</code> para um HTML ainda mais limpo, apenas com os elementos e estilos inline.</li>
+                    <li>No Moodle, crie um recurso <strong>"Página"</strong> e cole o HTML gerado no modo código fonte, ou use um <strong>bloco HTML</strong> para exibir conteúdo em áreas laterais.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">15.4 Dicas para Moodle</h3>
+                <ul>
+                    <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), o que garante compatibilidade máxima com o editor do Moodle.</li>
+                    <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens locais do Page Builder não serão acessíveis pelo Moodle.</li>
+                    <li><strong>Responsividade:</strong> O HTML gerado mantém a responsividade. Teste em diferentes dispositivos após colar no Moodle.</li>
+                    <li><strong>Limitação de largura:</strong> O Moodle pode aplicar estilos próprios de container. Use o parâmetro <code>?format=inner</code> para obter apenas o conteúdo bruto e ajuste margens no Moodle se necessário.</li>
+                    <li><strong>Copiar HTML direto do editor:</strong> No editor visual, o botão "Copy HTML" na barra de ferramentas copia o HTML da página atual (salva) para a área de transferência — você nem precisa sair do editor.</li>
+                </ul>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O fluxo mais comum é: crie a página no Page Builder &rarr; clique em "Copy HTML" &rarr; cole no Moodle no modo HTML. Simples e rápido!
+                </div>
             </div>
         </section>
 

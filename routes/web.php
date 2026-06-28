@@ -5,7 +5,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (Auth::check()) {
+        return redirect('/page-builder/pages');
+    }
+    return redirect('/login');
 });
 
 Route::get('/login', function () {

@@ -54,6 +54,7 @@
                                         @if($key === 'landing')Hero section with CTA
                                         @elseif($key === 'about')Company presentation
                                         @elseif($key === 'contact')Contact form layout
+                                        @elseif($key === 'showcase')Hero, features, stats, gallery, team, CTA, footer
                                         @else&#8205;@endif
                                     </span>
                                 </div>
@@ -88,9 +89,19 @@
         .template-card-preview.landing { background: #1a1a2e; color: #fff; }
         .template-card-preview.about { background: #f0f2f5; color: #333; }
         .template-card-preview.contact { background: #e8ecf1; color: #333; }
+        .template-card-preview.showcase { background: #0f172a; color: #fff; }
         .template-card-info { padding: .6rem; }
         .template-card-info strong { display: block; font-size: .85rem; margin-bottom: .15rem; }
         .template-card-info span { font-size: .75rem; color: #888; }
         .form-actions { display: flex; gap: .75rem; align-items: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee; }
     </style>
+
+    <script>
+    document.querySelectorAll('.template-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+    </script>
 @endsection

@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -250,6 +251,7 @@ class PageController extends Controller
     {
         $templates = [];
         foreach ($this->templates as $key => $tmpl) {
+            if ($key === 'blank') continue;
             $templates[$key] = $tmpl['name'];
         }
         return view('page-builder.pages.create', compact('templates'));
@@ -444,11 +446,17 @@ class PageController extends Controller
         ]);
     }
 
-    public function export(Page $page): JsonResponse
+    public function export(Page $page)
     {
         $data = $this->pageBuilder->exportPage($page);
 
-        return response()->json($data);
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $filename = Str::slug($page->title) . '.json';
+
+        return response($json, 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     public function import(Request $request): JsonResponse
@@ -491,7 +499,7 @@ class PageController extends Controller
     public function render(Page $page): \Illuminate\Http\Response
     {
         $html = $this->pageBuilder->renderPage($page, [
-            'with_container' => true,
+            'with_container' => request('format') !== 'inner',
             'theme' => request('theme', 'default'),
         ]);
 
