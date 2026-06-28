@@ -114,6 +114,16 @@ class ImageWidget extends BaseWidget
             return '<div class="pb-image-placeholder">Click to add image</div>';
         }
 
-        return "<img src=\"{$image['url']}\" alt=\"{$image['alt']}\" class=\"pb-image-editor\" style=\"max-width: 100%;\">";
+        $width = $settings['width'];
+        $maxWidth = $settings['max_width'];
+        $height = $settings['height'];
+        $borderRadius = $settings['border_radius'];
+        $opacity = $settings['opacity'];
+        $objectFit = $settings['object_fit'];
+        $alignment = $settings['alignment'];
+
+        $imgStyle = "width: {$width}; max-width: {$maxWidth}; height: {$height}; object-fit: {$objectFit}; border-radius: {$borderRadius}; opacity: {$opacity};";
+
+        return "<div style=\"text-align: {$alignment};\"><img src=\"{$image['url']}\" alt=\"{$image['alt']}\" class=\"pb-image-editor\" style=\"{$imgStyle}\"></div>";
     }
 }

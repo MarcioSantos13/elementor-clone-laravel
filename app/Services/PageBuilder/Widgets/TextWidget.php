@@ -69,7 +69,25 @@ class TextWidget extends BaseWidget
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
         $settings = array_merge($this->defaultSettings, $settings);
+        $text = $settings['content'];
+        $alignment = $settings['alignment'];
+        $color = $settings['color'];
+        $fontSize = $settings['font_size'];
+        $fontWeight = $settings['font_weight'];
+        $lineHeight = $settings['line_height'];
+        $fontFamily = $settings['font_family'];
 
-        return "<div class=\"pb-text-editor\">{$settings['content']}</div>";
+        $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight};";
+
+        if ($fontFamily) {
+            $style .= " font-family: {$fontFamily};";
+        }
+
+        $columnStyle = '';
+        if ($settings['column_count'] > 1) {
+            $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$settings['column_gap']};";
+        }
+
+        return "<div class=\"pb-text-editor\" style=\"{$style}{$columnStyle}\">{$text}</div>";
     }
 }

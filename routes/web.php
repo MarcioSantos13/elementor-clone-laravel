@@ -32,3 +32,7 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
+
+Route::middleware('auth')->get('/tutorial', function () {
+    return view('tutorial');
+})->name('tutorial');

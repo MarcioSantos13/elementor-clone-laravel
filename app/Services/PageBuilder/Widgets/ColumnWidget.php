@@ -118,10 +118,47 @@ HTML;
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
+        $settings = array_merge($this->defaultSettings, $settings);
         $children = $content['children'] ?? '';
+        $columnWidth = $settings['column_width'];
+        $verticalAlign = $settings['vertical_alignment'];
+        $contentPosition = $settings['content_position'];
+        $bgColor = $settings['background_color'];
+        $bgImage = $settings['background_image'];
+        $paddingTop = $settings['padding_top'];
+        $paddingBottom = $settings['padding_bottom'];
+        $paddingLeft = $settings['padding_left'];
+        $paddingRight = $settings['padding_right'];
+        $margin = $settings['margin'];
+        $borderRadius = $settings['border_radius'];
+        $boxShadow = $settings['box_shadow'];
+        $cssClasses = $settings['css_classes'];
+
+        $style = "padding: {$paddingTop} {$paddingRight} {$paddingBottom} {$paddingLeft}; border-radius: {$borderRadius}; display: flex; flex-direction: column; align-self: {$verticalAlign}; justify-content: {$contentPosition};";
+
+        if ($margin) {
+            $style .= " margin: {$margin};";
+        }
+
+        if ($bgColor && $bgColor !== 'transparent') {
+            $style .= " background-color: {$bgColor};";
+        }
+
+        if (!empty($bgImage['url'])) {
+            $style .= " background-image: url('{$bgImage['url']}'); background-position: center center; background-size: cover; background-repeat: no-repeat;";
+        }
+
+        if ($boxShadow && $boxShadow !== 'none') {
+            $style .= " box-shadow: {$boxShadow};";
+        }
+
+        $classes = "pb-column-editor {$columnWidth}";
+        if ($cssClasses) {
+            $classes .= " {$cssClasses}";
+        }
 
         return <<<HTML
-<div class="pb-column-editor">
+<div class="{$classes}" style="{$style}">
     <div class="pb-column-header">Column</div>
     <div class="pb-column-content">
         {$children}

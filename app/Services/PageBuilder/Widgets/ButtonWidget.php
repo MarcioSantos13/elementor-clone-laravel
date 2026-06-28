@@ -129,7 +129,46 @@ class ButtonWidget extends BaseWidget
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
         $settings = array_merge($this->defaultSettings, $settings);
+        $text = htmlspecialchars($settings['text'], ENT_QUOTES, 'UTF-8');
+        $alignment = $settings['alignment'];
+        $size = $settings['size'];
+        $fullWidth = $settings['full_width'];
+        $bgColor = $settings['background_color'];
+        $textColor = $settings['text_color'];
+        $borderColor = $settings['border_color'];
+        $borderRadius = $settings['border_radius'];
+        $borderWidth = $settings['border_width'];
+        $fontSize = $settings['font_size'];
+        $fontWeight = $settings['font_weight'];
 
-        return "<button class=\"pb-button-editor\">{$settings['text']}</button>";
+        $sizeMap = [
+            'small' => ['padding' => '8px 16px', 'font' => '14px'],
+            'medium' => ['padding' => '12px 24px', 'font' => '16px'],
+            'large' => ['padding' => '16px 32px', 'font' => '18px'],
+            'xl' => ['padding' => '20px 40px', 'font' => '20px'],
+        ];
+
+        if (isset($sizeMap[$size])) {
+            $paddingTB = explode(' ', $sizeMap[$size]['padding'])[0];
+            $paddingLR = explode(' ', $sizeMap[$size]['padding'])[1];
+            $fontSize = $sizeMap[$size]['font'];
+        } else {
+            $paddingTB = $settings['padding_top_bottom'];
+            $paddingLR = $settings['padding_left_right'];
+        }
+
+        $style = "background-color: {$bgColor}; color: {$textColor}; border: {$borderWidth} solid {$borderColor}; border-radius: {$borderRadius}; padding: {$paddingTB} {$paddingLR}; font-size: {$fontSize}; font-weight: {$fontWeight}; cursor: pointer; display: inline-block; text-decoration: none;";
+
+        if ($fullWidth) {
+            $style .= ' width: 100%; text-align: center;';
+        }
+
+        $buttonHtml = "<button class=\"pb-button-editor pb-button-{$size}\" style=\"{$style}\">{$text}</button>";
+
+        if ($alignment !== 'stretch') {
+            $buttonHtml = "<div style=\"text-align: {$alignment};\">{$buttonHtml}</div>";
+        }
+
+        return $buttonHtml;
     }
 }

@@ -74,6 +74,7 @@
             <a href="{{ route('page-builder.pages.index') }}">{{ config('app.name') }}</a>
         </div>
         <div class="navbar-menu">
+            <a href="{{ route('tutorial') }}" target="_blank" class="nav-link">&#128214; Tutorial</a>
             <a href="{{ route('page-builder.pages.index') }}" class="nav-link">Pages</a>
             <a href="{{ route('page-builder.pages.create') }}" class="nav-link nav-link-primary">New Page</a>
             <form action="{{ route('logout') }}" method="POST" style="display:inline">

@@ -306,6 +306,7 @@ const editor = {
         this.bindDragDrop();
         this.bindKeyboard();
         this.bindCanvasDrops();
+        this.bindInlineEditing();
         this.autoSave();
     },
 
@@ -358,7 +359,31 @@ const editor = {
 
     elementHtml(el) {
         let name = el.name || el.type;
-        return `<div class="pb-el-toolbar"><span class="pb-el-name">${name}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content"><div class="pb-el-placeholder">${el.type}</div></div>`;
+        const s = el.settings || {};
+        let preview = '';
+        switch (el.type) {
+            case 'heading': preview = `<${s.tag || 'h2'} style="text-align:${s.alignment||'left'};color:${s.color||'#333'};font-size:${({small:'1.2em',default:'2em',medium:'2.5em',large:'3em',xl:'3.5em',xxl:'4.5em'})[s.size]||'2em'};font-weight:${s.font_weight||'700'};line-height:${s.line_height||'1.4'}">${this.escHtml(s.title||'Heading')}</${s.tag || 'h2'}>`; break;
+            case 'text': preview = `<div style="text-align:${s.alignment||'left'};color:${s.color||'#666'};font-size:${s.font_size||'16px'};font-weight:${s.font_weight||'400'};line-height:${s.line_height||'1.7'}">${s.content||'<p>Text content</p>'}</div>`; break;
+            case 'image':
+                if (s.image && s.image.url) preview = `<div style="text-align:${s.alignment||'center'}"><img src="${this.escHtml(s.image.url)}" alt="${this.escHtml(s.image.alt||'')}" style="width:${s.width||'100%'};max-width:${s.max_width||'100%'};height:${s.height||'auto'};object-fit:${s.object_fit||'cover'};border-radius:${s.border_radius||'0px'};opacity:${s.opacity||1}"></div>`;
+                else preview = `<div class="pb-image-placeholder" style="text-align:center;padding:2rem;color:#999">No image selected</div>`;
+                break;
+            case 'button': {
+                const sizeMap = {small:{p:'8px 16px',f:'14px'},medium:{p:'12px 24px',f:'16px'},large:{p:'16px 32px',f:'18px'},xl:{p:'20px 40px',f:'20px'}};
+                const sz = sizeMap[s.size]||sizeMap.medium;
+                const btn = `<button style="background-color:${s.background_color||'#007bff'};color:${s.text_color||'#fff'};border:${s.border_width||'0px'} solid ${s.border_color||'transparent'};border-radius:${s.border_radius||'4px'};padding:${sz.p};font-size:${sz.f};font-weight:${s.font_weight||'500'};cursor:pointer;display:inline-block">${this.escHtml(s.text||'Button')}</button>`;
+                preview = s.alignment !== 'stretch' ? `<div style="text-align:${s.alignment||'left'}">${btn}</div>` : btn;
+                break;
+            }
+            default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
+        }
+        return `<div class="pb-el-toolbar"><span class="pb-el-name">${name}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;
+    },
+
+    escHtml(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
     },
 
     renderStructure(elements, parentUl) {
@@ -455,7 +480,8 @@ const editor = {
             text: () => {
                 const inp = document.createElement('input');
                 inp.type = 'text'; inp.id = `ctrl-${key}`; inp.value = value || '';
-                inp.oninput = (e) => this.updateSetting(key, e.target.value, elementId);
+                inp.spellcheck = false;
+                inp.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
                 return inp;
             },
             number: () => {
@@ -463,13 +489,14 @@ const editor = {
                 inp.type = 'number'; inp.id = `ctrl-${key}`; inp.value = value;
                 if (ctrl.min !== undefined) inp.min = ctrl.min;
                 if (ctrl.max !== undefined) inp.max = ctrl.max;
-                inp.oninput = (e) => this.updateSetting(key, parseFloat(e.target.value) || 0, elementId);
+                inp.onchange = (e) => this.updateSetting(key, parseFloat(e.target.value) || 0, elementId);
                 return inp;
             },
             textarea: () => {
                 const ta = document.createElement('textarea');
                 ta.id = `ctrl-${key}`; ta.value = typeof value === 'string' ? value : '';
-                ta.oninput = (e) => this.updateSetting(key, e.target.value, elementId);
+                ta.spellcheck = false;
+                ta.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
                 return ta;
             },
             select: () => {
@@ -494,7 +521,7 @@ const editor = {
                 txt.style.cssText = 'flex:1';
                 const update = (v) => { inp.value = v; txt.value = v; this.updateSetting(key, v, elementId); };
                 inp.oninput = (e) => update(e.target.value);
-                txt.oninput = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) update(e.target.value); };
+                txt.onchange = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) update(e.target.value); };
                 container.appendChild(inp);
                 container.appendChild(txt);
                 return container;
@@ -511,13 +538,12 @@ const editor = {
             url: () => {
                 const inp = document.createElement('input');
                 inp.type = 'url'; inp.id = `ctrl-${key}`; inp.value = value || '';
-                inp.oninput = (e) => this.updateSetting(key, e.target.value, elementId);
+                inp.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
                 return inp;
             },
         };
         return (types[ctrl.type] || types.text)();
     },
-
     updateSetting(key, value, elementId) {
         this.dirty = true;
         const settings = {};
@@ -531,6 +557,7 @@ const editor = {
         .then(() => this.reloadElement(elementId));
     },
 
+
     reloadElement(id) {
         fetch(`/page-builder/elements/${id}/render`)
             .then(r => r.json())
@@ -541,7 +568,6 @@ const editor = {
                     if (oldContent) oldContent.innerHTML = data.html;
                     else el.innerHTML = `<div class="pb-el-content">${data.html}</div>`;
                 }
-                this.loadElements();
             });
     },
 
@@ -671,6 +697,42 @@ const editor = {
         });
     },
 
+    bindInlineEditing() {
+        const dz = document.getElementById('canvas-dropzone');
+        dz.addEventListener('dblclick', (e) => {
+            const el = e.target.closest('.pb-el');
+            if (!el) return;
+            const textEl = e.target.closest('h1, h2, h3, h4, h5, h6, p, span, a, button, label');
+            if (!textEl) return;
+            if (el.dataset._editing) return;
+            const originalContent = textEl.textContent;
+            el.dataset._editing = '1';
+            textEl.contentEditable = 'true';
+            textEl.focus();
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(textEl);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            const finish = () => {
+                if (!el.dataset._editing) return;
+                textEl.contentEditable = 'false';
+                delete el.dataset._editing;
+                const newText = textEl.textContent.trim();
+                if (newText && newText !== originalContent) {
+                    const type = el.dataset.elType;
+                    const key = { heading: 'title', text: 'content', button: 'text' }[type] || 'title';
+                    this.updateSetting(key, newText, el.dataset.elId);
+                }
+            };
+            textEl.addEventListener('blur', finish, { once: true });
+            textEl.addEventListener('keydown', (k) => {
+                if (k.key === 'Enter' && !k.shiftKey) { k.preventDefault(); textEl.blur(); }
+                if (k.key === 'Escape') { textEl.textContent = originalContent; textEl.blur(); }
+            });
+        });
+    },
+
     bindKeyboard() {
         document.addEventListener('keydown', e => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); this.undo(); }
@@ -701,7 +763,7 @@ const editor = {
                 const container = document.getElementById('layout-templates');
                 container.innerHTML = '<div class="pb-widget-group-title" style="margin-bottom:.75rem">Choose a layout template</div>';
                 for (const [key, tmpl] of Object.entries(data.templates)) {
-                    const previews = { blank: '&#9635;', landing: '&#127968;', about: '&#128100;', contact: '&#128222;' };
+                    const previews = { blank: '&#9635;', landing: '&#127968;', about: '&#128100;', contact: '&#128222;', showcase: '&#127912;' };
                     const card = document.createElement('div');
                     card.className = 'pb-layout-card';
                     card.innerHTML = `
@@ -787,12 +849,12 @@ const editor = {
                 const ta = document.createElement('textarea');
                 ta.value = val || '';
                 ta.style.cssText = 'width:100%;padding:.45rem .6rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:.8rem;min-height:100px;font-family:monospace';
-                ta.oninput = (e) => this.updatePageSetting(ctrl.key, e.target.value);
+                ta.onchange = (e) => this.updatePageSetting(ctrl.key, e.target.value);
                 inputWrap.appendChild(ta);
             } else {
                 const inp = document.createElement('input');
                 inp.type = 'text'; inp.value = val || ''; inp.style.cssText = 'width:100%;padding:.45rem .6rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:.8rem';
-                inp.oninput = (e) => this.updatePageSetting(ctrl.key, e.target.value);
+                inp.onchange = (e) => this.updatePageSetting(ctrl.key, e.target.value);
                 inputWrap.appendChild(inp);
             }
 

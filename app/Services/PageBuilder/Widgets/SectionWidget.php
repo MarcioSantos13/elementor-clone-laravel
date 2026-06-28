@@ -141,12 +141,39 @@ HTML;
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
+        $settings = array_merge($this->defaultSettings, $settings);
         $children = $content['children'] ?? '';
+        $layout = $settings['layout'];
+        $bgColor = $settings['background_color'];
+        $bgImage = $settings['background_image'];
+        $paddingTop = $settings['padding_top'];
+        $paddingBottom = $settings['padding_bottom'];
+        $paddingLeft = $settings['padding_left'];
+        $paddingRight = $settings['padding_right'];
+        $marginTop = $settings['margin_top'];
+        $marginBottom = $settings['margin_bottom'];
+        $borderRadius = $settings['border_radius'];
+        $contentWidth = $settings['content_width'];
+
+        $sectionStyle = "padding: {$paddingTop} {$paddingRight} {$paddingBottom} {$paddingLeft}; margin: {$marginTop} 0 {$marginBottom} 0; border-radius: {$borderRadius}; position: relative;";
+
+        if ($bgColor && $bgColor !== 'transparent') {
+            $sectionStyle .= " background-color: {$bgColor};";
+        }
+
+        if (!empty($bgImage['url'])) {
+            $sectionStyle .= " background-image: url('{$bgImage['url']}'); background-position: center center; background-size: cover; background-repeat: no-repeat;";
+        }
+
+        $innerStyle = '';
+        if ($layout === 'boxed') {
+            $innerStyle = "max-width: {$contentWidth}; margin: 0 auto;";
+        }
 
         return <<<HTML
-<div class="pb-section-editor">
+<div class="pb-section-editor" style="{$sectionStyle}">
     <div class="pb-section-header">Section</div>
-    <div class="pb-section-content">
+    <div class="pb-section-content" style="{$innerStyle}">
         {$children}
     </div>
 </div>

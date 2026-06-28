@@ -88,6 +88,134 @@ class PageController extends Controller
                 ]],
             ],
         ],
+        'showcase' => [
+            'name' => 'Showcase Completo',
+            'description' => 'Template completo com hero, features, vídeo, estatísticas, equipe, depoimentos e contato',
+            'settings' => ['container_width' => '1140px', 'page_background' => '#ffffff', 'content_padding' => '0px'],
+            'elements' => [
+                // ── HERO SECTION ──
+                ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#0f172a', 'padding_top' => '120px', 'padding_bottom' => '120px', 'min_height' => '90vh', 'align_items' => 'center', 'justify_content' => 'center'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'vertical_alignment' => 'center', 'text_align' => 'center'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => 'Transforme Suas Ideias em Experiências Digitais', 'tag' => 'h1', 'size' => 'xxl', 'color' => '#ffffff', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '24px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="font-size:1.25rem;color:#94a3b8;max-width:700px;margin:0 auto;">Criamos soluções inovadoras que combinam design moderno, tecnologia de ponta e performance excepcional para impulsionar o seu negócio.</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '20px', 'line_height' => '1.8', 'margin_bottom' => '40px']],
+                        ['type' => 'button', 'settings' => ['text' => 'Comece Agora', 'link' => '#', 'background_color' => '#3b82f6', 'text_color' => '#ffffff', 'size' => 'large', 'alignment' => 'center', 'border_radius' => '50px', 'padding_left_right' => '40px', 'font_weight' => '600']],
+                        ['type' => 'button', 'settings' => ['text' => 'Saiba Mais', 'link' => '#', 'background_color' => 'transparent', 'text_color' => '#94a3b8', 'size' => 'large', 'alignment' => 'center', 'border_radius' => '50px', 'padding_left_right' => '40px', 'border_color' => '#334155', 'border_width' => '2px', 'font_weight' => '600']],
+                    ]],
+                ]],
+                // ── FEATURES / SERVIÇOS ──
+                ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '100px', 'padding_bottom' => '100px', 'gap' => '30px'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => 'Nossos Serviços', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:600px;margin:0 auto;">Oferecemos um conjunto completo de soluções para transformar sua presença digital</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '18px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#f8fafc', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://cdn-icons-png.flaticon.com/128/1055/1055687.png', 'alt' => 'Design', 'width' => 80, 'height' => 80], 'width' => '80px', 'max_width' => '80px', 'alignment' => 'center', 'margin_bottom' => '20px']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Design Moderno', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '12px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Interfaces elegantes e intuitivas criadas com as melhores práticas de UX/UI para encantar seus usuários.</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '15px', 'line_height' => '1.7']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#f8fafc', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://cdn-icons-png.flaticon.com/128/3242/3242257.png', 'alt' => 'Performance', 'width' => 80, 'height' => 80], 'width' => '80px', 'max_width' => '80px', 'alignment' => 'center']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Performance', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '12px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Otimizado para velocidade e desempenho máximo, garantindo a melhor experiência em qualquer dispositivo.</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '15px', 'line_height' => '1.7']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#f8fafc', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://cdn-icons-png.flaticon.com/128/10337/10337689.png', 'alt' => 'Suporte', 'width' => 80, 'height' => 80], 'width' => '80px', 'max_width' => '80px', 'alignment' => 'center']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Suporte Dedicado', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '12px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Equipe especializada pronta para ajudar você em cada etapa do seu projeto, do planejamento à execução.</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '15px', 'line_height' => '1.7']],
+                    ]],
+                ]],
+                // ── VIDEO SHOWCASE ──
+                ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0f172a', 'padding_top' => '100px', 'padding_bottom' => '100px', 'gap' => '40px', 'align_items' => 'center'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'vertical_alignment' => 'center', 'padding_right' => '30px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => 'Veja Nossa Plataforma em Ação', 'tag' => 'h2', 'size' => 'xl', 'color' => '#ffffff', 'alignment' => 'left', 'font_weight' => '700', 'margin_bottom' => '20px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;font-size:1.1rem;">Descubra como nossa plataforma pode revolucionar a forma como você cria e gerencia conteúdo digital. Assista ao vídeo demonstrativo e conheça todos os recursos.</p><p style="color:#94a3b8;font-size:1.1rem;margin-top:16px;">Interface intuitiva, componentes poderosos e total flexibilidade para criar páginas incríveis sem escrever uma linha de código.</p>', 'alignment' => 'left', 'color' => '#94a3b8', 'font_size' => '17px', 'line_height' => '1.8']],
+                        ['type' => 'button', 'settings' => ['text' => 'Agende uma Demonstração', 'link' => '#', 'background_color' => '#3b82f6', 'text_color' => '#ffffff', 'size' => 'medium', 'alignment' => 'left', 'border_radius' => '50px', 'padding_left_right' => '32px', 'font_weight' => '600', 'margin_top' => '20px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'vertical_alignment' => 'center', 'background_color' => '#1e293b', 'border_radius' => '16px', 'padding_top' => '0px', 'padding_bottom' => '0px', 'padding_left' => '0px', 'padding_right' => '0px'], 'children' => [
+                        ['type' => 'text', 'settings' => ['content' => '<div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:16px;overflow:hidden;"><iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>', 'alignment' => 'left']],
+                    ]],
+                ]],
+                // ── STATS / NÚMEROS ──
+                ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#1e293b', 'padding_top' => '80px', 'padding_bottom' => '80px', 'gap' => '0px'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => '500+', 'tag' => 'h2', 'size' => 'xxl', 'color' => '#3b82f6', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '8px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;font-size:1.1rem;">Projetos Entregues</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '17px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => '98%', 'tag' => 'h2', 'size' => 'xxl', 'color' => '#3b82f6', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '8px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;font-size:1.1rem;">Satisfação dos Clientes</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '17px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => '50+', 'tag' => 'h2', 'size' => 'xxl', 'color' => '#3b82f6', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '8px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;font-size:1.1rem;">Profissionais</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '17px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => '12+', 'tag' => 'h2', 'size' => 'xxl', 'color' => '#3b82f6', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '8px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;font-size:1.1rem;">Anos de Experiência</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '17px']],
+                    ]],
+                ]],
+                // ── TEAM ──
+                ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '100px', 'padding_bottom' => '100px', 'gap' => '30px'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '30px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => 'Nossa Equipe', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:600px;margin:0 auto;">Conheça os profissionais apaixonados que tornam tudo possível</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '18px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px', 'padding_left' => '10px', 'padding_right' => '10px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/300?img=1', 'alt' => 'Membro 1', 'width' => 200, 'height' => 200], 'width' => '200px', 'max_width' => '200px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Ana Silva', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">CEO & Fundadora</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '14px', 'margin_bottom' => '0px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px', 'padding_left' => '10px', 'padding_right' => '10px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/300?img=8', 'alt' => 'Membro 2', 'width' => 200, 'height' => 200], 'width' => '200px', 'max_width' => '200px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Carlos Oliveira', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">CTO</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '14px', 'margin_bottom' => '0px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px', 'padding_left' => '10px', 'padding_right' => '10px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/300?img=5', 'alt' => 'Membro 3', 'width' => 200, 'height' => 200], 'width' => '200px', 'max_width' => '200px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Marina Costa', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Head de Design</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '14px', 'margin_bottom' => '0px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px', 'padding_left' => '10px', 'padding_right' => '10px'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/300?img=3', 'alt' => 'Membro 4', 'width' => 200, 'height' => 200], 'width' => '200px', 'max_width' => '200px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Rafael Santos', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Lead Developer</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '14px', 'margin_bottom' => '0px']],
+                    ]],
+                ]],
+                // ── TESTEMUNHOS ──
+                ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#f8fafc', 'padding_top' => '100px', 'padding_bottom' => '100px', 'gap' => '30px'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => 'O Que Nossos Clientes Dizem', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:600px;margin:0 auto;">A satisfação dos nossos clientes é a nossa maior recompensa</p>', 'alignment' => 'center', 'color' => '#64748b', 'font_size' => '18px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px', 'box_shadow' => '0 4px 20px rgba(0,0,0,0.06)'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/100?img=11', 'alt' => 'Cliente 1', 'width' => 80, 'height' => 80], 'width' => '80px', 'max_width' => '80px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#475569;font-style:italic;">"A equipe transformou completamente nossa presença online. O resultado superou todas as nossas expectativas!"</p>', 'alignment' => 'center', 'color' => '#475569', 'font_size' => '15px', 'line_height' => '1.7']],
+                        ['type' => 'heading', 'settings' => ['title' => 'João Mendes', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">CEO, TechStart</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '13px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px', 'box_shadow' => '0 4px 20px rgba(0,0,0,0.06)'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/100?img=12', 'alt' => 'Cliente 2', 'width' => 80, 'height' => 80], 'width' => '80px', 'max_width' => '80px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#475569;font-style:italic;">"Profissionalismo e qualidade excepcionais. Recomendo para qualquer empresa que queira crescer digitalmente."</p>', 'alignment' => 'center', 'color' => '#475569', 'font_size' => '15px', 'line_height' => '1.7']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Fernanda Lima', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Diretora, InnovateLab</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '13px']],
+                    ]],
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px', 'box_shadow' => '0 4px 20px rgba(0,0,0,0.06)'], 'children' => [
+                        ['type' => 'image', 'settings' => ['image' => ['url' => 'https://i.pravatar.cc/100?img=26', 'alt' => 'Cliente 3', 'width' => 80, 'height' => 80], 'width' => '80px', 'max_width' => '80px', 'alignment' => 'center', 'border_radius' => '50%', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#475569;font-style:italic;">"Resultados incríveis em tempo recorde. A plataforma é intuitiva e o suporte é simplesmente fantástico."</p>', 'alignment' => 'center', 'color' => '#475569', 'font_size' => '15px', 'line_height' => '1.7']],
+                        ['type' => 'heading', 'settings' => ['title' => 'Pedro Alves', 'tag' => 'h4', 'size' => 'small', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '4px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Fundador, WebPlus</p>', 'alignment' => 'center', 'color' => '#94a3b8', 'font_size' => '13px']],
+                    ]],
+                ]],
+                // ── CTA FINAL ──
+                ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#3b82f6', 'padding_top' => '80px', 'padding_bottom' => '80px', 'border_radius' => '0px', 'align_items' => 'center', 'justify_content' => 'center'], 'children' => [
+                    ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_top' => '20px', 'padding_bottom' => '20px'], 'children' => [
+                        ['type' => 'heading', 'settings' => ['title' => 'Pronto para Transformar seu Negócio?', 'tag' => 'h2', 'size' => 'xl', 'color' => '#ffffff', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                        ['type' => 'text', 'settings' => ['content' => '<p style="color:#bfdbfe;max-width:600px;margin:0 auto 30px;font-size:1.15rem;">Entre em contato conosco hoje e descubra como podemos ajudar sua empresa a alcançar novos patamares.</p>', 'alignment' => 'center', 'color' => '#bfdbfe', 'font_size' => '18px']],
+                        ['type' => 'button', 'settings' => ['text' => 'Fale Conosco', 'link' => '#', 'background_color' => '#ffffff', 'text_color' => '#3b82f6', 'size' => 'large', 'alignment' => 'center', 'border_radius' => '50px', 'padding_left_right' => '40px', 'font_weight' => '700']],
+                    ]],
+                ]],
+            ],
+        ],
         'contact' => [
             'name' => 'Contact Page',
             'description' => 'Contact form layout',
@@ -120,7 +248,11 @@ class PageController extends Controller
 
     public function create(): View
     {
-        return view('page-builder.pages.create');
+        $templates = [];
+        foreach ($this->templates as $key => $tmpl) {
+            $templates[$key] = $tmpl['name'];
+        }
+        return view('page-builder.pages.create', compact('templates'));
     }
 
     public function store(Request $request): \Illuminate\Http\RedirectResponse
@@ -135,6 +267,14 @@ class PageController extends Controller
         ]);
 
         $page = $this->pageBuilder->createPage($validated);
+
+        $templateKey = $request->input('template');
+        if ($templateKey && isset($this->templates[$templateKey])) {
+            $template = $this->templates[$templateKey];
+            $page->settings = array_merge($page->settings ?? [], $template['settings']);
+            $page->save();
+            $this->importTemplateElements($page, $template['elements']);
+        }
 
         $redirectTo = $request->input('_redirect', 'index');
 
@@ -253,13 +393,13 @@ class PageController extends Controller
         ]);
     }
 
-    public function destroy(Page $page): JsonResponse
+    public function destroy(Page $page): \Illuminate\Http\RedirectResponse
     {
+        $title = $page->title;
         $page->delete();
 
-        return response()->json([
-            'message' => 'Page deleted successfully',
-        ]);
+        return redirect()->route('page-builder.pages.index')
+            ->with('success', "Page \"{$title}\" deleted successfully!");
     }
 
     public function publish(Page $page): JsonResponse

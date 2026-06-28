@@ -7,18 +7,22 @@ use App\Models\Page;
 use App\Models\Element;
 use App\Services\PageBuilder\Core\PageBuilderService;
 use App\Services\PageBuilder\Core\Renderer;
+use App\Services\PageBuilder\Core\WidgetManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ElementController extends Controller
 {
     protected PageBuilderService $pageBuilder;
     protected Renderer $renderer;
+    protected WidgetManager $widgetManager;
 
-    public function __construct(PageBuilderService $pageBuilder, Renderer $renderer)
+    public function __construct(PageBuilderService $pageBuilder, Renderer $renderer, WidgetManager $widgetManager)
     {
         $this->pageBuilder = $pageBuilder;
         $this->renderer = $renderer;
+        $this->widgetManager = $widgetManager;
     }
 
     public function index(Page $page): JsonResponse
@@ -156,6 +160,7 @@ class ElementController extends Controller
 
         $element->settings = array_merge($element->settings ?? [], $validated['settings']);
         $element->save();
+        $element->page->touch();
 
         return response()->json([
             'message' => 'Element settings updated successfully',
@@ -171,6 +176,7 @@ class ElementController extends Controller
 
         $element->styles = array_merge($element->styles ?? [], $validated['styles']);
         $element->save();
+        $element->page->touch();
 
         return response()->json([
             'message' => 'Element styles updated successfully',
@@ -180,10 +186,27 @@ class ElementController extends Controller
 
     public function renderElement(Element $element): JsonResponse
     {
-        $html = $this->renderer->renderSingleElement($element);
+        $widget = $this->widgetManager->getWidget($element->type);
+
+        if (!$widget) {
+            return response()->json(['html' => '<!-- Unknown widget -->', 'element_id' => $element->id]);
+        }
+
+        $childrenHtml = '';
+        if ($element->children->isNotEmpty()) {
+            foreach ($element->children as $child) {
+                $childrenHtml .= $this->renderer->renderSingleElement($child);
+            }
+        }
+
+        $innerHtml = $widget->renderEditor(
+            $element->settings ?? [],
+            array_merge($element->content ?? [], ['children' => $childrenHtml]),
+            $element->styles ?? []
+        );
 
         return response()->json([
-            'html' => $html,
+            'html' => $innerHtml,
             'element_id' => $element->id,
         ]);
     }

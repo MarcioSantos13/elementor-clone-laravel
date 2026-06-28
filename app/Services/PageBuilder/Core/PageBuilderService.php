@@ -100,9 +100,9 @@ class PageBuilderService
      */
     public function renderPage(Page $page, array $options = []): string
     {
-        $cacheKey = "page.{$page->id}.render." . md5(json_encode($options));
+        $ts = $page->updated_at ? $page->updated_at->timestamp : 0;
+        $cacheKey = "page.{$page->id}.{$ts}.render." . md5(json_encode($options));
 
-        // Verificar cache
         if ($this->config['templates']['cache'] ?? false) {
             return Cache::remember($cacheKey, $this->config['templates']['cache_ttl'] ?? 3600, function () use ($page, $options) {
                 return $this->renderer->render($page, $options);
@@ -368,9 +368,6 @@ class PageBuilderService
     {
         Cache::forget("page.{$page->id}.render");
         Cache::forget("page.{$page->id}.json");
-
-        // Limpar cache de todos os formatos
-        Cache::forget("page.{$page->id}.render.*");
     }
 
     /**

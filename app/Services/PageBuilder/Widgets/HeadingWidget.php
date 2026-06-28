@@ -93,7 +93,35 @@ class HeadingWidget extends BaseWidget
         $settings = array_merge($this->defaultSettings, $settings);
         $tag = htmlspecialchars($settings['tag'], ENT_QUOTES, 'UTF-8');
         $title = htmlspecialchars($settings['title'], ENT_QUOTES, 'UTF-8');
+        $alignment = $settings['alignment'];
+        $color = $settings['color'];
+        $fontFamily = $settings['font_family'];
+        $fontWeight = $settings['font_weight'];
+        $letterSpacing = $settings['letter_spacing'];
+        $lineHeight = $settings['line_height'];
+        $marginBottom = $settings['margin_bottom'];
 
-        return "<{$tag} class=\"pb-heading-editor\">{$title}</{$tag}>";
+        $sizeMap = [
+            'small' => '1.2em',
+            'default' => '2em',
+            'medium' => '2.5em',
+            'large' => '3em',
+            'xl' => '3.5em',
+            'xxl' => '4.5em',
+        ];
+
+        $fontSize = $sizeMap[$settings['size']] ?? '2em';
+
+        $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight}; margin-bottom: {$marginBottom};";
+
+        if ($fontFamily) {
+            $style .= " font-family: {$fontFamily};";
+        }
+
+        if ($letterSpacing !== 'normal') {
+            $style .= " letter-spacing: {$letterSpacing};";
+        }
+
+        return "<{$tag} class=\"pb-heading-editor\" style=\"{$style}\">{$title}</{$tag}>";
     }
 }
