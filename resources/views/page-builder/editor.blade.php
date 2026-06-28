@@ -676,24 +676,22 @@ const editor = {
 
     bindCanvasDrops() {
         const dz = document.getElementById('canvas-dropzone');
-        const canvas = document.getElementById('canvas');
-        [dz, canvas].forEach(el => {
-            el.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
-            el.addEventListener('drop', e => {
-                e.preventDefault();
-                const type = e.dataTransfer.getData('text/plain');
-                if (!type) return;
-                let parentId = null;
-                const target = e.target.closest('.pb-el');
-                if (target) parentId = target.dataset.elId;
-                fetch(`/page-builder/pages/${this.pageId}/elements`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
-                    body: JSON.stringify({ type, parent_id: parentId }),
-                })
-                .then(r => r.json())
-                .then(() => this.loadElements());
-            });
+        dz.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+        dz.addEventListener('drop', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            const type = e.dataTransfer.getData('text/plain');
+            if (!type) return;
+            let parentId = null;
+            const target = e.target.closest('.pb-el');
+            if (target) parentId = target.dataset.elId;
+            fetch(`/page-builder/pages/${this.pageId}/elements`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
+                body: JSON.stringify({ type, parent_id: parentId }),
+            })
+            .then(r => r.json())
+            .then(() => this.loadElements());
         });
     },
 
