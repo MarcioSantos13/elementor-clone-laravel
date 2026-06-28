@@ -270,97 +270,188 @@
         <section id="showcase" class="step">
             <h2>13. Template Showcase Completo</h2>
             <div class="step-body">
-                <p>O template <strong>Showcase Completo</strong> é uma landing page de marketing completa construída inteiramente com o page builder. Ele demonstra técnicas avançadas de layout usando Seções aninhadas, Colunas e widgets estilizados. Veja abaixo o passo a passo de como foi construído:</p>
+                <p>O template <strong>Showcase Completo</strong> é uma landing page de marketing completa construída inteiramente com o page builder. Ele demonstra técnicas avançadas de layout usando Seções aninhadas, Colunas e widgets estilizados. Siga o passo a passo abaixo para recriá-lo do zero:</p>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.1 Seção Hero</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com cor de fundo <code>#1a1a2e</code> e padding de 100px topo/base</li>
-                    <li><strong>Layout:</strong> Dentro, uma única <strong>Coluna</strong> centralizada (text-align: center)</li>
-                    <li>Widget <strong>Título</strong>: <code>"Bem-vindo ao Showcase"</code>, tag H1, cor branca, alinhamento centralizado</li>
-                    <li>Widget <strong>Texto</strong>: <code>"Crie landing pages bonitas com nosso construtor drag-and-drop"</code>, cor cinza claro</li>
-                    <li>Widget <strong>Botão</strong>: <code>"Começar Agora"</code>, fundo branco, texto escuro, formato pílula (border-radius: 50px), padding 12px 36px</li>
+                    <li><strong>Arraste uma Seção</strong> da lista de widgets para a área da página (canvas). Esta será a seção principal do hero.</li>
+                    <li><strong>Selecione a Seção</strong> clicando nela. No painel direito, configure:
+                        <ul>
+                            <li><strong>Cor de fundo:</strong> <code>#1a1a2e</code></li>
+                            <li><strong>Padding superior/inferior:</strong> <code>100px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Coluna</strong> para dentro da Seção que você acabou de criar.</li>
+                    <li><strong>Selecione a Coluna</strong> e no painel direito, em Alinhamento, escolha <strong>Centro</strong> (<code>text-align: center</code>).</li>
+                    <li><strong>Arraste um widget Título</strong> para dentro da Coluna. Configure:
+                        <ul>
+                            <li><strong>Texto:</strong> <code>"Bem-vindo ao Showcase"</code></li>
+                            <li><strong>Tag:</strong> H1</li>
+                            <li><strong>Cor:</strong> branca (<code>#ffffff</code>)</li>
+                            <li><strong>Alinhamento:</strong> Centro</li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste um widget Texto</strong> para dentro da Coluna (abaixo do título). Configure:
+                        <ul>
+                            <li><strong>Conteúdo:</strong> <code>"Crie landing pages bonitas com nosso construtor drag-and-drop"</code></li>
+                            <li><strong>Cor:</strong> cinza claro (<code>#cccccc</code>)</li>
+                            <li><strong>Alinhamento:</strong> Centro</li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste um widget Botão</strong> para dentro da Coluna (abaixo do texto). Configure:
+                        <ul>
+                            <li><strong>Texto:</strong> <code>"Começar Agora"</code></li>
+                            <li><strong>Cor do fundo:</strong> branca (<code>#ffffff</code>)</li>
+                            <li><strong>Cor do texto:</strong> escura (<code>#1a1a2e</code>)</li>
+                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula)</li>
+                            <li><strong>Padding:</strong> <code>12px 36px</code></li>
+                            <li><strong>Alinhamento:</strong> Centro</li>
+                        </ul>
+                    </li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.2 Seção de Recursos (Features)</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com fundo claro <code>#f8f9fa</code> e padding de 80px topo/base</li>
-                    <li><strong>Container interno:</strong> Uma segunda <strong>Seção</strong> (filha, max-width 1140px, margin auto) para limitar a largura do conteúdo</li>
-                    <li><strong>Título</strong>: <code>"Recursos"</code>, tag H2, centralizado</li>
-                    <li><strong>Layout de colunas:</strong> Três widgets <strong>Coluna</strong> lado a lado (33% cada) dentro de uma Seção</li>
-                    <li>Cada coluna contém:
+                    <li><strong>Arraste uma nova Seção</strong> para a página (ela virá abaixo da seção Hero). Configure:
                         <ul>
-                            <li><strong>Título</strong>: nome do recurso (ex.: "Alta Performance", "Arrastar & Soltar", "Responsivo")</li>
-                            <li><strong>Texto</strong>: parágrafo de descrição do recurso, cor cinza escuro</li>
+                            <li><strong>Cor de fundo:</strong> <code>#f8f9fa</code></li>
+                            <li><strong>Padding superior/inferior:</strong> <code>80px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma segunda Seção</strong> para dentro da Seção que você acabou de criar. Esta seção interna servirá para limitar a largura do conteúdo. Configure:
+                        <ul>
+                            <li><strong>Largura máxima (max-width):</strong> <code>1140px</code></li>
+                            <li><strong>Margem:</strong> <code>auto</code> (para centralizar)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste um widget Título</strong> para dentro da seção interna. Configure:
+                        <ul>
+                            <li><strong>Texto:</strong> <code>"Recursos"</code></li>
+                            <li><strong>Tag:</strong> H2</li>
+                            <li><strong>Alinhamento:</strong> Centro</li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Seção</strong> para dentro da seção interna (abaixo do título). Esta será a linha que conterá as colunas de recursos.</li>
+                    <li><strong>Arraste três Colunas</strong> para dentro desta nova Seção. Cada coluna terá automaticamente 33% de largura.</li>
+                    <li><strong>Na primeira Coluna</strong>, arraste:
+                        <ul>
+                            <li>Um <strong>Título</strong> com texto <code>"Alta Performance"</code></li>
+                            <li>Um <strong>Texto</strong> com a descrição do recurso (cor cinza escuro)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Na segunda Coluna</strong>, arraste:
+                        <ul>
+                            <li>Um <strong>Título</strong> com texto <code>"Arrastar & Soltar"</code></li>
+                            <li>Um <strong>Texto</strong> com a descrição do recurso</li>
+                        </ul>
+                    </li>
+                    <li><strong>Na terceira Coluna</strong>, arraste:
+                        <ul>
+                            <li>Um <strong>Título</strong> com texto <code>"Responsivo"</code></li>
+                            <li>Um <strong>Texto</strong> com a descrição do recurso</li>
                         </ul>
                     </li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.3 Seção de Estatísticas (Stats)</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com fundo escuro <code>#16213e</code> e padding de 60px topo/base</li>
-                    <li><strong>Layout de colunas:</strong> Três widgets <strong>Coluna</strong> lado a lado</li>
-                    <li>Cada coluna contém:
+                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
-                            <li><strong>Título</strong>: número grande da estatística (ex.: "500+", "99%", "24/7"), cor branca, alinhamento centralizado</li>
-                            <li><strong>Texto</strong>: rótulo da estatística (ex.: "Projetos Concluídos", "Satisfação do Cliente", "Suporte"), cor cinza, alinhamento centralizado</li>
+                            <li><strong>Cor de fundo:</strong> <code>#16213e</code></li>
+                            <li><strong>Padding superior/inferior:</strong> <code>60px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Seção</strong> para dentro dela (max-width: <code>1140px</code>, margem: <code>auto</code>).</li>
+                    <li><strong>Arraste três Colunas</strong> lado a lado dentro da seção interna.</li>
+                    <li><strong>Em cada Coluna</strong>, arraste:
+                        <ul>
+                            <li>Um <strong>Título</strong> com o número da estatística (ex.: <code>"500+"</code>, <code>"99%"</code>, <code>"24/7"</code>), cor branca, alinhamento centralizado</li>
+                            <li>Um <strong>Texto</strong> com o rótulo (ex.: <code>"Projetos Concluídos"</code>, <code>"Satisfação do Cliente"</code>, <code>"Suporte"</code>), cor cinza, alinhamento centralizado</li>
                         </ul>
                     </li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.4 Seção de Galeria / Portfólio</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com fundo branco e padding de 80px topo/base</li>
-                    <li><strong>Container interno:</strong> Uma <strong>Seção</strong> filha (max-width 1140px, margin auto)</li>
-                    <li><strong>Título</strong>: <code>"Nosso Trabalho"</code>, tag H2, centralizado</li>
-                    <li><strong>Texto</strong>: <code>"Veja alguns dos nossos projetos recentes"</code>, centralizado</li>
-                    <li><strong>Layout de colunas:</strong> Três widgets <strong>Coluna</strong> (33% cada)</li>
-                    <li>Cada coluna contém:
+                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
-                            <li>Widget <strong>Imagem</strong>: imagem placeholder (ex.: <code>https://placehold.co/600x400/1a1a2e/ffffff?text=Projeto+1</code>), largura 100%</li>
-                            <li><strong>Título</strong>: nome do projeto (H3, margem superior pequena)</li>
-                            <li><strong>Texto</strong>: descrição da categoria do projeto</li>
+                            <li><strong>Cor de fundo:</strong> branca (<code>#ffffff</code>)</li>
+                            <li><strong>Padding superior/inferior:</strong> <code>80px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Seção</strong> para dentro dela (max-width: <code>1140px</code>, margem: <code>auto</code>).</li>
+                    <li><strong>Arraste um Título</strong>: <code>"Nosso Trabalho"</code>, H2, centralizado.</li>
+                    <li><strong>Arraste um Texto</strong>: <code>"Veja alguns dos nossos projetos recentes"</code>, centralizado.</li>
+                    <li><strong>Arraste uma Seção</strong> (linha) e dentro dela <strong>três Colunas</strong> (33% cada).</li>
+                    <li><strong>Em cada Coluna</strong>, arraste:
+                        <ul>
+                            <li>Uma <strong>Imagem</strong> com URL: <code>https://placehold.co/600x400/1a1a2e/ffffff?text=Projeto+1</code> (ajuste o número do projeto para 1, 2 e 3), largura <code>100%</code></li>
+                            <li>Um <strong>Título</strong> com o nome do projeto (H3)</li>
+                            <li>Um <strong>Texto</strong> com a descrição da categoria</li>
                         </ul>
                     </li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.5 Seção de Equipe (Team)</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com fundo claro <code>#f0f0f5</code> e padding de 80px topo/base</li>
-                    <li><strong>Container interno:</strong> Uma <strong>Seção</strong> filha (max-width 1140px, margin auto)</li>
-                    <li><strong>Título</strong>: <code>"Conheça Nossa Equipe"</code>, tag H2, centralizado</li>
-                    <li><strong>Layout de colunas:</strong> Quatro widgets <strong>Coluna</strong> (25% cada)</li>
-                    <li>Cada coluna contém:
+                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
-                            <li>Widget <strong>Imagem</strong>: avatar redondo placeholder (border-radius configurado via estilo inline ou URL da imagem), largura 150px, centralizado</li>
-                            <li><strong>Título</strong>: nome do membro (H4, centralizado)</li>
-                            <li><strong>Texto</strong>: cargo/função (ex.: "CEO & Fundador", centralizado, texto pequeno)</li>
+                            <li><strong>Cor de fundo:</strong> <code>#f0f0f5</code></li>
+                            <li><strong>Padding superior/inferior:</strong> <code>80px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Seção</strong> para dentro dela (max-width: <code>1140px</code>, margem: <code>auto</code>).</li>
+                    <li><strong>Arraste um Título</strong>: <code>"Conheça Nossa Equipe"</code>, H2, centralizado.</li>
+                    <li><strong>Arraste uma Seção</strong> (linha) e dentro dela <strong>quatro Colunas</strong> (25% cada).</li>
+                    <li><strong>Em cada Coluna</strong>, arraste:
+                        <ul>
+                            <li>Uma <strong>Imagem</strong> de avatar (URL de placeholder redondo, ex.: <code>https://placehold.co/150x150/1a1a2e/ffffff?text=Joao</code>), largura <code>150px</code>, centralizado</li>
+                            <li>Um <strong>Título</strong> com o nome do membro (H4, centralizado)</li>
+                            <li>Um <strong>Texto</strong> com o cargo (ex.: <code>"CEO & Fundador"</code>, centralizado, texto pequeno)</li>
                         </ul>
                     </li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.6 Seção CTA (Chamada para Ação)</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com cor de fundo <code>#0f3460</code> e padding de 60px topo/base</li>
-                    <li><strong>Layout de colunas:</strong> Dois widgets <strong>Coluna</strong> lado a lado (70% / 30%)</li>
-                    <li><strong>Coluna esquerda (70%):</strong>
+                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
-                            <li><strong>Título</strong>: <code>"Pronto para Começar?"</code>, tag H2, cor branca, alinhado à esquerda</li>
+                            <li><strong>Cor de fundo:</strong> <code>#0f3460</code></li>
+                            <li><strong>Padding superior/inferior:</strong> <code>60px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Seção</strong> para dentro dela (max-width: <code>1140px</code>, margem: <code>auto</code>).</li>
+                    <li><strong>Arraste duas Colunas</strong> lado a lado. Na primeira Coluna, deixe com <strong>70%</strong> de largura e na segunda com <strong>30%</strong>.</li>
+                    <li><strong>Na Coluna da esquerda (70%):</strong>
+                        <ul>
+                            <li><strong>Título</strong>: <code>"Pronto para Começar?"</code>, H2, cor branca, alinhado à esquerda</li>
                             <li><strong>Texto</strong>: <code>"Junte-se a milhares de clientes satisfeitos usando nossa plataforma."</code>, cor cinza claro</li>
                         </ul>
                     </li>
-                    <li><strong>Coluna direita (30%):</strong>
+                    <li><strong>Na Coluna da direita (30%):</strong>
                         <ul>
-                            <li>Widget <strong>Botão</strong>: <code>"Fale Conosco"</code>, fundo claro, texto escuro, alinhado à direita, formato pílula</li>
+                            <li><strong>Botão</strong>: <code>"Fale Conosco"</code>, fundo claro, texto escuro, alinhado à direita, formato pílula</li>
                         </ul>
                     </li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">13.7 Seção de Rodapé (Footer)</h3>
                 <ol>
-                    <li><strong>Container:</strong> Uma <strong>Seção</strong> de largura total com fundo escuro <code>#1a1a2e</code> e padding de 40px topo/base</li>
-                    <li><strong>Layout de colunas:</strong> Quatro widgets <strong>Coluna</strong> (25% cada)</li>
-                    <li>Cada coluna contém um <strong>Título</strong> (título da coluna do rodapé, pequeno, maiúsculo) e <strong>Texto</strong> (links ou descrição)</li>
-                    <li>Abaixo das colunas, um widget <strong>Texto</strong> de largura total com texto de copyright centralizado: <code>"&copy; 2025 Showcase. Todos os direitos reservados."</code></li>
+                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
+                        <ul>
+                            <li><strong>Cor de fundo:</strong> <code>#1a1a2e</code></li>
+                            <li><strong>Padding superior/inferior:</strong> <code>40px</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste uma Seção</strong> para dentro dela (max-width: <code>1140px</code>, margem: <code>auto</code>).</li>
+                    <li><strong>Arraste quatro Colunas</strong> (25% cada).</li>
+                    <li><strong>Em cada Coluna</strong>, arraste:
+                        <ul>
+                            <li>Um <strong>Título</strong> pequeno e maiúsculo para o nome da coluna (ex.: <code>"PRODUTO"</code>, <code>"EMPRESA"</code>, <code>"SUPORTE"</code>, <code>"REDES"</code>)</li>
+                            <li>Um <strong>Texto</strong> com links ou descrição (cor cinza)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Fora das colunas</strong> (diretamente na seção interna), arraste um widget <strong>Texto</strong> de largura total com o copyright centralizado: <code>"&copy; 2025 Showcase. Todos os direitos reservados."</code></li>
                 </ol>
 
                 <div class="tip">
