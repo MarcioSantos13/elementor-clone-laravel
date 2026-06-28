@@ -113,8 +113,8 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .pb-el-name { font-weight: 500; margin-right: .5rem; }
 .pb-el-type { opacity: .7; }
 .pb-el-action {
-    background: none; border: none; color: #fff; cursor: pointer; padding: 2px 4px;
-    border-radius: 2px; font-size: .75rem; line-height: 1;
+    background: none; border: none; color: #fff; cursor: pointer; padding: 2px 6px;
+    border-radius: 3px; font-size: 1.1rem; line-height: 1;
 }
 .pb-el-action:hover { background: rgba(255,255,255,.2); }
 .pb-el-content { min-height: 20px; }
