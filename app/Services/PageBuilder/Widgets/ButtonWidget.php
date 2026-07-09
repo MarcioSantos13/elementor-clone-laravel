@@ -53,7 +53,7 @@ class ButtonWidget extends BaseWidget
 
     public function render(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $text = htmlspecialchars($settings['text'], ENT_QUOTES, 'UTF-8');
         $link = htmlspecialchars($settings['link'], ENT_QUOTES, 'UTF-8');
         $target = htmlspecialchars($settings['link_target'], ENT_QUOTES, 'UTF-8');
@@ -128,7 +128,7 @@ class ButtonWidget extends BaseWidget
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $text = htmlspecialchars($settings['text'], ENT_QUOTES, 'UTF-8');
         $alignment = $settings['alignment'];
         $size = $settings['size'];

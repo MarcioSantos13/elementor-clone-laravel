@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'templates' => [
-        'cache' => env('PAGE_BUILDER_CACHE', true),
-        'cache_ttl' => env('PAGE_BUILDER_CACHE_TTL', 3600),
+    'template_cache' => [
+        'enabled' => env('PAGE_BUILDER_CACHE', false),
+        'ttl' => env('PAGE_BUILDER_CACHE_TTL', 3600),
     ],
 
     'revisions' => [

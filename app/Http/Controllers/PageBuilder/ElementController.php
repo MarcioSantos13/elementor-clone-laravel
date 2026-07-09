@@ -10,7 +10,10 @@ use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\WidgetManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ElementController extends Controller
 {
@@ -27,7 +30,8 @@ class ElementController extends Controller
 
     public function index(Page $page): JsonResponse
     {
-        $elements = $page->elements()->with('children')->get();
+        $this->authorize('view', $page);
+        $elements = $page->allElements()->get();
 
         return response()->json([
             'elements' => $this->buildTree($elements),
@@ -36,6 +40,7 @@ class ElementController extends Controller
 
     public function store(Request $request, Page $page): JsonResponse
     {
+        $this->authorize('update', $page);
         $validated = $request->validate([
             'type' => 'required|string',
             'settings' => 'nullable|array',
@@ -57,6 +62,7 @@ class ElementController extends Controller
 
     public function show(Element $element): JsonResponse
     {
+        $this->authorize('view', $element->page);
         return response()->json([
             'element' => $element->load('children'),
         ]);
@@ -64,6 +70,7 @@ class ElementController extends Controller
 
     public function update(Request $request, Element $element): JsonResponse
     {
+        $this->authorize('update', $element->page);
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
             'settings' => 'nullable|array',
@@ -88,6 +95,7 @@ class ElementController extends Controller
 
     public function destroy(Element $element): JsonResponse
     {
+        $this->authorize('update', $element->page);
         $this->pageBuilder->removeElement($element);
 
         return response()->json([
@@ -97,6 +105,7 @@ class ElementController extends Controller
 
     public function duplicate(Element $element): JsonResponse
     {
+        $this->authorize('update', $element->page);
         $newElement = $this->pageBuilder->duplicateElement($element);
 
         return response()->json([
@@ -107,6 +116,7 @@ class ElementController extends Controller
 
     public function reorder(Request $request, Page $page): JsonResponse
     {
+        $this->authorize('update', $page);
         $validated = $request->validate([
             'order' => 'required|array',
             'order.*.id' => 'required|integer|exists:elements,id',
@@ -137,6 +147,7 @@ class ElementController extends Controller
 
     public function move(Request $request, Element $element): JsonResponse
     {
+        $this->authorize('update', $element->page);
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:elements,id',
             'order' => 'required|integer|min:0',
@@ -154,6 +165,7 @@ class ElementController extends Controller
 
     public function updateSettings(Request $request, Element $element): JsonResponse
     {
+        $this->authorize('update', $element->page);
         $validated = $request->validate([
             'settings' => 'required|array',
         ]);
@@ -170,6 +182,7 @@ class ElementController extends Controller
 
     public function updateStyles(Request $request, Element $element): JsonResponse
     {
+        $this->authorize('update', $element->page);
         $validated = $request->validate([
             'styles' => 'required|array',
         ]);
@@ -186,6 +199,7 @@ class ElementController extends Controller
 
     public function renderElement(Element $element): JsonResponse
     {
+        $this->authorize('view', $element->page);
         $widget = $this->widgetManager->getWidget($element->type);
 
         if (!$widget) {
@@ -213,6 +227,7 @@ class ElementController extends Controller
 
     public function controls(Element $element): JsonResponse
     {
+        $this->authorize('view', $element->page);
         $widgetControls = $this->renderer->getWidgetControls($element->type);
 
         if (!$widgetControls) {
@@ -236,30 +251,58 @@ class ElementController extends Controller
         return response()->json($widgetControls);
     }
 
-    protected function buildTree($elements): array
+    public function uploadImage(Request $request): JsonResponse
     {
-        $tree = [];
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+        ]);
 
-        foreach ($elements as $element) {
-            $node = [
-                'id' => $element->id,
-                'uuid' => $element->uuid,
-                'type' => $element->type,
-                'name' => $element->name,
-                'order' => $element->order,
-                'settings' => $element->settings,
-                'content' => $element->content,
-                'styles' => $element->styles,
-                'column_size' => $element->column_size,
-            ];
+        $file = $request->file('image');
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('page-builder', $filename, 'public');
 
-            if ($element->children->isNotEmpty()) {
-                $node['children'] = $this->buildTree($element->children);
-            }
-
-            $tree[] = $node;
+        if (!$path) {
+            return response()->json(['error' => 'Falha ao fazer upload'], 500);
         }
 
-        return $tree;
+        $url = parse_url(Storage::disk('public')->url($path), PHP_URL_PATH);
+
+        return response()->json([
+            'url' => $url,
+            'filename' => $filename,
+        ]);
+    }
+
+    protected function buildTree($elements): array
+    {
+        $byParent = [];
+        foreach ($elements as $e) {
+            $byParent[(int) ($e->parent_id ?? 0)][] = $e;
+        }
+
+        $build = function ($parentId) use ($byParent, &$build) {
+            $result = [];
+            foreach ($byParent[$parentId] ?? [] as $element) {
+                $node = [
+                    'id' => $element->id,
+                    'uuid' => $element->uuid,
+                    'type' => $element->type,
+                    'name' => $element->name,
+                    'order' => $element->order,
+                    'settings' => $element->settings,
+                    'content' => $element->content,
+                    'styles' => $element->styles,
+                    'column_size' => $element->column_size,
+                ];
+                $children = $build($element->id);
+                if ($children) {
+                    $node['children'] = $children;
+                }
+                $result[] = $node;
+            }
+            return $result;
+        };
+
+        return $build(0);
     }
 }

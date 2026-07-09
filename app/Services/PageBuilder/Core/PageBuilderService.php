@@ -40,6 +40,7 @@ class PageBuilderService
             $page = new Page();
             $page->fill($data);
             $page->user_id = auth()->id();
+            $page->status = $data['status'] ?? 'draft';
             $page->slug = $this->generateUniqueSlug($data['title']);
             $page->save();
 
@@ -117,8 +118,8 @@ class PageBuilderService
         $ts = $page->updated_at ? $page->updated_at->timestamp : 0;
         $cacheKey = "page.{$page->id}.{$ts}.render." . md5(json_encode($options));
 
-        if ($this->config['templates']['cache'] ?? false) {
-            return Cache::remember($cacheKey, $this->config['templates']['cache_ttl'] ?? 3600, function () use ($page, $options) {
+        if ($this->config['template_cache']['enabled'] ?? false) {
+            return Cache::remember($cacheKey, $this->config['template_cache']['ttl'] ?? 3600, function () use ($page, $options) {
                 return $this->renderer->render($page, $options);
             });
         }
@@ -147,7 +148,7 @@ class PageBuilderService
             $element->settings = array_merge($widget->getDefaultSettings(), $settings);
             $element->content = [];
             $element->styles = [];
-            $element->order = $page->elements()->max('order') + 1;
+            $element->order = ((int) ($page->elements()->max('order') ?? -1)) + 1;
             $element->save();
 
             DB::commit();
@@ -343,15 +344,39 @@ class PageBuilderService
      */
     protected function sanitizeContent(array $content): array
     {
-        // Implementar sanitizaÃ§Ã£o profunda
         return array_map(function ($item) {
             if (is_array($item)) {
                 return $this->sanitizeContent($item);
             }
 
-            // Sanitizar HTML se necessÃ¡rio
             if (is_string($item) && $this->containsHtml($item)) {
-                return strip_tags($item, '<p><br><strong><em><u><ul><ol><li><a><img><div><span>');
+                $allowed = '<p><br><strong><em><u><s><ul><ol><li><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><video><source>';
+                $clean = strip_tags($item, $allowed);
+
+                $clean = preg_replace_callback('/<a\s[^>]*href\s*=\s*["\']([^"\']*)["\'][^>]*>/i', function ($m) {
+                    $url = filter_var($m[1], FILTER_SANITIZE_URL);
+                    if ($url && (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') || str_starts_with($url, 'mailto:') || str_starts_with($url, 'tel:') || str_starts_with($url, '/'))) {
+                        return str_replace($m[1], $url, $m[0]);
+                    }
+                    return str_replace($m[1], '#', $m[0]);
+                }, $clean);
+
+                $clean = preg_replace_callback('/<img\s[^>]*src\s*=\s*["\']([^"\']*)["\'][^>]*>/i', function ($m) {
+                    $url = filter_var($m[1], FILTER_SANITIZE_URL);
+                    if ($url && (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') || str_starts_with($url, 'data:image/'))) {
+                        return str_replace($m[1], $url, $m[0]);
+                    }
+                    return str_replace($m[1], '', $m[0]);
+                }, $clean);
+
+                $clean = preg_replace('/<([a-z]+)[^>]*on\w+\s*=\s*["\'][^"\']*["\']/i', '<$1', $clean);
+                $clean = preg_replace('/<([a-z]+)[^>]*javascript\s*:/i', '<$1', $clean);
+
+                return $clean;
+            }
+
+            if (is_string($item)) {
+                return htmlspecialchars($item, ENT_QUOTES | ENT_HTML5, 'UTF-8', false);
             }
 
             return $item;
@@ -359,12 +384,40 @@ class PageBuilderService
     }
 
     /**
-     * Sanitizar settings
+     * Sanitizar settings com base no tipo esperado
      */
     protected function sanitizeSettings(array $settings): array
     {
-        // Sanitizar cada setting baseado no tipo
-        return $settings;
+        $sanitized = [];
+
+        foreach ($settings as $key => $value) {
+            if (is_string($value)) {
+                if (str_contains($key, 'color') || str_contains($key, '_color')) {
+                    $sanitized[$key] = preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value) ? $value : '#000000';
+                } elseif (str_contains($key, 'url') || str_contains($key, 'link') || str_contains($key, 'src')) {
+                    $sanitized[$key] = filter_var($value, FILTER_SANITIZE_URL);
+                } elseif (str_contains($key, 'content') || str_contains($key, 'html') || $key === 'content') {
+                    $allowed = '<p><br><strong><em><u><s><ul><ol><li><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption>';
+                    $sanitized[$key] = strip_tags($value, $allowed);
+                } elseif (in_array($key, ['css_classes', 'css_id', 'name', 'title', 'alt', 'text', 'label'])) {
+                    $sanitized[$key] = strip_tags($value);
+                } else {
+                    $sanitized[$key] = htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8', false);
+                }
+            } elseif (is_numeric($value)) {
+                $sanitized[$key] = is_float($value) ? (float) $value : (int) $value;
+            } elseif (is_bool($value)) {
+                $sanitized[$key] = $value;
+            } elseif (is_array($value)) {
+                $sanitized[$key] = $this->sanitizeSettings($value);
+            } elseif (is_null($value)) {
+                $sanitized[$key] = null;
+            } else {
+                $sanitized[$key] = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8', false);
+            }
+        }
+
+        return $sanitized;
     }
 
     /**
@@ -380,7 +433,10 @@ class PageBuilderService
      */
     protected function clearPageCache(Page $page): void
     {
+        $ts = $page->updated_at ? $page->updated_at->timestamp : 0;
         Cache::forget("page.{$page->id}.render");
+        Cache::forget("page.{$page->id}.{$ts}.render." . md5(json_encode(['with_container' => true, 'theme' => 'default'])));
+        Cache::forget("page.{$page->id}.{$ts}.render." . md5(json_encode(['with_container' => false, 'theme' => 'default'])));
         Cache::forget("page.{$page->id}.json");
     }
 

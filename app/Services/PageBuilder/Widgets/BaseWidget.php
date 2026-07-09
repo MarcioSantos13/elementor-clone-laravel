@@ -158,8 +158,16 @@ abstract class BaseWidget implements WidgetInterface
             return [];
         }
 
+        $url = $value['url'] ?? '';
+        if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
+            $url = filter_var($url, FILTER_SANITIZE_URL);
+            if ($url !== '' && !str_starts_with($url, 'http://') && !str_starts_with($url, 'https://') && !str_starts_with($url, '/')) {
+                $url = '';
+            }
+        }
+
         return [
-            'url' => filter_var($value['url'] ?? '', FILTER_VALIDATE_URL) ? $value['url'] : '',
+            'url' => $url,
             'alt' => strip_tags($value['alt'] ?? ''),
             'width' => (int) ($value['width'] ?? 0),
             'height' => (int) ($value['height'] ?? 0),
@@ -210,6 +218,11 @@ abstract class BaseWidget implements WidgetInterface
         }
 
         return " style=\"{$css}\"";
+    }
+
+    protected function prepareSettings(array $settings): array
+    {
+        return array_merge($this->defaultSettings, $settings);
     }
 
     protected function renderTemplate(string $template, array $data = []): string

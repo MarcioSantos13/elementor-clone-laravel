@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\ElementFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Element extends Model
 {
-    use SoftDeletes;
+    /** @use HasFactory<ElementFactory> */
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'page_id',

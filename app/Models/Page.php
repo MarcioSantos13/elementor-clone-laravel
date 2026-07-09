@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\PageFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Page extends Model
 {
-    use SoftDeletes;
+    /** @use HasFactory<PageFactory> */
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -79,7 +82,7 @@ class Page extends Model
 
     public function getUrl(): string
     {
-        return route('page.show', $this->slug);
+        return route('page-builder.render', $this->id);
     }
 
     public function getEditorUrl(): string

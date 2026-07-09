@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "elementor/elementor-clone-laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Laravel Page Builder - A drag-and-drop page builder inspired by Elementor, built with Laravel 12.",
+    "keywords": ["laravel", "page-builder", "elementor", "drag-and-drop", "wysiwyg"],
     "license": "MIT",
     "require": {
         "php": "^8.2",

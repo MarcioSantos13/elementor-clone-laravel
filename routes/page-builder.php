@@ -32,6 +32,7 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::get('elements/{element}/render', [ElementController::class, 'renderElement'])->name('elements.render');
     Route::get('elements/{element}/controls', [ElementController::class, 'controls'])->name('elements.controls');
     Route::get('widgets/{type}/controls', [ElementController::class, 'widgetControls'])->name('widgets.controls');
+    Route::post('upload', [ElementController::class, 'uploadImage'])->name('upload');
 
     Route::get('pages/{page}/revisions', [RevisionController::class, 'index'])->name('revisions.index');
     Route::get('revisions/{revision}', [RevisionController::class, 'show'])->name('revisions.show');

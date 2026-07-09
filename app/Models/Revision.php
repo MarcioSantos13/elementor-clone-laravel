@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Database\Factories\RevisionFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Revision extends Model
 {
+    /** @use HasFactory<RevisionFactory> */
+    use HasFactory;
     protected $fillable = [
         'page_id',
         'user_id',

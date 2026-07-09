@@ -46,7 +46,7 @@ class ImageWidget extends BaseWidget
 
     public function render(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $image = $settings['image'];
         $caption = htmlspecialchars($settings['caption'], ENT_QUOTES, 'UTF-8');
         $alignment = $settings['alignment'];
@@ -86,10 +86,11 @@ class ImageWidget extends BaseWidget
         }
 
         $imgHtml = "<img{$imgAttrStr}>";
-        $imgHtml = "<figure class=\"pb-image-wrapper\" style=\"text-align: {$alignment};\">{$imgHtml}</figure>";
 
         if ($caption) {
             $imgHtml = "<figure class=\"pb-image-wrapper\" style=\"text-align: {$alignment};\">{$imgHtml}<figcaption class=\"pb-image-caption\">{$caption}</figcaption></figure>";
+        } else {
+            $imgHtml = "<figure class=\"pb-image-wrapper\" style=\"text-align: {$alignment};\">{$imgHtml}</figure>";
         }
 
         if ($link) {
@@ -107,7 +108,7 @@ class ImageWidget extends BaseWidget
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $image = $settings['image'];
 
         if (empty($image['url'])) {

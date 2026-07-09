@@ -101,6 +101,8 @@ HTML;
             $element->styles ?? []
         );
 
+        $innerHtml = $this->processEmbeds($innerHtml);
+
         $attributes = $this->buildAttributes($element);
         $styles = $this->buildStyleString($element->styles ?? []);
         $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
@@ -141,6 +143,8 @@ HTML;
             array_merge($element->content ?? [], ['children' => $childrenHtml]),
             $element->styles ?? []
         );
+
+        $innerHtml = $this->processEmbeds($innerHtml);
 
         $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
         $classes = "pb-editor-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}";
@@ -231,9 +235,50 @@ HTML;
         return implode(' ', $classes);
     }
 
+    protected function processEmbeds(string $html): string
+    {
+        $processed = preg_replace_callback(
+            '/<iframe\s[^>]*src=["\'](https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com)[^"\']+)["\'][^>]*>/i',
+            function ($matches) {
+                $url = $matches[1];
+                $videoId = null;
+
+                if (preg_match('/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/', $url, $m)) {
+                    $videoId = $m[1];
+                } elseif (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $url, $m)) {
+                    $videoId = $m[1];
+                } elseif (preg_match('/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/', $url, $m)) {
+                    $videoId = $m[1];
+                }
+
+                if ($videoId) {
+                    $iframe = str_replace($url, "https://www.youtube-nocookie.com/embed/{$videoId}", $matches[0]);
+                    if (!str_contains($iframe, 'allow="')) {
+                        $iframe = str_replace('<iframe', '<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen', $iframe);
+                    }
+                    return $iframe;
+                }
+
+                return $matches[0];
+            },
+            $html
+        );
+
+        $processed = preg_replace_callback(
+            '/<a\s[^>]*href=["\'](https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+))["\'][^>]*>.*?<\/a>/i',
+            function ($matches) {
+                $videoId = $matches[2];
+                return '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/' . $videoId . '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+            },
+            $processed
+        );
+
+        return $processed;
+    }
+
     protected function renderStyles(Page $page): string
     {
-        $css = '';
+        $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n</style>\n";
 
         if ($page->settings['custom_css'] ?? false) {
             $css .= "\n<style>\n{$page->settings['custom_css']}\n</style>\n";
@@ -284,6 +329,8 @@ HTML;
             array_merge($element->content ?? [], ['children' => $childrenHtml]),
             $element->styles ?? []
         );
+
+        $innerHtml = $this->processEmbeds($innerHtml);
 
         $attributes = $this->buildAttributes($element);
         $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';

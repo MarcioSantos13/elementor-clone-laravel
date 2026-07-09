@@ -7,6 +7,7 @@ use App\Services\PageBuilder\Core\WidgetManager;
 use App\Services\PageBuilder\Core\ElementManager;
 use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\PageBuilderService;
+use App\Services\PageBuilder\Core\TemplateManager;
 use Illuminate\Support\ServiceProvider;
 
 class PageBuilderServiceProvider extends ServiceProvider
@@ -41,6 +42,10 @@ class PageBuilderServiceProvider extends ServiceProvider
                 $app->make(ElementManager::class),
                 $app->make(Renderer::class)
             );
+        });
+
+        $this->app->singleton(TemplateManager::class, function ($app) {
+            return new TemplateManager();
         });
 
         $this->app->alias(PageBuilderService::class, 'page-builder');

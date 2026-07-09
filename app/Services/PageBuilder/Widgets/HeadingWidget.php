@@ -43,7 +43,7 @@ class HeadingWidget extends BaseWidget
 
     public function render(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $tag = htmlspecialchars($settings['tag'], ENT_QUOTES, 'UTF-8');
         $title = htmlspecialchars($settings['title'], ENT_QUOTES, 'UTF-8');
         $alignment = $settings['alignment'];
@@ -90,7 +90,7 @@ class HeadingWidget extends BaseWidget
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $tag = htmlspecialchars($settings['tag'], ENT_QUOTES, 'UTF-8');
         $title = htmlspecialchars($settings['title'], ENT_QUOTES, 'UTF-8');
         $alignment = $settings['alignment'];

@@ -5,48 +5,58 @@
 @section('content')
     <div class="container">
         <div class="page-header">
-            <h1>Create New Page</h1>
-            <a href="{{ route('page-builder.pages.index') }}" class="btn btn-secondary">&larr; Back to Pages</a>
+            <h1>Criar Nova Página</h1>
+            <a href="{{ route('page-builder.pages.index') }}" class="btn btn-secondary">&larr; Voltar para Páginas</a>
         </div>
 
-        <div class="card create-page-card">
+        <div class="card" style="max-width:700px">
             <form action="{{ route('page-builder.pages.store') }}" method="POST">
                 @csrf
 
                 <div class="form-group">
-                    <label for="title">Title <span class="required">*</span></label>
-                    <input type="text" name="title" id="title" class="form-control" value="{{ old('title') }}" placeholder="e.g. Home, About Us, Contact" required autofocus>
+                    <label for="title">Título <span class="required">*</span></label>
+                    <input type="text" name="title" id="title" class="form-control" value="{{ old('title') }}" placeholder="Ex: Home, Sobre, Contato" required autofocus>
                     @error('title')
-                        <span class="error">{{ $message }}</span>
+                        <div class="error">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="status">Status</label>
-                        <select name="status" id="status" class="form-control">
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
+                        <label for="status">Situação</label>
+                        <select name="status" id="status" class="form-control form-select">
+                            <option value="draft">Rascunho</option>
+                            <option value="published">Publicado</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Template <span class="optional">(optional — pre-populates the page)</span></label>
+                    <label>Modelo <span class="optional">(opcional — pré-preenche a página)</span></label>
                     <div class="template-grid">
                         <label class="template-card {{ old('template') === '' || old('template') === null ? 'selected' : '' }}">
                             <input type="radio" name="template" value="" {{ old('template') === '' || old('template') === null ? 'checked' : '' }}>
-                            <div class="template-card-preview blank">&#9635;</div>
+                            <div class="template-card-preview blank">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                            </div>
                             <div class="template-card-info">
-                                <strong>Blank Page</strong>
-                                <span>Start from scratch</span>
+                                <strong>Página em Branco</strong>
+                                <span>Começar do zero</span>
                             </div>
                         </label>
                         @foreach($templates as $key => $name)
                             <label class="template-card {{ old('template') === $key ? 'selected' : '' }}">
                                 <input type="radio" name="template" value="{{ $key }}" {{ old('template') === $key ? 'checked' : '' }}>
                                 <div class="template-card-preview {{ $key }}">
-                                    @if($key === 'landing')&#127968;@elseif($key === 'about')&#128100;@elseif($key === 'contact')&#128222;@else&#9635;@endif
+                                    @if($key === 'landing')
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h18M3 6h18M3 18h12"/><circle cx="19" cy="18" r="2"/></svg>
+                                    @elseif($key === 'about')
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21c0-4.418-3.582-8-8-8s-8 3.582-8 8"/></svg>
+                                    @elseif($key === 'contact')
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                                    @else
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                                    @endif
                                 </div>
                                 <div class="template-card-info">
                                     <strong>{{ $name }}</strong>
@@ -63,44 +73,44 @@
                     </div>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" name="_redirect" value="index" class="btn btn-primary">Create &amp; Back to List</button>
-                    <button type="submit" name="_redirect" value="editor" class="btn btn-success">Create &amp; Open Editor</button>
-                    <a href="{{ route('page-builder.pages.index') }}" class="btn btn-secondary">Cancel</a>
+                <div style="display:flex;gap:.75rem;align-items:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e2e8f0">
+                    <button type="submit" name="_redirect" value="index" class="btn btn-secondary">Criar &amp; Voltar</button>
+                    <button type="submit" name="_redirect" value="editor" class="btn btn-primary">Criar &amp; Abrir Editor</button>
+                    <a href="{{ route('page-builder.pages.index') }}" class="btn btn-secondary" style="margin-left:auto">Cancelar</a>
                 </div>
             </form>
         </div>
     </div>
 
     <style>
-        .create-page-card { max-width: 700px; }
         .template-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-top: .3rem; }
         .template-card {
-            display: block; cursor: pointer; border: 2px solid #ddd; border-radius: 8px;
-            overflow: hidden; transition: all .15s; background: #fff;
+            display: block; cursor: pointer; border: 2px solid #e2e8f0; border-radius: 10px;
+            overflow: hidden; transition: all .2s; background: #fff;
         }
-        .template-card:hover { border-color: #007bff; }
-        .template-card.selected { border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,.2); }
+        .template-card:hover { border-color: #6366f1; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(99,102,241,.12); }
+        .template-card.selected { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.2); }
         .template-card input[type="radio"] { display: none; }
         .template-card-preview {
             height: 90px; display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; background: #f8f9fa; color: #666;
+            font-size: 2.5rem; background: #f8fafc; color: #64748b;
         }
-        .template-card-preview.landing { background: #1a1a2e; color: #fff; }
-        .template-card-preview.about { background: #f0f2f5; color: #333; }
-        .template-card-preview.contact { background: #e8ecf1; color: #333; }
-        .template-card-preview.showcase { background: #0f172a; color: #fff; }
-        .template-card-info { padding: .6rem; }
-        .template-card-info strong { display: block; font-size: .85rem; margin-bottom: .15rem; }
-        .template-card-info span { font-size: .75rem; color: #888; }
-        .form-actions { display: flex; gap: .75rem; align-items: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #eee; }
+        .template-card-preview.landing { background: linear-gradient(135deg,#1e1b4b,#312e81); color: #a5b4fc; }
+        .template-card-preview.about { background: linear-gradient(135deg,#f0f9ff,#e0f2fe); color: #0369a1; }
+        .template-card-preview.contact { background: linear-gradient(135deg,#f8fafc,#f1f5f9); color: #475569; }
+        .template-card-preview.showcase { background: linear-gradient(135deg,#0f172a,#1e293b); color: #94a3b8; }
+        .template-card-info { padding: .65rem .75rem; }
+        .template-card-info strong { display: block; font-size: .85rem; margin-bottom: .15rem; color: #0f172a; }
+        .template-card-info span { font-size: .75rem; color: #64748b; }
     </style>
 
     <script>
-    document.querySelectorAll('.template-card').forEach(card => {
-        card.addEventListener('click', function(e) {
-            document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected');
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+            });
         });
     });
     </script>

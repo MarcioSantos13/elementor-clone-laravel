@@ -20,6 +20,7 @@ class RevisionController extends Controller
 
     public function index(Page $page): JsonResponse
     {
+        $this->authorize('view', $page);
         $revisions = $page->revisions()->with('user')->paginate(50);
 
         return response()->json([
@@ -29,6 +30,7 @@ class RevisionController extends Controller
 
     public function show(Revision $revision): JsonResponse
     {
+        $this->authorize('view', $revision->page);
         return response()->json([
             'revision' => $revision->load('user'),
         ]);
@@ -36,6 +38,7 @@ class RevisionController extends Controller
 
     public function restore(Page $page, Revision $revision): JsonResponse
     {
+        $this->authorize('update', $page);
         $this->pageBuilder->restoreRevision($page, $revision);
 
         return response()->json([
@@ -46,6 +49,7 @@ class RevisionController extends Controller
 
     public function diff(Page $page, Revision $revision): JsonResponse
     {
+        $this->authorize('view', $page);
         $previousRevision = Revision::where('page_id', $page->id)
             ->where('id', '<', $revision->id)
             ->orderBy('id', 'desc')
@@ -61,6 +65,7 @@ class RevisionController extends Controller
 
     public function destroy(Revision $revision): JsonResponse
     {
+        $this->authorize('update', $revision->page);
         $revision->delete();
 
         return response()->json([
@@ -70,6 +75,7 @@ class RevisionController extends Controller
 
     public function prune(Page $page): JsonResponse
     {
+        $this->authorize('update', $page);
         $keep = (int) request('keep', 50);
 
         $deleted = Revision::where('page_id', $page->id)
@@ -86,6 +92,7 @@ class RevisionController extends Controller
 
     public function autoSave(Request $request, Page $page): JsonResponse
     {
+        $this->authorize('update', $page);
         $validated = $request->validate([
             'content' => 'sometimes|array',
             'settings' => 'sometimes|array',

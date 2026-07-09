@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - {{ config('app.name') }}</title>
+    <title>Registro - {{ config('app.name') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,12 +14,8 @@
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; padding: 1rem;
         }
-        .auth-container {
-            width: 100%; max-width: 400px;
-        }
-        .auth-brand {
-            text-align: center; margin-bottom: 2rem;
-        }
+        .auth-container { width: 100%; max-width: 420px; }
+        .auth-brand { text-align: center; margin-bottom: 2rem; }
         .auth-brand-icon {
             display: inline-flex; align-items: center; justify-content: center;
             width: 48px; height: 48px; background: linear-gradient(135deg,#6366f1,#8b5cf6);
@@ -52,8 +48,10 @@
         .error {
             background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2);
             color: #fca5a5; padding: .65rem .8rem; border-radius: 10px;
-            margin-bottom: 1rem; font-size: .85rem; display: flex; align-items: center; gap: .5rem;
+            margin-bottom: 1rem; font-size: .85rem;
         }
+        .error div { margin-bottom: .2rem; }
+        .error div:last-child { margin-bottom: 0; }
         .auth-footer { text-align: center; margin-top: 1.25rem; font-size: .875rem; color: #64748b; }
         .auth-footer a { color: #818cf8; text-decoration: none; font-weight: 500; transition: color .15s; }
         .auth-footer a:hover { color: #a5b4fc; }
@@ -66,26 +64,38 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
             </div>
             <h1>{{ config('app.name') }}</h1>
-            <p>Faça login para continuar</p>
+            <p>Crie sua conta gratuita</p>
         </div>
         <div class="card">
             @if($errors->any())
-                <div class="error">&#9888; {{ $errors->first() }}</div>
+                <div class="error">
+                    @foreach($errors->all() as $error)
+                        <div>&#9888; {{ $error }}</div>
+                    @endforeach
+                </div>
             @endif
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('register') }}">
                 @csrf
                 <div class="form-group">
+                    <label for="name">Nome</label>
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Seu nome" required>
+                </div>
+                <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" placeholder="seu@email.com" required>
+                    <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="seu@email.com" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input type="password" name="password" id="password" placeholder="Sua senha" required>
+                    <input type="password" name="password" id="password" placeholder="Mínimo de 8 caracteres" required>
                 </div>
-                <button type="submit">Entrar</button>
+                <div class="form-group">
+                    <label for="password_confirmation">Confirmar Senha</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Repita a senha" required>
+                </div>
+                <button type="submit">Criar Conta</button>
             </form>
             <div class="auth-footer">
-                Não tem conta? <a href="{{ route('register') }}">Criar conta</a>
+                Já tem conta? <a href="{{ route('login') }}">Entrar</a>
             </div>
         </div>
     </div>

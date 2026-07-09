@@ -39,7 +39,7 @@ class TextWidget extends BaseWidget
 
     public function render(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $text = $settings['content'];
         $alignment = $settings['alignment'];
         $color = $settings['color'];
@@ -47,6 +47,7 @@ class TextWidget extends BaseWidget
         $fontWeight = $settings['font_weight'];
         $lineHeight = $settings['line_height'];
         $fontFamily = $settings['font_family'];
+        $children = $content['children'] ?? '';
 
         $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight};";
 
@@ -54,8 +55,9 @@ class TextWidget extends BaseWidget
             $style .= " font-family: {$fontFamily};";
         }
 
+        $dropCss = '';
         if ($settings['drop_cap']) {
-            $style .= ' .pb-text:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }';
+            $dropCss = ' pb-drop-cap';
         }
 
         $columnStyle = '';
@@ -63,12 +65,12 @@ class TextWidget extends BaseWidget
             $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$settings['column_gap']};";
         }
 
-        return "<div class=\"pb-text\" style=\"{$style}{$columnStyle}\">{$text}</div>";
+        return "<div class=\"pb-text{$dropCss}\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
     }
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $text = $settings['content'];
         $alignment = $settings['alignment'];
         $color = $settings['color'];
@@ -76,6 +78,7 @@ class TextWidget extends BaseWidget
         $fontWeight = $settings['font_weight'];
         $lineHeight = $settings['line_height'];
         $fontFamily = $settings['font_family'];
+        $children = $content['children'] ?? '';
 
         $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight};";
 
@@ -88,6 +91,6 @@ class TextWidget extends BaseWidget
             $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$settings['column_gap']};";
         }
 
-        return "<div class=\"pb-text-editor\" style=\"{$style}{$columnStyle}\">{$text}</div>";
+        return "<div class=\"pb-text-editor\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
     }
 }

@@ -56,7 +56,7 @@ class SectionWidget extends BaseWidget
 
     public function render(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $children = $content['children'] ?? '';
         $layout = $settings['layout'];
         $contentWidth = $settings['content_width'];
@@ -141,7 +141,7 @@ HTML;
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $children = $content['children'] ?? '';
         $layout = $settings['layout'];
         $bgColor = $settings['background_color'];

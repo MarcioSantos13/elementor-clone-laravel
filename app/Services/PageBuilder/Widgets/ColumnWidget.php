@@ -55,7 +55,7 @@ class ColumnWidget extends BaseWidget
 
     public function render(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $children = $content['children'] ?? '';
         $columnWidth = $settings['column_width'];
         $verticalAlign = $settings['vertical_alignment'];
@@ -118,7 +118,7 @@ HTML;
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
-        $settings = array_merge($this->defaultSettings, $settings);
+        $settings = $this->prepareSettings($settings);
         $children = $content['children'] ?? '';
         $columnWidth = $settings['column_width'];
         $verticalAlign = $settings['vertical_alignment'];
