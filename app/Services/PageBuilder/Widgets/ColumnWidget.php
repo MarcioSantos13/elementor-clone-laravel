@@ -47,9 +47,14 @@ class ColumnWidget extends BaseWidget
             'vertical_alignment' => ['type' => 'select', 'label' => 'Vertical Alignment',
                 'options' => ['stretch', 'flex-start', 'center', 'flex-end'],
             ],
+            'text_align' => ['type' => 'select', 'label' => 'Text Align', 'options' => ['left', 'center', 'right', 'justify']],
             'background_color' => ['type' => 'color', 'label' => 'Background Color'],
             'padding_top' => ['type' => 'text', 'label' => 'Padding Top'],
             'padding_bottom' => ['type' => 'text', 'label' => 'Padding Bottom'],
+            'padding_left' => ['type' => 'text', 'label' => 'Padding Left'],
+            'padding_right' => ['type' => 'text', 'label' => 'Padding Right'],
+            'margin' => ['type' => 'text', 'label' => 'Margin'],
+            'border_radius' => ['type' => 'text', 'label' => 'Border Radius'],
         ];
     }
 
@@ -123,6 +128,7 @@ HTML;
         $columnWidth = $settings['column_width'];
         $verticalAlign = $settings['vertical_alignment'];
         $contentPosition = $settings['content_position'];
+        $textAlign = $settings['text_align'] ?? '';
         $bgColor = $settings['background_color'];
         $bgImage = $settings['background_image'];
         $paddingTop = $settings['padding_top'];
@@ -135,6 +141,9 @@ HTML;
         $cssClasses = $settings['css_classes'];
 
         $style = "padding: {$paddingTop} {$paddingRight} {$paddingBottom} {$paddingLeft}; border-radius: {$borderRadius}; display: flex; flex-direction: column; align-self: {$verticalAlign}; justify-content: {$contentPosition};";
+        if ($textAlign) {
+            $style .= " text-align: {$textAlign};";
+        }
 
         if ($margin) {
             $style .= " margin: {$margin};";

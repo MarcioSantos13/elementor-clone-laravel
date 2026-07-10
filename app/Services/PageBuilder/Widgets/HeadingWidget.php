@@ -56,16 +56,16 @@ class HeadingWidget extends BaseWidget
         $link = $settings['link'];
         $linkTarget = $settings['link_target'];
 
+        $tagSizeMap = ['h1' => '2.2em', 'h2' => '1.8em', 'h3' => '1.4em', 'h4' => '1.15em', 'h5' => '1em', 'h6' => '.85em'];
         $sizeMap = [
             'small' => '1.2em',
-            'default' => '2em',
             'medium' => '2.5em',
             'large' => '3em',
             'xl' => '3.5em',
             'xxl' => '4.5em',
         ];
 
-        $fontSize = $sizeMap[$settings['size']] ?? '2em';
+        $fontSize = $sizeMap[$settings['size']] ?? ($tagSizeMap[$settings['tag']] ?? '1.8em');
 
         $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight}; margin-bottom: {$marginBottom};";
 
@@ -101,16 +101,16 @@ class HeadingWidget extends BaseWidget
         $lineHeight = $settings['line_height'];
         $marginBottom = $settings['margin_bottom'];
 
+        $tagSizeMap = ['h1' => '2.2em', 'h2' => '1.8em', 'h3' => '1.4em', 'h4' => '1.15em', 'h5' => '1em', 'h6' => '.85em'];
         $sizeMap = [
             'small' => '1.2em',
-            'default' => '2em',
             'medium' => '2.5em',
             'large' => '3em',
             'xl' => '3.5em',
             'xxl' => '4.5em',
         ];
 
-        $fontSize = $sizeMap[$settings['size']] ?? '2em';
+        $fontSize = $sizeMap[$settings['size']] ?? ($tagSizeMap[$settings['tag']] ?? '1.8em');
 
         $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight}; margin-bottom: {$marginBottom};";
 

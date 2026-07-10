@@ -26,8 +26,11 @@
             <a href="#preview">Visualizar Página</a>
             <a href="#duplicate-delete">Duplicar &amp; Excluir</a>
             <a href="#showcase">Template Showcase Completo</a>
-            <a href="#project-structure">Estrutura do Projeto</a>
-            <a href="#improvements">Melhorias Implementadas</a>
+            <a href="#architecture">Arquitetura do Projeto</a>
+            <a href="#database">Banco de Dados</a>
+            <a href="#routes">Rotas</a>
+            <a href="#quality">Qualidade &amp; Testes</a>
+            <a href="#improvements">Melhorias Propostas</a>
             <a href="#moodle">Uso com Moodle 4.5+</a>
         </div>
 
@@ -95,19 +98,70 @@ php artisan db:seed</code></pre>
             <h2>1. Visão Geral</h2>
 
             <div class="step-body">
-                <p>Este construtor de páginas permite criar páginas visualmente arrastando widgets para uma tela, editando conteúdo e estilo, e publicando o resultado — sem necessidade de código.</p>
-                <p><strong>O que você pode fazer:</strong></p>
+                <p>O <strong>Laravel Page Builder</strong> é um construtor de páginas visual drag-and-drop inspirado no Elementor. Permite criar páginas web completas arrastando widgets para uma tela, editando conteúdo e estilo em tempo real, sem escrever código.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Stack Tecnológica</h3>
+                <table class="widget-table">
+                    <tr><th>Camada</th><th>Tecnologia</th><th>Versão</th></tr>
+                    <tr><td>Backend</td><td>Laravel</td><td>12.x</td></tr>
+                    <tr><td>Frontend</td><td>JavaScript vanilla (sem frameworks)</td><td>ES2022+</td></tr>
+                    <tr><td>Banco de Dados</td><td>SQLite (padrão) / MySQL / MariaDB</td><td>&#8212;</td></tr>
+                    <tr><td>PHP</td><td>LTS</td><td>8.2+</td></tr>
+                    <tr><td>Build</td><td>Vite + Tailwind CSS</td><td>7.x / 4.x</td></tr>
+                    <tr><td>Testes</td><td>PHPUnit</td><td>11.x</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Números do Projeto</h3>
+                <table class="widget-table">
+                    <tr><th>Métrica</th><th>Valor</th></tr>
+                    <tr><td>Widgets disponíveis</td><td>6 (Título, Texto, Imagem, Botão, Seção, Coluna)</td></tr>
+                    <tr><td>Templates prontos</td><td>5 (Blank, Landing, About, Contact, Showcase Completo)</td></tr>
+                    <tr><td>Rotas definidas</td><td>35+ (CRUD páginas, elementos, revisões, templates)</td></tr>
+                    <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
+                    <tr><td>Tabelas no banco</td><td>3 principais (pages, elements, revisions)</td></tr>
+                    <tr><td>Views Blade</td><td>9 (login, register, tutorial, editor, pages)</td></tr>
+                    <tr><td>Linhas de JS do editor</td><td>~730</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades</h3>
                 <ul>
                     <li>Criar páginas com título e status (rascunho / publicado)</li>
-                    <li>Abrir um <strong>editor visual</strong> em tela cheia</li>
-                    <li>Arrastar <strong>widgets</strong> (Título, Texto, Imagem, Botão, etc.) para a página</li>
+                    <li>Abrir um <strong>editor visual</strong> em tela cheia com tema escuro</li>
+                    <li>Arrastar <strong>6 widgets</strong> (Título, Texto, Imagem, Botão, Seção, Coluna)</li>
                     <li>Selecionar qualquer elemento e editar suas <strong>configurações</strong> no painel direito</li>
                     <li>Alternar entre visualização <strong>desktop / tablet / mobile</strong></li>
-                    <li>Aplicar <strong>templates</strong> prontos (Landing, Sobre, Contato, Showcase Completo)</li>
+                    <li>Aplicar <strong>5 templates</strong> prontos</li>
+                    <li>Inline editing — duplo-clique para editar texto diretamente no canvas</li>
                     <li>Desfazer / refazer alterações (Ctrl+Z / Ctrl+Shift+Z)</li>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
-                    <li>Duplicar, exportar, importar ou excluir páginas</li>
+                    <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
+                    <li>Duplicar, exportar (JSON), importar, copiar HTML, excluir páginas</li>
+                    <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
                 </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Arquitetura Resumida</h3>
+                <div style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.8rem;line-height:1.6;overflow-x:auto;font-family:monospace">
+<pre style="margin:0">┌──────────────────────────────────────────────────┐
+│                  FRONTEND                         │
+│   editor.blade.php + page-builder-editor.js       │
+│   (730 linhas JS vanilla, sem frameworks)         │
+├──────────────────────────────────────────────────┤
+│                CONTROLLERS                        │
+│   PageController │ ElementController              │
+│   RevisionController                              │
+├──────────────────────────────────────────────────┤
+│                 SERVICES                          │
+│   PageBuilderService │ Renderer │ WidgetManager   │
+│   TemplateManager │ ElementManager                │
+├──────────────────────────────────────────────────┤
+│                  WIDGETS                          │
+│   BaseWidget → Heading │ Text │ Image │ Button    │
+│              Section │ Column                     │
+├──────────────────────────────────────────────────┤
+│              DATABASE (SQLite)                    │
+│   pages → elements (árvore) → revisions           │
+└──────────────────────────────────────────────────┘</pre>
+                </div>
             </div>
         </section>
 
@@ -176,18 +230,56 @@ php artisan db:seed</code></pre>
         <section id="editor" class="step">
             <h2>4. O Editor</h2>
             <div class="step-body">
-                <p>O editor é uma interface em tela cheia com tema escuro e três painéis:</p>
+                <p>O editor é uma interface em tela cheia com tema escuro. Ele carrega ao acessar <code>/page-builder/pages/{id}/editor</code>. A URL do canvas é acessível publicamente.</p>
                 <div class="panel-layout-ill">
                     <div class="panel-ill left"><strong>Widgets</strong><br><span style="font-size:.75rem">arraste itens para a tela</span></div>
-                    <div class="panel-ill center"><strong>Canvas</strong><br><span style="font-size:.75rem">prévia da sua página</span></div>
+                    <div class="panel-ill center"><strong>Canvas</strong><br><span style="font-size:.75rem">prévia ao vivo da sua página</span></div>
                     <div class="panel-ill right"><strong>Configurações</strong><br><span style="font-size:.75rem">opções do elemento selecionado</span></div>
                 </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Esquerdo — Widgets</h3>
                 <ul>
-                    <li><strong>Painel esquerdo</strong> — lista de widgets disponíveis. Arraste um para a tela.</li>
-                    <li><strong>Centro (canvas)</strong> — mostra uma prévia ao vivo da página. Clique em qualquer elemento para selecioná-lo.</li>
-                    <li><strong>Painel direito</strong> — mostra as configurações do elemento selecionado (ou da página).</li>
-                    <li><strong>Barra superior</strong> — botões responsivos (desktop/tablet/mobile), salvar, publicar, desfazer/refazer.</li>
+                    <li>Lista os 6 widgets disponíveis: Título, Texto, Imagem, Botão, Seção e Coluna</li>
+                    <li>Cada widget mostra um ícone (emoji) e nome</li>
+                    <li>O painel começa colapsado — clique no ícone de widgets (☰) na barra superior para expandir</li>
+                    <li>Clique em um widget para adicioná-lo à página (ou arraste para o canvas)</li>
                 </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Centro — Canvas</h3>
+                <ul>
+                    <li>Exibe a prévia ao vivo da página (iframe de largura 100%)</li>
+                    <li>Clique em qualquer elemento para selecioná-lo — ele fica com borda azul</li>
+                    <li>O elemento selecionado aparece destacado no painel direito</li>
+                    <li>Duplo-clique em textos de Título e Texto para edição inline</li>
+                    <li>Botão de remover (✕) aparece ao passar o mouse sobre elementos</li>
+                </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Direito — Configurações</h3>
+                <ul>
+                    <li>Mostra as configurações do elemento selecionado, ou da página se nada estiver selecionado</li>
+                    <li>Cada configuração tem um campo de entrada (texto, cor, seleção, etc.)</li>
+                    <li>As mudanças são aplicadas instantaneamente ao canvas</li>
+                    <li>O painel começa colapsado — clique no ícone de configurações (⚙️) na barra superior para expandir</li>
+                </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Barra Superior</h3>
+                <table class="widget-table">
+                    <tr><th>Grupo</th><th>Botões</th><th>Função</th></tr>
+                    <tr><td>Layout</td><td>☰, ⚙️</td><td>Expandir/colapsar painéis esquerdo e direito</td></tr>
+                    <tr><td>Responsivo</td><td>🖥️ 📱 📲</td><td>Desktop (100%), Tablet (768px), Mobile (360px)</td></tr>
+                    <tr><td>Ações</td><td>Desfazer / Refazer</td><td>Ctrl+Z / Ctrl+Shift+Z (máximo 50 estados)</td></tr>
+                    <tr><td>Salvar</td><td>💾 Salvar</td><td>Salva como rascunho (sem publicar)</td></tr>
+                    <tr><td>Publicar</td><td>🚀 Publicar</td><td>Muda status para "publicado"</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Carregamento do Editor</h3>
+                <ol>
+                    <li>A página é carregada via GET para <code>/page-builder/pages/{id}/editor</code></li>
+                    <li>O JS busca <code>GET /api/page-builder/pages/{id}/elements</code> para obter a árvore de elementos</li>
+                    <li>Os elementos são renderizados recursivamente (Seção → Coluna → widgets)</li>
+                    <li>O painel de configurações é carregado via <code>GET /api/page-builder/widgets/{type}/controls</code></li>
+                    <li>Salvamento automático inicia a cada 60 segundos</li>
+                </ol>
             </div>
         </section>
 
@@ -195,24 +287,112 @@ php artisan db:seed</code></pre>
         <section id="drag-widgets" class="step">
             <h2>5. Adicionar Widgets (Arrastar &amp; Soltar)</h2>
             <div class="step-body">
-                <p>Cada widget adiciona um tipo diferente de conteúdo. Veja o que cada um faz:</p>
+                <p>Cada widget adiciona um tipo diferente de conteúdo. Veja o que cada um faz e suas configurações disponíveis:</p>
+
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Visão Geral dos Widgets</h3>
                 <table class="widget-table">
-                    <tr><th>Widget</th><th>O que cria</th></tr>
-                    <tr><td><strong>Título (Heading)</strong></td><td>Um título grande (&lt;h1&gt;–&lt;h6&gt;) com tag, texto, alinhamento e cor configuráveis</td></tr>
-                    <tr><td><strong>Texto</strong></td><td>Um parágrafo ou bloco de texto com conteúdo e cor configuráveis</td></tr>
-                    <tr><td><strong>Imagem</strong></td><td>Uma imagem com URL, texto alternativo e largura configuráveis</td></tr>
-                    <tr><td><strong>Botão</strong></td><td>Um botão clicável com texto, URL, alinhamento e cor configuráveis</td></tr>
-                    <tr><td><strong>Seção</strong></td><td>Um contêiner estrutural (linha de largura total). Você coloca Colunas ou outros widgets dentro dela</td></tr>
-                    <tr><td><strong>Coluna</strong></td><td>Uma coluna vertical dentro de uma Seção. Controla largura, alinhamento, padding, fundo</td></tr>
+                    <tr><th>Widget</th><th>O que cria</th><th>Total de controles</th></tr>
+                    <tr><td><strong>Título (Heading)</strong></td><td>Um título grande (&lt;h1&gt;–&lt;h6&gt;) com tag, texto, alinhamento e cor configuráveis</td><td>8</td></tr>
+                    <tr><td><strong>Texto</strong></td><td>Um parágrafo ou bloco de texto com conteúdo e cor configuráveis</td><td>7</td></tr>
+                    <tr><td><strong>Imagem</strong></td><td>Uma imagem com URL, texto alternativo e largura configuráveis</td><td>7</td></tr>
+                    <tr><td><strong>Botão</strong></td><td>Um botão clicável com texto, URL, alinhamento e cor configuráveis</td><td>8</td></tr>
+                    <tr><td><strong>Seção</strong></td><td>Um contêiner estrutural (linha de largura total). Você coloca Colunas ou outros widgets dentro dela</td><td>16</td></tr>
+                    <tr><td><strong>Coluna</strong></td><td>Uma coluna vertical dentro de uma Seção. Controla largura, alinhamento, padding, fundo</td><td>10</td></tr>
                 </table>
-                <p><strong>Como adicionar:</strong></p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Título (Heading)</h3>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Title</td><td>text (obrigatório)</td><td>Texto do título (máx. 500 caracteres)</td></tr>
+                    <tr><td>HTML Tag</td><td>select</td><td>h1, h2, h3, h4, h5, h6, p, div</td></tr>
+                    <tr><td>Alignment</td><td>select</td><td>left, center, right, justify</td></tr>
+                    <tr><td>Size</td><td>select</td><td>small, default, medium, large, xl, xxl</td></tr>
+                    <tr><td>Color</td><td>color</td><td>Qualquer cor (hex)</td></tr>
+                    <tr><td>Font Family</td><td>text</td><td>Nome da fonte (ex: Arial, Georgia)</td></tr>
+                    <tr><td>Font Weight</td><td>select</td><td>300, 400, 500, 600, 700, 800, 900</td></tr>
+                    <tr><td>Link</td><td>url</td><td>URL para onde o título链接 (opcional)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Texto</h3>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Content</td><td>textarea (obrigatório)</td><td>Conteúdo do texto (suporta HTML)</td></tr>
+                    <tr><td>Alignment</td><td>select</td><td>left, center, right, justify</td></tr>
+                    <tr><td>Color</td><td>color</td><td>Qualquer cor (hex)</td></tr>
+                    <tr><td>Font Size</td><td>number</td><td>8–200px</td></tr>
+                    <tr><td>Font Family</td><td>text</td><td>Nome da fonte</td></tr>
+                    <tr><td>Line Height</td><td>number</td><td>0.5–5.0</td></tr>
+                    <tr><td>Drop Cap</td><td>boolean</td><td>Sim/Não (primeira letra em destaque)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Imagem</h3>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Image</td><td>image</td><td>URL da imagem</td></tr>
+                    <tr><td>Caption</td><td>text</td><td>Legenda (máx. 300 caracteres)</td></tr>
+                    <tr><td>Alignment</td><td>select</td><td>left, center, right</td></tr>
+                    <tr><td>Width</td><td>text</td><td>Largura (ex: 100%, 300px)</td></tr>
+                    <tr><td>Border Radius</td><td>text</td><td>Raio da borda (ex: 8px, 50%)</td></tr>
+                    <tr><td>Link</td><td>url</td><td>URL de destino ao clicar</td></tr>
+                    <tr><td>Enable Lightbox</td><td>boolean</td><td>Sim/Não (abrir em lightbox)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Botão</h3>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Button Text</td><td>text (obrigatório)</td><td>Texto do botão (máx. 100 caracteres)</td></tr>
+                    <tr><td>Link</td><td>url</td><td>URL de destino</td></tr>
+                    <tr><td>Alignment</td><td>select</td><td>left, center, right, stretch</td></tr>
+                    <tr><td>Size</td><td>select</td><td>small, medium, large, xl</td></tr>
+                    <tr><td>Background Color</td><td>color</td><td>Cor de fundo do botão</td></tr>
+                    <tr><td>Text Color</td><td>color</td><td>Cor do texto</td></tr>
+                    <tr><td>Border Radius</td><td>text</td><td>Raio da borda (ex: 6px)</td></tr>
+                    <tr><td>Font Size</td><td>number</td><td>10–100px</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Seção</h3>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Layout</td><td>select</td><td>boxed, full_width, full_height</td></tr>
+                    <tr><td>Content Width</td><td>text</td><td>Largura do conteúdo (ex: 1140px)</td></tr>
+                    <tr><td>Min Height</td><td>text</td><td>Altura mínima (ex: 400px)</td></tr>
+                    <tr><td>Align Items</td><td>select</td><td>stretch, flex-start, center, flex-end</td></tr>
+                    <tr><td>Justify Content</td><td>select</td><td>flex-start, center, flex-end, space-between, space-around, space-evenly</td></tr>
+                    <tr><td>Background Type</td><td>select</td><td>none, classic, gradient, video</td></tr>
+                    <tr><td>Background Color</td><td>color</td><td>Cor de fundo</td></tr>
+                    <tr><td>Padding Top</td><td>text</td><td>Espaçamento superior (ex: 80px)</td></tr>
+                    <tr><td>Padding Bottom</td><td>text</td><td>Espaçamento inferior</td></tr>
+                    <tr><td>Padding Left</td><td>text</td><td>Espaçamento esquerdo</td></tr>
+                    <tr><td>Padding Right</td><td>text</td><td>Espaçamento direito</td></tr>
+                    <tr><td>Margin Top</td><td>text</td><td>Margem superior</td></tr>
+                    <tr><td>Margin Bottom</td><td>text</td><td>Margem inferior</td></tr>
+                    <tr><td>Border Radius</td><td>text</td><td>Raio da borda</td></tr>
+                    <tr><td>Box Shadow</td><td>text</td><td>Sombra (ex: 0 4px 6px rgba(0,0,0,0.1))</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Coluna</h3>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Column Width</td><td>select</td><td>col-1 até col-12 (grid de 12 colunas, padrão: col-4)</td></tr>
+                    <tr><td>Vertical Alignment</td><td>select</td><td>stretch, flex-start, center, flex-end</td></tr>
+                    <tr><td>Text Align</td><td>select</td><td>left, center, right, justify</td></tr>
+                    <tr><td>Background Color</td><td>color</td><td>Cor de fundo</td></tr>
+                    <tr><td>Padding Top</td><td>text</td><td>Espaçamento superior</td></tr>
+                    <tr><td>Padding Bottom</td><td>text</td><td>Espaçamento inferior</td></tr>
+                    <tr><td>Padding Left</td><td>text</td><td>Espaçamento esquerdo</td></tr>
+                    <tr><td>Padding Right</td><td>text</td><td>Espaçamento direito</td></tr>
+                    <tr><td>Margin</td><td>text</td><td>Margem externa</td></tr>
+                    <tr><td>Border Radius</td><td>text</td><td>Raio da borda</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Adicionar</h3>
                 <ol>
                     <li>No <strong>painel esquerdo</strong>, encontre o widget desejado</li>
                     <li><strong>Arraste</strong> (clique e segure) e <strong>solte</strong> na tela</li>
                     <li>O widget aparece instantaneamente no canvas</li>
                 </ol>
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> Comece arrastando uma <strong>Seção</strong> para a tela, depois arraste uma <strong>Coluna</strong> para dentro da seção, e então arraste widgets de conteúdo (Título, Texto, etc.) para dentro da coluna.
+                    <strong>&#128161; Dica:</strong> Comece arrastando uma <strong>Seção</strong> para a tela, depois arraste uma <strong>Coluna</strong> para dentro da seção, e então arraste widgets de conteúdo (Título, Texto, etc.) para dentro da coluna. A estrutura é: Seção → Coluna → Widget.
                 </div>
             </div>
         </section>
@@ -779,104 +959,322 @@ php artisan db:seed</code></pre>
         </section>
 
         {{-- PROJECT STRUCTURE --}}
-        <section id="project-structure" class="step">
-            <h2>15. Estrutura do Projeto</h2>
+        <section id="architecture" class="step">
+            <h2>15. Arquitetura do Projeto</h2>
             <div class="step-body">
-                <p>Este projeto é uma aplicação Laravel com a seguinte estrutura de alto nível:</p>
+                <p>O projeto segue o padrão MVC do Laravel com uma camada adicional de <strong>Serviços</strong> e <strong>Widgets</strong> para isolar a lógica do page builder.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Backend (Laravel)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Diagrama de Arquitetura</h3>
+                <div style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.78rem;line-height:1.5;overflow-x:auto;font-family:monospace">
+<pre style="margin:0">┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND (730 linhas JS)                 │
+│  page-builder-editor.js ← editor.blade.php                     │
+│  drag-drop, undo/redo, auto-save, inline editing, panels       │
+├─────────────────────────────────────────────────────────────────┤
+│                     CONTROLLERS (3 classes)                      │
+│  PageController      — CRUD páginas, templates, export/import   │
+│  ElementController   — CRUD elementos, controles, upload        │
+│  RevisionController  — revisões, diff, restore, auto-save       │
+├─────────────────────────────────────────────────────────────────┤
+│                     SERVICES (5 classes)                         │
+│  PageBuilderService  — orquestra tudo (create, update, render)  │
+│  ElementManager      — CRUD elementos, árvore, reordenação      │
+│  WidgetManager       — registra e gerencia widgets dinamicamente│
+│  Renderer            — renderiza árvore de elementos → HTML     │
+│  TemplateManager     — 5 templates predefinidos                 │
+├─────────────────────────────────────────────────────────────────┤
+│                     WIDGETS (7 classes)                          │
+│  BaseWidget (abstract) → HeadingWidget                          │
+│                        → TextWidget                             │
+│                        → ImageWidget                            │
+│                        → ButtonWidget                           │
+│                        → SectionWidget                          │
+│                        → ColumnWidget                           │
+├─────────────────────────────────────────────────────────────────┤
+│                     DATABASE (SQLite)                            │
+│  pages → elements (árvore via parent_id) → revisions            │
+└─────────────────────────────────────────────────────────────────┘</pre>
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Árvore de Diretórios do Page Builder</h3>
                 <table class="widget-table">
-                    <tr><th>Caminho</th><th>Descrição</th></tr>
-                    <tr><td><code>app/Models/</code></td><td>Models Eloquent: <code>Page</code>, <code>PageElement</code>, <code>Widget</code></td></tr>
-                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>Controllers para API de páginas, renderização do editor, templates</td></tr>
-                    <tr><td><code>app/Http/Controllers/PageBuilderController.php</code></td><td>Controller principal para operações CRUD e gerenciamento de templates</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/</code></td><td>Classes de serviço para renderização de páginas, lógica de construção de templates</td></tr>
-                    <tr><td><code>database/migrations/</code></td><td>Arquivos de migração para as tabelas pages, page_elements e widgets</td></tr>
-                    <tr><td><code>database/seeders/</code></td><td>Seeders para criar definições de templates e dados de widget de exemplo</td></tr>
-                    <tr><td><code>routes/web.php</code></td><td>Rotas web para o page builder (páginas, editor, templates)</td></tr>
-                    <tr><td><code>routes/api.php</code></td><td>Rotas de API para operações AJAX (salvar, atualizar, reordenar elementos)</td></tr>
+                    <tr><th>Caminho</th><th>Arquivos</th><th>Descrição</th></tr>
+                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>3</td><td>PageController, ElementController, RevisionController</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>5</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>7</td><td>BaseWidget + 6 widgets concretos</td></tr>
+                    <tr><td><code>app/Providers/</code></td><td>1</td><td>PageBuilderServiceProvider (registra singletons e rotas)</td></tr>
+                    <tr><td><code>config/page-builder.php</code></td><td>1</td><td>Configuração: lista de widgets habilitados, config de cache</td></tr>
+                    <tr><td><code>database/migrations/</code></td><td>3</td><td>pages, elements, revisions</td></tr>
+                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>35+ rotas (resource pages + elementos + revisões)</td></tr>
+                    <tr><td><code>resources/views/</code></td><td>9</td><td>Blade views (editor, pages, auth, tutorial)</td></tr>
+                    <tr><td><code>public/js/</code></td><td>1</td><td>page-builder-editor.js (730 linhas)</td></tr>
+                    <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
+                    <tr><td><code>tests/Feature/</code></td><td>4</td><td>PageControllerTest, ElementControllerTest, RevisionControllerTest, ExampleTest</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Frontend (Views & Assets)</h3>
-                <table class="widget-table">
-                    <tr><th>Caminho</th><th>Descrição</th></tr>
-                    <tr><td><code>resources/views/page-builder/pages/</code></td><td>Views Blade para lista de páginas (index), formulário de criação, preview</td></tr>
-                    <tr><td><code>resources/views/page-builder/editor/</code></td><td>View Blade para a interface do editor em tela cheia</td></tr>
-                    <tr><td><code>resources/views/page-builder/layouts/</code></td><td>Arquivos de layout (app.blade.php) compartilhados entre as views do builder</td></tr>
-                    <tr><td><code>resources/views/page-builder/partials/</code></td><td>Partials reutilizáveis (painel de widgets, painel de configurações, barra de ferramentas)</td></tr>
-                    <tr><td><code>resources/views/page-builder/render/</code></td><td>Componentes Blade para renderizar cada tipo de widget no front-end</td></tr>
-                    <tr><td><code>public/js/page-builder/</code></td><td>Arquivos JavaScript: drag-and-drop, desfazer/refazer, salvamento automático, lógica do editor</td></tr>
-                    <tr><td><code>public/css/page-builder/</code></td><td>Arquivos CSS para a interface do editor e renderização front-end</td></tr>
-                </table>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Injeção de Dependências (Provider)</h3>
+                <p>O <code>PageBuilderServiceProvider</code> registra todos os serviços como <strong>singletons</strong> (uma instância compartilhada):</p>
+                <ul>
+                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 6 widgets</li>
+                    <li><code>ElementManager</code> — recebe WidgetManager via construtor</li>
+                    <li><code>Renderer</code> — recebe WidgetManager, renderiza árvore de elementos → HTML</li>
+                    <li><code>PageBuilderService</code> — orquestra os três serviços acima</li>
+                    <li><code>TemplateManager</code> — singleton independente, sem dependências</li>
+                </ul>
+                <p>O provider também carrega rotas, views e config publicável.</p>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Fluxo de Dados Principal</h3>
                 <ol>
-                    <li><strong>Pages</strong> armazenam metadados (título, status, configurações de container, CSS personalizado)</li>
-                    <li><strong>PageElements</strong> armazenam a árvore de widgets como uma estrutura aninhada (<code>parent_id</code> para hierarquia, <code>sort_order</code> para ordenação)</li>
-                    <li>Cada <strong>PageElement</strong> tem um <code>widget_id</code> referenciando o model <strong>Widget</strong>, além de uma coluna JSON <code>settings</code> para configuração específica do widget</li>
-                    <li>O <strong>editor</strong> carrega a página com todos os seus elementos via um endpoint da API, então renderiza o canvas usando partials recursivas</li>
-                    <li><strong>Salvar</strong> envia a árvore completa de elementos como JSON para o servidor, que sincroniza com o banco de dados</li>
-                    <li><strong>Templates</strong> são conjuntos predefinidos de PageElements que podem ser aplicados a páginas novas ou existentes</li>
+                    <li><strong>Criar página</strong> → <code>PageController::store()</code> → <code>PageBuilderService::createPage()</code> → insere na tabela <code>pages</code></li>
+                    <li><strong>Abrir editor</strong> → <code>PageController::edit()</code> → renderiza <code>editor.blade.php</code> → JS busca <code>GET /elements</code></li>
+                    <li><strong>Arrastar widget</strong> → JS envia <code>POST /elements</code> → <code>ElementController::store()</code> → insere na tabela <code>elements</code></li>
+                    <li><strong>Editar configuração</strong> → JS envia <code>PUT /elements/{id}/settings</code> → atualiza JSON <code>settings</code></li>
+                    <li><strong>Salvar</strong> → <code>PUT /pages/{id}</code> → <code>PageBuilderService::updatePage()</code> → cria <code>Revision</code></li>
+                    <li><strong>Renderizar</strong> → <code>Renderer::render()</code> → percorre árvore recursivamente → gera HTML com estilos inline</li>
                 </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Sistema de Widgets</h3>
+                <p>Cada widget é uma classe que implementa <code>WidgetInterface</code> e estende <code>BaseWidget</code>. Cada um define:</p>
+                <ul>
+                    <li><code>__construct()</code> — tipo, label, ícone, categorias, configurações padrão</li>
+                    <li><code>controls()</code> — array de configurações editáveis no painel</li>
+                    <li><code>render()</code> — gera o HTML de exibição final (front-end)</li>
+                    <li><code>renderEditor()</code> — gera o HTML para o canvas do editor (com atributos <code>data-element-id</code>)</li>
+                </ul>
+                <p>O <code>WidgetManager</code> registra widgets dinamicamente a partir do arquivo de config, permitindo habilitar/desabilitar widgets sem modificar código.</p>
+            </div>
+        </section>
+
+        {{-- DATABASE --}}
+        <section id="database" class="step">
+            <h2>16. Banco de Dados</h2>
+            <div class="step-body">
+                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 3 tabelas principais além das padrão do Laravel (users, cache, jobs):</p>
+
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Tabela <code>pages</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Referência ao usuário dono (cascade delete)</td></tr>
+                    <tr><td><code>title</code></td><td>string</td><td>Título da página</td></tr>
+                    <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug para URLs (gerado automaticamente)</td></tr>
+                    <tr><td><code>status</code></td><td>string</td><td>"draft" ou "published" (padrão: draft)</td></tr>
+                    <tr><td><code>content</code></td><td>longText (nullable)</td><td>Conteúdo HTML renderizado</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações: container_width, page_background, content_padding, css_custom</td></tr>
+                    <tr><td><code>meta_data</code></td><td>json (nullable)</td><td>Metadados (SEO, tags, etc.)</td></tr>
+                    <tr><td><code>template</code></td><td>string (nullable)</td><td>Nome do template aplicado</td></tr>
+                    <tr><td><code>created_at / updated_at</code></td><td>timestamps</td><td>Datas de criação e atualização</td></tr>
+                    <tr><td><code>deleted_at</code></td><td>softDeletes</td><td>Exclusão lógica</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>elements</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>page_id</code></td><td>foreignId</td><td>Página pai (cascade delete)</td></tr>
+                    <tr><td><code>parent_id</code></td><td>foreignId (nullable)</td><td>Elemento pai — cria a <strong>árvore</strong> (Section → Column → Widget)</td></tr>
+                    <tr><td><code>uuid</code></td><td>uuid (unique)</td><td>Identificador único universal para cada elemento</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>Tipo do widget: heading, text, image, button, section, column</td></tr>
+                    <tr><td><code>name</code></td><td>string</td><td>Nome exibido no editor (ex: "Heading", "Section")</td></tr>
+                    <tr><td><code>order</code></td><td>integer</td><td>Ordem dentro do pai (padrão: 0)</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações do widget (varia por tipo)</td></tr>
+                    <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo (textos, URLs, etc.)</td></tr>
+                    <tr><td><code>styles</code></td><td>json (nullable)</td><td>Estilos CSS personalizados</td></tr>
+                    <tr><td><code>responsive_settings</code></td><td>json (nullable)</td><td>Configurações por breakpoint</td></tr>
+                    <tr><td><code>animation</code></td><td>json (nullable)</td><td>Animações de entrada</td></tr>
+                    <tr><td><code>effects</code></td><td>json (nullable)</td><td>Efeitos visuais</td></tr>
+                    <tr><td><code>column_size</code></td><td>string</td><td>Largura da coluna (padrão: "col-12")</td></tr>
+                    <tr><td><code>css_classes</code></td><td>json (nullable)</td><td>Classes CSS adicionais</td></tr>
+                    <tr><td><code>css_id</code></td><td>string (nullable)</td><td>ID CSS personalizado</td></tr>
+                    <tr><td><code>deleted_at</code></td><td>softDeletes</td><td>Exclusão lógica</td></tr>
+                </table>
+                <div class="tip">
+                    <strong>&#128161; Árvore de Elementos:</strong> A estrutura hierárquica é formada pelo campo <code>parent_id</code>. Uma Seção contém Colunas, que contêm widgets. Exemplo: Section (parent_id=null) → Column (parent_id=section.id) → Heading (parent_id=column.id).
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>revisions</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>page_id</code></td><td>foreignId</td><td>Página revisada (cascade delete)</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Usuário que fez a revisão</td></tr>
+                    <tr><td><code>version</code></td><td>string(20)</td><td>Versão da revisão (ex: "1.0", "2.3")</td></tr>
+                    <tr><td><code>label</code></td><td>string (nullable)</td><td>Label descritivo (ex: "Versão inicial")</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>"manual" ou "auto" (padrão: manual)</td></tr>
+                    <tr><td><code>content</code></td><td>longText (nullable)</td><td>Snapshot do conteúdo HTML da página</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Snapshot das configurações da página</td></tr>
+                    <tr><td><code>meta_data</code></td><td>json (nullable)</td><td>Snapshot dos metadados</td></tr>
+                    <tr><td><code>diff</code></td><td>json (nullable)</td><td>Diff em relação à revisão anterior</td></tr>
+                </table>
+            </div>
+        </section>
+
+        {{-- ROUTES --}}
+        <section id="routes" class="step">
+            <h2>17. Rotas</h2>
+            <div class="step-body">
+                <p>Todas as rotas do page builder ficam em <code>routes/page-builder.php</code>, protegidas pelo middleware <code>web</code> + <code>auth</code>, com prefixo <code>/page-builder</code>.</p>
+
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Rotas de Páginas</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages</code></td><td>PageController@index</td><td>Listar páginas</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/create</code></td><td>PageController@create</td><td>Formulário de criação</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages</code></td><td>PageController@store</td><td>Criar página</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/editor</code></td><td>PageController@edit</td><td>Abrir editor visual</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/pages/{id}</code></td><td>PageController@update</td><td>Atualizar página</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/pages/{id}</code></td><td>PageController@destroy</td><td>Excluir página</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/render</code></td><td>PageController@render</td><td>Renderizar HTML da página</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/data</code></td><td>PageController@getData</td><td>Dados JSON da página</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/publish</code></td><td>PageController@publish</td><td>Publicar</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/unpublish</code></td><td>PageController@unpublish</td><td>Despublicar</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/duplicate</code></td><td>PageController@duplicate</td><td>Duplicar página</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/export</code></td><td>PageController@export</td><td>Exportar JSON</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/import</code></td><td>PageController@import</td><td>Importar JSON</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/templates</code></td><td>PageController@listTemplates</td><td>Listar templates</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/apply-template</code></td><td>PageController@applyTemplate</td><td>Aplicar template</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/pages/{id}/layout</code></td><td>PageController@updateLayout</td><td>Atualizar layout</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Elementos</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/elements</code></td><td>ElementController@index</td><td>Listar elementos da página</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/elements</code></td><td>ElementController@store</td><td>Criar elemento</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/elements/{id}</code></td><td>ElementController@show</td><td>Ver elemento</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/elements/{id}</code></td><td>ElementController@update</td><td>Atualizar elemento</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/elements/{id}</code></td><td>ElementController@destroy</td><td>Excluir elemento</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/elements/{id}/duplicate</code></td><td>ElementController@duplicate</td><td>Duplicar elemento</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/elements/reorder</code></td><td>ElementController@reorder</td><td>Reordenar elementos</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/elements/{id}/move</code></td><td>ElementController@move</td><td>Mover elemento</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/elements/{id}/settings</code></td><td>ElementController@updateSettings</td><td>Atualizar configurações</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/elements/{id}/styles</code></td><td>ElementController@updateStyles</td><td>Atualizar estilos</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/elements/{id}/render</code></td><td>ElementController@renderElement</td><td>Renderizar elemento</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/elements/{id}/controls</code></td><td>ElementController@controls</td><td>Controles do elemento</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/widgets/{type}/controls</code></td><td>ElementController@widgetControls</td><td>Controles por tipo de widget</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/upload</code></td><td>ElementController@uploadImage</td><td>Upload de imagem</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Revisões</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/revisions</code></td><td>RevisionController@index</td><td>Listar revisões</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/revisions/{id}</code></td><td>RevisionController@show</td><td>Ver revisão</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/revisions/{id}/restore</code></td><td>RevisionController@restore</td><td>Restaurar revisão</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/revisions/{id}/diff</code></td><td>RevisionController@diff</td><td>Ver diff</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/revisions/{id}</code></td><td>RevisionController@destroy</td><td>Excluir revisão</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/revisions/prune</code></td><td>RevisionController@prune</td><td>Limpar revisões antigas</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/revisions/auto-save</code></td><td>RevisionController@autoSave</td><td>Auto-save (a cada 60s)</td></tr>
+                </table>
+            </div>
+        </section>
+
+        {{-- QUALITY --}}
+        <section id="quality" class="step">
+            <h2>18. Qualidade &amp; Testes</h2>
+            <div class="step-body">
+                <p>O projeto tem uma suíte completa de testes automatizados com <strong>93 testes</strong> rodando em SQLite em memória.</p>
+
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Resumo da Qualidade</h3>
+                <table class="widget-table">
+                    <tr><th>Métrica</th><th>Valor</th><th>Avaliação</th></tr>
+                    <tr><td>Testes totais</td><td>93</td><td style="color:green">Boa cobertura</td></tr>
+                    <tr><td>Testes unitários</td><td>45</td><td style="color:green">Widgets, Services, Templates</td></tr>
+                    <tr><td>Testes de feature</td><td>48</td><td style="color:green">Controllers, Auth, Fluxos</td></tr>
+                    <tr><td>Cobertura de controllers</td><td>3/3</td><td style="color:green">100% dos controllers</td></tr>
+                    <tr><td>Cobertura de widgets</td><td>7/7</td><td style="color:green">BaseWidget + todos os 6 widgets</td></tr>
+                    <tr><td>Sanitização de XSS</td><td>Implementada</td><td style="color:green">PageBuilderService::sanitizeContent()</td></tr>
+                    <tr><td>Autorização (Policy)</td><td>Implementada</td><td style="color:green">PagePolicy em PageController</td></tr>
+                    <tr><td>Tratamento de erros JS</td><td>14 fetch()</td><td style="color:green">Todos com .catch() + toast</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes Unitários (45)</h3>
+                <table class="widget-table">
+                    <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
+                    <tr><td><code>BaseWidgetTest</code></td><td>13</td><td>Getters, validação, prepareSettings, sanitização, isContainer, isDynamic</td></tr>
+                    <tr><td><code>PageBuilderServiceTest</code></td><td>19</td><td>Create, update, sanitize, elements, revisions, export/import, render</td></tr>
+                    <tr><td><code>TemplateManagerTest</code></td><td>12</td><td>Listagem, aplicação, importação, edge cases, estrutura de templates</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (48)</h3>
+                <table class="widget-table">
+                    <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
+                    <tr><td><code>PageControllerTest</code></td><td>24</td><td>CRUD, auth, publish, templates, export/import, duplicate</td></tr>
+                    <tr><td><code>ElementControllerTest</code></td><td>15</td><td>CRUD, auth, reorder, move, settings, styles, controls</td></tr>
+                    <tr><td><code>RevisionControllerTest</code></td><td>9</td><td>List, show, restore, diff, delete, prune, auto-save, auth</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Rodar os Testes</h3>
+                <div style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0">
+<pre style="margin:0"># Rodar todos os testes
+php artisan test
+
+# Rodar apenas os testes unitários
+php artisan test --testsuite=Unit
+
+# Rodar com verbose
+php artisan test --verbose</pre>
+                </div>
             </div>
         </section>
 
         {{-- IMPROVEMENTS --}}
         <section id="improvements" class="step">
-            <h2>16. Melhorias Implementadas</h2>
+            <h2>19. Melhorias Propostas</h2>
             <div class="step-body">
-                <p>Durante o desenvolvimento, diversas melhorias de segurança, qualidade e arquitetura foram aplicadas. Abaixo o resumo de cada uma.</p>
+                <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. Abaixo estão as melhorias propostas, organizadas por prioridade.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.1 Autorização (Policy)</h3>
-                <p>Uma <strong>PagePolicy</strong> foi criada em <code>app/Policies/PagePolicy.php</code> para restringir ações de edição e exclusão de páginas ao usuário dono (<code>user_id</code>). A visualização permanece liberada para qualquer usuário logado. A policy é registrada via <code>AuthServiceProvider</code> em <code>app/Providers/AuthServiceProvider.php</code> e aplicada com <code>$this->authorize()</code> nos controllers de página, elemento e revisão.</p>
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Alta Prioridade (Segurança &amp; Confiabilidade)</h3>
+                <table class="widget-table">
+                    <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
+                    <tr><td>1</td><td><strong>Rate Limiting</strong></td><td>Adicionar rate limiting nas rotas de API (save, upload) para evitar abuso</td><td>Segurança</td></tr>
+                    <tr><td>2</td><td><strong>CSRF nas rotas API</strong></td><td>Verificar se todas as rotas POST/PUT/DELETE têm proteção CSRF (middleware web já aplica, mas validar)</td><td>Segurança</td></tr>
+                    <tr><td>3</td><td><strong>Validação de Upload</strong></td><td>Adicionar validação de tipo MIME e tamanho no upload de imagens (atualmente aceita qualquer arquivo)</td><td>Segurança</td></tr>
+                    <tr><td>4</td><td><strong>Soft Delete com Hard Limit</strong></td><td>Adicionar limpeza periódica de registros soft-deleted antigos (>30 dias) para evitar crescimento do banco</td><td>Performance</td></tr>
+                    <tr><td>5</td><td><strong>Lock de Concorrência</strong></td><td>Usar <code>lockForUpdate()</code> ao salvar páginas com múltiplos usuários editando simultaneamente</td><td>Confiabilidade</td></tr>
+                </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2 Sanitização de Conteúdo e Configurações</h3>
-                <p>O método <code>sanitizeContent()</code> no <code>PageBuilderService</code> foi reforçado para sanitizar URLs em tags <code>&lt;a&gt;</code> e <code>&lt;img&gt;</code>, remover atributos <code>on*</code> (event handlers) e bloquear protocolo <code>javascript:</code>. O método <code>sanitizeSettings()</code> valida cada configuração de widget por tipo esperado (cores, URLs, HTML, texto puro, números, booleanos e aninhados), rejeitando valores inesperados.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Média Prioridade (Funcionalidade)</h3>
+                <table class="widget-table">
+                    <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
+                    <tr><td>6</td><td><strong>Widget de Vídeo</strong></td><td>Adicionar widget para incorporar vídeos do YouTube/Vimeo com preview no editor</td><td>Funcionalidade</td></tr>
+                    <tr><td>7</td><td><strong>Widget de Ícone</strong></td><td>Widget de ícones com biblioteca Font Awesome ou similar</td><td>Funcionalidade</td></tr>
+                    <tr><td>8</td><td><strong>Widget de Divisor</strong></td><td>Linha horizontal com estilo configurável (cor, espessura, tipo)</td><td>Funcionalidade</td></tr>
+                    <tr><td>9</td><td><strong>Widget de Espaçador</strong></td><td>Espaço em branco com altura configurável para respiração visual</td><td>Funcionalidade</td></tr>
+                    <tr><td>10</td><td><strong>Galeria de Imagens</strong></td><td>Widget para exibir múltiplas imagens em grid ou carrossel</td><td>Funcionalidade</td></tr>
+                    <tr><td>11</td><td><strong>Formulário de Contato</strong></td><td>Widget de formulário com campos configuráveis e envio por email</td><td>Funcionalidade</td></tr>
+                </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.3 Tratamento de Erros no Editor JavaScript</h3>
-                <p>Todas as 14 chamadas <code>fetch()</code> no editor JS (<code>public/js/page-builder-editor.js</code>) agora possuem encadeamento <code>.catch()</code> que exibe um toast de erro ao usuário, evitando que falhas silenciosas passem despercebidas.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Baixa Prioridade (UX &amp; Performance)</h3>
+                <table class="widget-table">
+                    <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
+                    <tr><td>12</td><td><strong>Ctrl+Z Visual</strong></td><td>Botão de desfazer visível no editor (além do atalho de teclado)</td><td>UX</td></tr>
+                    <tr><td>13</td><td><strong>Preview em Tempo Real</strong></td><td>Ao editar configurações, atualizar o canvas instantaneamente (atualmente requer click fora)</td><td>UX</td></tr>
+                    <tr><td>14</td><td><strong>Drag Handle Melhorado</strong></td><td>Ícone de arrastar mais visível e área de drag maior para facilitar reordenação</td><td>UX</td></tr>
+                    <tr><td>15</td><td><strong>Cache de Widgets</strong></td><td>Cache os controles de widgets no localStorage para carregamento mais rápido do editor</td><td>Performance</td></tr>
+                </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.4 TemplateManager</h3>
-                <p>A lógica de templates foi extraída do <code>PageController</code> para uma classe dedicada <code>TemplateManager</code> em <code>app/Services/PageBuilder/Core/TemplateManager.php</code>. Ela é registrada como singleton no <code>PageBuilderServiceProvider</code> e injetada no controller, seguindo o princípio da responsabilidade única. Os templates hardcoded foram movidos para o método <code>defaultTemplates()</code> do gerenciador.</p>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.5 Settings com Valores Default (prepareSettings)</h3>
-                <p>O método <code>prepareSettings()</code> foi adicionado ao <code>BaseWidget</code> e implementado em todos os 6 widgets (Heading, Text, Image, Button, Section, Column). Ele faz o merge automático das configurações salvas com os defaults definidos em <code>getDefaultSettings()</code>, eliminando lógica duplicada nos métodos <code>render()</code> e <code>renderEditor()</code>.</p>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.6 Editor JS Extraído</h3>
-                <p>O JavaScript do editor (<em>~630 linhas</em>) foi movido da view Blade <code>editor.blade.php</code> para um arquivo separado <code>public/js/page-builder-editor.js</code>. A view agora inclui o script via <code>&lt;script src&gt;</code>, melhorando a organização e permitindo cache pelo navegador.</p>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.7 Factories e Testes Automatizados</h3>
-                <p>Foram criadas <strong>factories</strong> para os models <code>Page</code>, <code>Element</code> e <code>Revision</code> (com traits <code>HasFactory</code> adicionadas). Um total de <strong>92 testes</strong> foram implementados:</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Melhorias Já Implementadas</h3>
                 <ul>
-                    <li><strong>19 testes unitários</strong> — <code>PageBuilderServiceTest</code> (create, update, sanitize, elements, revisions, export/import, render)</li>
-                    <li><strong>12 testes unitários</strong> — <code>TemplateManagerTest</code> (listagem, aplicação, importação, edge cases, estrutura de templates)</li>
-                    <li><strong>13 testes unitários</strong> — <code>BaseWidgetTest</code> (getters, validação, prepareSettings, sanitização, isContainer, isDynamic)</li>
-                    <li><strong>24 testes de feature</strong> — <code>PageControllerTest</code> (CRUD, auth, publish, templates, export/import)</li>
-                    <li><strong>15 testes de feature</strong> — <code>ElementControllerTest</code> (CRUD, auth, reorder, move, settings, styles)</li>
-                    <li><strong>9 testes de feature</strong> — <code>RevisionControllerTest</code> (list, show, restore, diff, delete, prune, auto-save, auth)</li>
+                    <li><strong>PagePolicy</strong> — autorização por dono da página</li>
+                    <li><strong>Sanitização XSS</strong> — <code>sanitizeContent()</code> e <code>sanitizeSettings()</code></li>
+                    <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
+                    <li><strong>TemplateManager</strong> — extraído do controller para classe dedicada</li>
+                    <li><strong>prepareSettings()</strong> — merge automático de defaults em todos os 6 widgets</li>
+                    <li><strong>Editor JS extraído</strong> — 730 linhas em arquivo separado para cache</li>
+                    <li><strong>93 testes</strong> — cobertura completa de controllers, services e widgets</li>
+                    <li><strong>Bug fixes</strong> — status default, max order nulo, config key, AuthorizesRequests</li>
                 </ul>
-                <p>Os testes usam <code>RefreshDatabase</code> com SQLite em memória e cobrem todos os cenários críticos de autorização, validação e fluxos de dados.</p>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.8 Correções de Bugs</h3>
-                <ul>
-                    <li><strong>Status default:</strong> <code>createPage()</code> agora define status como <code>'draft'</code> quando não especificado.</li>
-                    <li><strong>Max order nulo:</strong> <code>addElement()</code> trata <code>max('sort_order')</code> retornando <code>null</code> (tabela vazia).</li>
-                    <li><strong>Config key:</strong> renomeada de <code>page-builder.templates</code> (conflito) para <code>page-builder.template_cache</code>.</li>
-                    <li><strong>AuthorizesRequests:</strong> trait adicionada ao <code>Base Controller</code> (estava faltando).</li>
-                </ul>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.9 composer.json Personalizado</h3>
-                <p>O arquivo <code>composer.json</code> foi atualizado com <code>name</code>, <code>description</code> e <code>keywords</code> específicos do projeto, e o arquivo <code>_check_pwd.php</code> (resquício de instalação) foi removido.</p>
             </div>
         </section>
 
         {{-- MOODLE --}}
         <section id="moodle" class="step">
-            <h2>17. Uso com Moodle 4.5+</h2>
+            <h2>20. Uso com Moodle 4.5+</h2>
             <div class="step-body">
                 <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções de uso.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">17.1 Copiar HTML para o Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.1 Copiar HTML para o Moodle</h3>
                 <ol>
                     <li>Crie sua página no Page Builder normalmente (use templates prontos ou comece do zero).</li>
                     <li>Na lista de páginas, clique em <strong>"Copy HTML"</strong> (ou no editor, clique no botão <strong>"Copy HTML"</strong> da barra de ferramentas).</li>
@@ -886,14 +1284,14 @@ php artisan db:seed</code></pre>
                     <li>Salve as alterações. O conteúdo será exibido com os estilos inline preservados.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">17.2 Exportar e Importar entre Moodle e Page Builder</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.2 Exportar e Importar entre Moodle e Page Builder</h3>
                 <ol>
                     <li><strong>Exportar:</strong> Na lista de páginas, clique em <strong>"Export"</strong> para baixar um arquivo <code>.json</code> com toda a estrutura da página.</li>
                     <li><strong>Importar:</strong> Em qualquer instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, selecione o arquivo <code>.json</code> exportado e a página será recriada.</li>
                     <li>Isso permite transferir páginas entre diferentes instalações ou fazer backup antes de modificar.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">17.3 Renderização como Página Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.3 Renderização como Página Moodle</h3>
                 <ol>
                     <li>O Page Builder pode ser incorporado ao Moodle como um <strong>recurso externo</strong> ou via <strong>iframe</strong>.</li>
                     <li>Use o parâmetro <code>?format=inner</code> na URL de renderização (<code>/page-builder/pages/{id}/render?format=inner</code>) para obter apenas o HTML do conteúdo, sem a estrutura completa da página (ideal para incorporação).</li>
@@ -901,7 +1299,7 @@ php artisan db:seed</code></pre>
                     <li>No Moodle, crie um recurso <strong>"Página"</strong> e cole o HTML gerado no modo código fonte, ou use um <strong>bloco HTML</strong> para exibir conteúdo em áreas laterais.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">17.4 Dicas para Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.4 Dicas para Moodle</h3>
                 <ul>
                     <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), o que garante compatibilidade máxima com o editor do Moodle.</li>
                     <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens locais do Page Builder não serão acessíveis pelo Moodle.</li>

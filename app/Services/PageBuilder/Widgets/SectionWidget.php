@@ -47,10 +47,19 @@ class SectionWidget extends BaseWidget
         $this->controls = [
             'layout' => ['type' => 'select', 'label' => 'Layout', 'options' => ['boxed', 'full_width', 'full_height']],
             'content_width' => ['type' => 'text', 'label' => 'Content Width'],
+            'min_height' => ['type' => 'text', 'label' => 'Min Height'],
+            'align_items' => ['type' => 'select', 'label' => 'Align Items', 'options' => ['stretch', 'flex-start', 'center', 'flex-end']],
+            'justify_content' => ['type' => 'select', 'label' => 'Justify Content', 'options' => ['flex-start', 'center', 'flex-end', 'space-between', 'space-around', 'space-evenly']],
             'background_type' => ['type' => 'select', 'label' => 'Background Type', 'options' => ['none', 'classic', 'gradient', 'video']],
             'background_color' => ['type' => 'color', 'label' => 'Background Color'],
             'padding_top' => ['type' => 'text', 'label' => 'Padding Top'],
             'padding_bottom' => ['type' => 'text', 'label' => 'Padding Bottom'],
+            'padding_left' => ['type' => 'text', 'label' => 'Padding Left'],
+            'padding_right' => ['type' => 'text', 'label' => 'Padding Right'],
+            'margin_top' => ['type' => 'text', 'label' => 'Margin Top'],
+            'margin_bottom' => ['type' => 'text', 'label' => 'Margin Bottom'],
+            'border_radius' => ['type' => 'text', 'label' => 'Border Radius'],
+            'box_shadow' => ['type' => 'text', 'label' => 'Box Shadow'],
         ];
     }
 

@@ -65,6 +65,7 @@ const editor = {
             div.className = 'pb-el';
             div.dataset.elId = el.id;
             div.dataset.elType = el.type;
+            div.dataset.isContainer = el.is_container ? 'true' : 'false';
             div.innerHTML = this.elementHtml(el);
             div.onclick = (e) => { e.stopPropagation(); this.selectElement(el.id); };
             if (parentEl) parentEl.appendChild(div);
@@ -83,7 +84,13 @@ const editor = {
         const s = el.settings || {};
         let preview = '';
         switch (el.type) {
-            case 'heading': preview = `<${s.tag || 'h2'} style="text-align:${s.alignment||'left'};color:${s.color||'#333'};font-size:${({small:'1.2em',default:'2em',medium:'2.5em',large:'3em',xl:'3.5em',xxl:'4.5em'})[s.size]||'2em'};font-weight:${s.font_weight||'700'};line-height:${s.line_height||'1.4'}">${this.escHtml(s.title||'Heading')}</${s.tag || 'h2'}>`; break;
+            case 'heading': {
+                const tagSizeMap = {h1:'2.2em',h2:'1.8em',h3:'1.4em',h4:'1.15em',h5:'1em',h6:'.85em'};
+                const sizeMap = {small:'1.2em',medium:'2.5em',large:'3em',xl:'3.5em',xxl:'4.5em'};
+                const fs = s.size && sizeMap[s.size] ? sizeMap[s.size] : (tagSizeMap[s.tag] || '1.8em');
+                preview = `<${s.tag || 'h2'} style="text-align:${s.alignment||'left'};color:${s.color||'#333'};font-size:${fs};font-weight:${s.font_weight||'700'};line-height:${s.line_height||'1.4'}">${this.escHtml(s.title||'Heading')}</${s.tag || 'h2'}>`;
+                break;
+            }
             case 'text': preview = `<div style="text-align:${s.alignment||'left'};color:${s.color||'#666'};font-size:${s.font_size||'16px'};font-weight:${s.font_weight||'400'};line-height:${s.line_height||'1.7'}">${s.content||'<p>Text content</p>'}</div>`; break;
             case 'image':
                 if (s.image && s.image.url) preview = `<div style="text-align:${s.alignment||'center'}"><img src="${this.escHtml(s.image.url)}" alt="${this.escHtml(s.image.alt||'')}" style="width:${s.width||'100%'};max-width:${s.max_width||'100%'};height:${s.height||'auto'};object-fit:${s.object_fit||'cover'};border-radius:${s.border_radius||'0px'};opacity:${s.opacity||1}"></div>`;
@@ -144,9 +151,12 @@ const editor = {
 
     loadControls(id) {
         fetch(`/page-builder/elements/${id}/controls`)
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
             .then(data => {
-                if (data.error) return;
+                if (data.error) { console.error('Controls error:', data.error); return; }
                 const widget = data.widget;
                 const element = data.element;
                 document.getElementById('settings-empty').style.display = 'none';
@@ -156,7 +166,7 @@ const editor = {
                 document.getElementById('settings-type').textContent = widget.type;
                 this.renderControls(widget.controls || {}, element.settings || {}, id);
             })
-            .catch(() => this.toastError('Falha ao carregar controles'));
+            .catch(err => { console.error('loadControls failed:', err); this.toastError('Falha ao carregar controles'); });
     },
 
     renderControls(controls, settings, elementId) {
@@ -365,9 +375,12 @@ const editor = {
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
             body: JSON.stringify({ settings }),
         })
-        .then(r => r.json())
+        .then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        })
         .then(() => this.reloadElement(elementId))
-        .catch(() => this.toastError('Falha ao atualizar configuração'));
+        .catch(err => { console.error('updateSetting failed:', err); this.toastError('Falha ao atualizar configuração'); });
     },
 
     reloadElement(id) {
@@ -513,7 +526,7 @@ const editor = {
             e.dataTransfer.dropEffect = 'copy';
             const target = e.target.closest('.pb-el');
             document.querySelectorAll('.pb-el.drop-over').forEach(el => el.classList.remove('drop-over'));
-            if (target) target.classList.add('drop-over');
+            if (target && target.dataset.isContainer === 'true') target.classList.add('drop-over');
             if (emptyCanvas) emptyCanvas.classList.add('drag-over');
         });
 
@@ -533,7 +546,14 @@ const editor = {
             if (!type) return;
             let parentId = null;
             const target = e.target.closest('.pb-el');
-            if (target) parentId = target.dataset.elId;
+            if (target) {
+                if (target.dataset.isContainer === 'true') {
+                    parentId = target.dataset.elId;
+                } else {
+                    this.toastError('Este widget não aceita outros widgets dentro dele');
+                    return;
+                }
+            }
             this.showToast('Adicionando ' + type + '...', 'info');
             fetch(`/page-builder/pages/${this.pageId}/elements`, {
                 method: 'POST',

@@ -50,8 +50,12 @@ class ElementController extends Controller
         $element = $this->pageBuilder->addElement($page, $validated['type'], $validated['settings'] ?? []);
 
         if (!empty($validated['parent_id'])) {
-            $element->parent_id = $validated['parent_id'];
-            $element->save();
+            $parent = Element::find($validated['parent_id']);
+            $parentWidget = $parent ? $this->widgetManager->getWidget($parent->type) : null;
+            if ($parentWidget && $parentWidget->isContainer()) {
+                $element->parent_id = $validated['parent_id'];
+                $element->save();
+            }
         }
 
         return response()->json([
@@ -283,6 +287,7 @@ class ElementController extends Controller
         $build = function ($parentId) use ($byParent, &$build) {
             $result = [];
             foreach ($byParent[$parentId] ?? [] as $element) {
+                $widget = $this->widgetManager->getWidget($element->type);
                 $node = [
                     'id' => $element->id,
                     'uuid' => $element->uuid,
@@ -293,6 +298,7 @@ class ElementController extends Controller
                     'content' => $element->content,
                     'styles' => $element->styles,
                     'column_size' => $element->column_size,
+                    'is_container' => $widget ? $widget->isContainer() : false,
                 ];
                 $children = $build($element->id);
                 if ($children) {

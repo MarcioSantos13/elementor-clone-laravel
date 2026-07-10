@@ -91,7 +91,7 @@ HTML;
         }
 
         $childrenHtml = '';
-        if ($element->children->isNotEmpty()) {
+        if ($widget->isContainer() && $element->children->isNotEmpty()) {
             $childrenHtml = $this->renderElements($element->children, $options);
         }
 
