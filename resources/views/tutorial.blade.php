@@ -120,7 +120,7 @@ php artisan db:seed</code></pre>
                     <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>3 principais (pages, elements, revisions)</td></tr>
                     <tr><td>Views Blade</td><td>9 (login, register, tutorial, editor, pages)</td></tr>
-                    <tr><td>Linhas de JS do editor</td><td>~730</td></tr>
+                    <tr><td>Linhas de JS do editor</td><td>~900</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades</h3>
@@ -129,9 +129,12 @@ php artisan db:seed</code></pre>
                     <li>Abrir um <strong>editor visual</strong> em tela cheia com tema escuro</li>
                     <li>Arrastar <strong>6 widgets</strong> (Título, Texto, Imagem, Botão, Seção, Coluna)</li>
                     <li>Selecionar qualquer elemento e editar suas <strong>configurações</strong> no painel direito</li>
+                    <li><strong>Editor de texto rich-text (WYSIWYG)</strong> com toolbar: negrito, itálico, links, imagens, vídeos YouTube, listas, código fonte</li>
+                    <li><strong>Inserir imagens</strong> no texto via upload ou colar (Ctrl+V) — imagem inline no conteúdo</li>
+                    <li><strong>Inserir vídeos YouTube</strong> — cole a URL e o embed responsivo 16:9 é inserido automaticamente</li>
+                    <li>Inline editing — duplo-clique para editar texto diretamente no canvas (preserva HTML)</li>
                     <li>Alternar entre visualização <strong>desktop / tablet / mobile</strong></li>
                     <li>Aplicar <strong>5 templates</strong> prontos</li>
-                    <li>Inline editing — duplo-clique para editar texto diretamente no canvas</li>
                     <li>Desfazer / refazer alterações (Ctrl+Z / Ctrl+Shift+Z)</li>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
                     <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
@@ -144,7 +147,7 @@ php artisan db:seed</code></pre>
 <pre style="margin:0">┌──────────────────────────────────────────────────┐
 │                  FRONTEND                         │
 │   editor.blade.php + page-builder-editor.js       │
-│   (730 linhas JS vanilla, sem frameworks)         │
+│   (900+ linhas JS vanilla, sem frameworks)         │
 ├──────────────────────────────────────────────────┤
 │                CONTROLLERS                        │
 │   PageController │ ElementController              │
@@ -258,6 +261,7 @@ php artisan db:seed</code></pre>
                 <ul>
                     <li>Mostra as configurações do elemento selecionado, ou da página se nada estiver selecionado</li>
                     <li>Cada configuração tem um campo de entrada (texto, cor, seleção, etc.)</li>
+                    <li>O widget de texto exibe um <strong>editor WYSIWYG</strong> com toolbar para formatação, imagens e vídeos</li>
                     <li>As mudanças são aplicadas instantaneamente ao canvas</li>
                     <li>O painel começa colapsado — clique no ícone de configurações (⚙️) na barra superior para expandir</li>
                 </ul>
@@ -316,7 +320,7 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Texto</h3>
                 <table class="widget-table">
                     <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
-                    <tr><td>Content</td><td>textarea (obrigatório)</td><td>Conteúdo do texto (suporta HTML)</td></tr>
+                    <tr><td>Content</td><td>wysiwyg (obrigatório)</td><td>Editor rich-text com toolbar (negrito, itálico, links, imagens, vídeos YouTube, listas, código fonte)</td></tr>
                     <tr><td>Alignment</td><td>select</td><td>left, center, right, justify</td></tr>
                     <tr><td>Color</td><td>color</td><td>Qualquer cor (hex)</td></tr>
                     <tr><td>Font Size</td><td>number</td><td>8–200px</td></tr>
@@ -324,6 +328,27 @@ php artisan db:seed</code></pre>
                     <tr><td>Line Height</td><td>number</td><td>0.5–5.0</td></tr>
                     <tr><td>Drop Cap</td><td>boolean</td><td>Sim/Não (primeira letra em destaque)</td></tr>
                 </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Toolbar do Editor de Texto</h4>
+                <p>Ao selecionar um widget de texto, o painel direito exibe um editor rich-text (WYSIWYG) com as seguintes ferramentas:</p>
+                <table class="widget-table">
+                    <tr><th>Botão</th><th>Função</th><th>Como usar</th></tr>
+                    <tr><td><strong>B</strong></td><td>Negrito</td><td>Selecione o texto e clique</td></tr>
+                    <tr><td><strong>I</strong></td><td>Itálico</td><td>Selecione o texto e clique</td></tr>
+                    <tr><td><strong>U</strong></td><td>Sublinhado</td><td>Selecione o texto e clique</td></tr>
+                    <tr><td><strong>S</strong></td><td>Tachado</td><td>Selecione o texto e clique</td></tr>
+                    <tr><td><strong>&#9650;</strong></td><td>Título H2</td><td>Converte o parágrafo em título</td></tr>
+                    <tr><td><strong>&#182;</strong></td><td>Parágrafo</td><td>Converte de volta para parágrafo</td></tr>
+                    <tr><td><strong>&#128279;</strong></td><td>Inserir link</td><td>Pede a URL e cria um hyperlink</td></tr>
+                    <tr><td><strong>&#128247;</strong></td><td>Inserir imagem</td><td>Abre seletor de arquivo, faz upload e insere inline</td></tr>
+                    <tr><td><strong>&#9654;</strong></td><td>Vídeo YouTube</td><td>Pede a URL do YouTube e insere embed responsivo 16:9</td></tr>
+                    <tr><td><strong>&#8226;</strong></td><td>Lista</td><td>Cria lista com marcadores</td></tr>
+                    <tr><td><strong>1.</strong></td><td>Lista Numerada</td><td>Cria lista numerada</td></tr>
+                    <tr><td><strong>&lt;/&gt;</strong></td><td>Código fonte</td><td>Alterna entre visual e edição HTML raw</td></tr>
+                </table>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Você também pode <strong>colar imagens</strong> diretamente no editor (Ctrl+V) — elas são enviadas automaticamente e inseridas no texto. Para vídeos, clique no botão <strong>&#9654;</strong> e cole a URL do YouTube.
+                </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Imagem</h3>
                 <table class="widget-table">
@@ -1237,7 +1262,7 @@ php artisan test --verbose</pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Média Prioridade (Funcionalidade)</h3>
                 <table class="widget-table">
                     <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
-                    <tr><td>6</td><td><strong>Widget de Vídeo</strong></td><td>Adicionar widget para incorporar vídeos do YouTube/Vimeo com preview no editor</td><td>Funcionalidade</td></tr>
+                    <tr><td>6</td><td><s>Widget de Vídeo</s></td><td><s>Adicionar widget para incorporar vídeos do YouTube/Vimeo com preview no editor</s> — <strong>Implementado</strong> via botão YouTube no editor WYSIWYG do widget de texto</td><td>Funcionalidade</td></tr>
                     <tr><td>7</td><td><strong>Widget de Ícone</strong></td><td>Widget de ícones com biblioteca Font Awesome ou similar</td><td>Funcionalidade</td></tr>
                     <tr><td>8</td><td><strong>Widget de Divisor</strong></td><td>Linha horizontal com estilo configurável (cor, espessura, tipo)</td><td>Funcionalidade</td></tr>
                     <tr><td>9</td><td><strong>Widget de Espaçador</strong></td><td>Espaço em branco com altura configurável para respiração visual</td><td>Funcionalidade</td></tr>
@@ -1261,9 +1286,13 @@ php artisan test --verbose</pre>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
                     <li><strong>TemplateManager</strong> — extraído do controller para classe dedicada</li>
                     <li><strong>prepareSettings()</strong> — merge automático de defaults em todos os 6 widgets</li>
-                    <li><strong>Editor JS extraído</strong> — 730 linhas em arquivo separado para cache</li>
+                    <li><strong>Editor JS extraído</strong> — 900+ linhas em arquivo separado para cache</li>
                     <li><strong>93 testes</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Bug fixes</strong> — status default, max order nulo, config key, AuthorizesRequests</li>
+                    <li><strong>Editor WYSIWYG</strong> — widget de texto com toolbar rich-text (negrito, itálico, links, imagens, vídeos, listas)</li>
+                    <li><strong>Upload de imagens no texto</strong> — botão de imagem + colar (Ctrl+V) no editor WYSIWYG</li>
+                    <li><strong>Vídeos YouTube</strong> — botão na toolbar que converte URL em embed responsivo com privacidade</li>
+                    <li><strong>Edição inline corrigida</strong> — preserva HTML (innerHTML) ao invés de destruir com textContent</li>
                 </ul>
             </div>
         </section>
@@ -1303,6 +1332,8 @@ php artisan test --verbose</pre>
                 <ul>
                     <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), o que garante compatibilidade máxima com o editor do Moodle.</li>
                     <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens locais do Page Builder não serão acessíveis pelo Moodle.</li>
+                    <li><strong>Imagens no texto:</strong> O editor de texto (WYSIWYG) permite inserir imagens diretamente no conteúdo. Faça upload pela toolbar ou cole (Ctrl+V). As imagens ficam com CSS inline, compatíveis com o Moodle.</li>
+                    <li><strong>Vídeos YouTube:</strong> Na toolbar do editor de texto, clique no botão <strong>&#9654;</strong> (vermelho) e cole a URL do vídeo. O embed é inserido como <code>&lt;iframe&gt;</code> com privacidade ativada (<code>youtube-nocookie.com</code>), recomendado pelo Moodle.</li>
                     <li><strong>Responsividade:</strong> O HTML gerado mantém a responsividade. Teste em diferentes dispositivos após colar no Moodle.</li>
                     <li><strong>Limitação de largura:</strong> O Moodle pode aplicar estilos próprios de container. Use o parâmetro <code>?format=inner</code> para obter apenas o conteúdo bruto e ajuste margens no Moodle se necessário.</li>
                     <li><strong>Copiar HTML direto do editor:</strong> No editor visual, o botão "Copy HTML" na barra de ferramentas copia o HTML da página atual (salva) para a área de transferência — você nem precisa sair do editor.</li>

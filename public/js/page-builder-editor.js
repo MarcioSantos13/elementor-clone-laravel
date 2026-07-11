@@ -471,6 +471,32 @@ const editor = {
                 };
                 toolbar.appendChild(imgBtn);
 
+                const ytBtn = document.createElement('button');
+                ytBtn.type = 'button';
+                ytBtn.innerHTML = '&#9654;';
+                ytBtn.title = 'Inserir vídeo YouTube';
+                ytBtn.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:#ff0000;cursor:pointer;font-size:13px;font-weight:700';
+                ytBtn.onmouseenter = () => { ytBtn.style.background = 'var(--pb-border)'; };
+                ytBtn.onmouseleave = () => { ytBtn.style.background = 'transparent'; ytBtn.style.borderColor = 'transparent'; };
+                ytBtn.onmousedown = (e) => {
+                    e.preventDefault();
+                    const url = prompt('Cole a URL do YouTube:', 'https://www.youtube.com/watch?v=');
+                    if (!url) return;
+                    let videoId = null;
+                    const m1 = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+                    const m2 = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+                    const m3 = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+                    if (m1) videoId = m1[1];
+                    else if (m2) videoId = m2[1];
+                    else if (m3) videoId = m3[1];
+                    if (!videoId) { this.toastError('URL do YouTube não reconhecida'); return; }
+                    const iframe = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin:12px 0"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+                    focusContent();
+                    document.execCommand('insertHTML', false, iframe);
+                    setTimeout(() => { focusContent(); debounceSave(content.innerHTML); }, 50);
+                };
+                toolbar.appendChild(ytBtn);
+
                 const sep3 = document.createElement('span');
                 sep3.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px';
                 toolbar.appendChild(sep3);
