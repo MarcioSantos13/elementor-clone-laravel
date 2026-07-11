@@ -87,6 +87,7 @@ abstract class BaseWidget implements WidgetInterface
             'url' => $this->validateUrl($value),
             'image' => $this->validateImage($value),
             'dimension' => $this->validateDimension($value, $control),
+            'wysiwyg' => (string) $value,
             default => $this->validateText($value, $control),
         };
     }

@@ -362,6 +362,183 @@ const editor = {
                 container.appendChild(urlRow);
                 return container;
             },
+            wysiwyg: () => {
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'display:flex;flex-direction:column;border:1px solid var(--pb-border);border-radius:6px;overflow:hidden;background:var(--pb-bg)';
+
+                const toolbar = document.createElement('div');
+                toolbar.style.cssText = 'display:flex;flex-wrap:wrap;gap:2px;padding:4px 6px;background:var(--pb-surface2);border-bottom:1px solid var(--pb-border)';
+
+                const focusContent = () => {
+                    content.focus();
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    if (sel.rangeCount > 0) {
+                        const existing = sel.getRangeAt(0);
+                        if (content.contains(existing.startContainer)) return;
+                    }
+                    range.selectNodeContents(content);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                };
+
+                const execCmd = (cmd, val) => {
+                    focusContent();
+                    document.execCommand(cmd, false, val || null);
+                };
+
+                const makeBtn = (label, title, cmd, val) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.innerHTML = label;
+                    b.title = title;
+                    b.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;font-size:13px;font-weight:600';
+                    b.onmouseenter = () => { b.style.background = 'var(--pb-border)'; };
+                    b.onmouseleave = () => { b.style.background = 'transparent'; b.style.borderColor = 'transparent'; };
+                    b.onmousedown = (e) => { e.preventDefault(); execCmd(cmd, val); };
+                    return b;
+                };
+
+                const content = document.createElement('div');
+                content.contentEditable = 'true';
+                content.id = `ctrl-${key}`;
+                content.innerHTML = typeof value === 'string' ? value : '<p></p>';
+                content.style.cssText = 'min-height:120px;max-height:400px;overflow-y:auto;padding:8px 10px;font-size:13px;line-height:1.6;color:var(--pb-text);outline:none';
+                content.innerHTML = content.innerHTML || '<p></p>';
+
+                toolbar.appendChild(makeBtn('B', 'Negrito', 'bold'));
+                toolbar.appendChild(makeBtn('I', 'Itálico', 'italic'));
+                toolbar.appendChild(makeBtn('U', 'Sublinhado', 'underline'));
+                toolbar.appendChild(makeBtn('S', 'Tachado', 'strikeThrough'));
+
+                const sep = document.createElement('span');
+                sep.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px';
+                toolbar.appendChild(sep);
+
+                toolbar.appendChild(makeBtn('&#9650;', 'Título H2', 'formatBlock', 'h2'));
+                toolbar.appendChild(makeBtn('&#182;', 'Parágrafo', 'formatBlock', 'p'));
+
+                const sep2 = document.createElement('span');
+                sep2.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px';
+                toolbar.appendChild(sep2);
+
+                const linkBtn = document.createElement('button');
+                linkBtn.type = 'button';
+                linkBtn.innerHTML = '&#128279;';
+                linkBtn.title = 'Inserir link';
+                linkBtn.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;font-size:13px';
+                linkBtn.onmouseenter = () => { linkBtn.style.background = 'var(--pb-border)'; };
+                linkBtn.onmouseleave = () => { linkBtn.style.background = 'transparent'; linkBtn.style.borderColor = 'transparent'; };
+                linkBtn.onmousedown = (e) => {
+                    e.preventDefault();
+                    const url = prompt('URL do link:', 'https://');
+                    if (url) execCmd('createLink', url);
+                };
+                toolbar.appendChild(linkBtn);
+
+                const imgBtn = document.createElement('button');
+                imgBtn.type = 'button';
+                imgBtn.innerHTML = '&#128247;';
+                imgBtn.title = 'Inserir imagem';
+                imgBtn.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;font-size:13px';
+                imgBtn.onmouseenter = () => { imgBtn.style.background = 'var(--pb-border)'; };
+                imgBtn.onmouseleave = () => { imgBtn.style.background = 'transparent'; imgBtn.style.borderColor = 'transparent'; };
+
+                const imgFileInput = document.createElement('input');
+                imgFileInput.type = 'file';
+                imgFileInput.accept = 'image/jpeg,image/png,image/gif,image/webp';
+                imgFileInput.style.display = 'none';
+
+                const insertImageInEditor = (url) => {
+                    const html = `<img src="${url}" style="max-width:100%;height:auto;border-radius:4px" alt="">`;
+                    focusContent();
+                    document.execCommand('insertHTML', false, html);
+                    setTimeout(() => {
+                        focusContent();
+                        debounceSave(content.innerHTML);
+                    }, 50);
+                };
+
+                imgBtn.onmousedown = (e) => { e.preventDefault(); imgFileInput.click(); };
+                imgFileInput.onchange = () => {
+                    const file = imgFileInput.files[0];
+                    if (!file) return;
+                    this.uploadImageFile(file, (url) => {
+                        insertImageInEditor(url);
+                    });
+                    imgFileInput.value = '';
+                };
+                toolbar.appendChild(imgBtn);
+
+                const sep3 = document.createElement('span');
+                sep3.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px';
+                toolbar.appendChild(sep3);
+
+                toolbar.appendChild(makeBtn('&#8226;', 'Lista', 'insertUnorderedList'));
+                toolbar.appendChild(makeBtn('1.', 'Lista Numerada', 'insertOrderedList'));
+
+                const sourceToggle = document.createElement('button');
+                sourceToggle.type = 'button';
+                sourceToggle.textContent = '</>';
+                sourceToggle.title = 'Ver código fonte';
+                sourceToggle.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;font-size:11px;font-family:monospace;font-weight:700;margin-left:auto';
+                sourceToggle.onmouseenter = () => { sourceToggle.style.background = 'var(--pb-border)'; };
+                sourceToggle.onmouseleave = () => { sourceToggle.style.background = 'transparent'; sourceToggle.style.borderColor = 'transparent'; };
+
+                let sourceMode = false;
+                let sourceTa = null;
+                sourceToggle.onmousedown = (e) => {
+                    e.preventDefault();
+                    sourceMode = !sourceMode;
+                    if (sourceMode) {
+                        sourceTa = document.createElement('textarea');
+                        sourceTa.value = content.innerHTML;
+                        sourceTa.style.cssText = 'width:100%;min-height:120px;max-height:400px;padding:8px 10px;font-size:12px;font-family:monospace;background:var(--pb-surface2);color:var(--pb-text);border:none;resize:vertical;outline:none';
+                        content.style.display = 'none';
+                        wrap.appendChild(sourceTa);
+                        sourceToggle.style.background = 'var(--pb-accent)';
+                        sourceToggle.style.color = '#fff';
+                    } else {
+                        content.innerHTML = sourceTa.value;
+                        sourceTa.remove();
+                        sourceTa = null;
+                        content.style.display = '';
+                        sourceToggle.style.background = 'transparent';
+                        sourceToggle.style.color = 'var(--pb-text)';
+                        debounceSave(content.innerHTML);
+                    }
+                };
+                toolbar.appendChild(sourceToggle);
+
+                const debounceSave = (() => {
+                    let timer;
+                    return (html) => {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => this.updateSetting(key, html, elementId), 400);
+                    };
+                })();
+
+                content.oninput = () => { debounceSave(content.innerHTML); };
+
+                const wysiwygPasteHandler = (e) => {
+                    if (!wrap.isConnected) return;
+                    const item = Array.from(e.clipboardData.items).find(i => i.type.startsWith('image/'));
+                    if (!item) return;
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    if (file) {
+                        this.uploadImageFile(file, (url) => {
+                            insertImageInEditor(url);
+                        });
+                    }
+                };
+                content.addEventListener('paste', wysiwygPasteHandler);
+
+                wrap.appendChild(toolbar);
+                wrap.appendChild(content);
+                return wrap;
+            },
         };
         return (types[ctrl.type] || types.text)();
     },
@@ -574,8 +751,8 @@ const editor = {
             const textEl = e.target.closest('h1, h2, h3, h4, h5, h6, p, span, a, button, label');
             if (!textEl) return;
             if (el.dataset._editing) return;
-            const originalContent = textEl.textContent;
             el.dataset._editing = '1';
+            el.dataset._origHtml = textEl.innerHTML;
             textEl.contentEditable = 'true';
             textEl.focus();
             const selection = window.getSelection();
@@ -587,17 +764,18 @@ const editor = {
                 if (!el.dataset._editing) return;
                 textEl.contentEditable = 'false';
                 delete el.dataset._editing;
-                const newText = textEl.textContent.trim();
-                if (newText && newText !== originalContent) {
+                const newHtml = textEl.innerHTML.trim();
+                const origHtml = textEl.dataset._origHtml || '';
+                if (newHtml && newHtml !== origHtml) {
                     const type = el.dataset.elType;
                     const key = { heading: 'title', text: 'content', button: 'text' }[type] || 'title';
-                    this.updateSetting(key, newText, el.dataset.elId);
+                    this.updateSetting(key, newHtml, el.dataset.elId);
                 }
             };
             textEl.addEventListener('blur', finish, { once: true });
             textEl.addEventListener('keydown', (k) => {
                 if (k.key === 'Enter' && !k.shiftKey) { k.preventDefault(); textEl.blur(); }
-                if (k.key === 'Escape') { textEl.textContent = originalContent; textEl.blur(); }
+                if (k.key === 'Escape') { textEl.innerHTML = el.dataset._origHtml || ''; textEl.blur(); }
             });
         });
     },

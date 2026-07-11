@@ -27,7 +27,7 @@ class TextWidget extends BaseWidget
         ];
 
         $this->controls = [
-            'content' => ['type' => 'textarea', 'label' => 'Content', 'required' => true],
+            'content' => ['type' => 'wysiwyg', 'label' => 'Content', 'required' => true],
             'alignment' => ['type' => 'select', 'label' => 'Alignment', 'options' => ['left', 'center', 'right', 'justify']],
             'color' => ['type' => 'color', 'label' => 'Color'],
             'font_size' => ['type' => 'number', 'label' => 'Font Size', 'min' => 8, 'max' => 200],
