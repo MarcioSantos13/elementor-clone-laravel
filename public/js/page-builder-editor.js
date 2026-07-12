@@ -18,6 +18,18 @@ const editor = {
         this.bindCanvasDrops();
         this.bindInlineEditing();
         this.autoSave();
+        this.observeCanvas();
+    },
+
+    observeCanvas() {
+        const dz = document.getElementById('canvas-dropzone');
+        if (!dz) return;
+        let timer = null;
+        const observer = new MutationObserver(() => {
+            clearTimeout(timer);
+            timer = setTimeout(() => this.renderMath(), 150);
+        });
+        observer.observe(dz, { childList: true, subtree: true, characterData: true });
     },
 
     toastError(msg) {

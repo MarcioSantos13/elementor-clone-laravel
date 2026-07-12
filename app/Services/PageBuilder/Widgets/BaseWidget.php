@@ -228,7 +228,7 @@ abstract class BaseWidget implements WidgetInterface
 
     protected function safeCssValue(string $value): string
     {
-        return preg_replace('/[<>"\'\\]/', '', $value);
+        return str_replace(['<', '>', '"', "'"], '', $value);
     }
 
     protected function renderTemplate(string $template, array $data = []): string
