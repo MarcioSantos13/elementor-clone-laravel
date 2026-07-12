@@ -6,6 +6,8 @@
 <title>Editando: {{ $page->title }} - {{ config('app.name') }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <style>
 :root {
     --pb-primary: #6366f1;
@@ -302,6 +304,14 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
                     <div class="pb-widget-item" draggable="true" data-type="text"><span class="pb-widget-icon">T</span><span class="pb-widget-label">Texto</span></div>
                     <div class="pb-widget-item" draggable="true" data-type="image"><span class="pb-widget-icon">&#128247;</span><span class="pb-widget-label">Imagem</span></div>
                     <div class="pb-widget-item" draggable="true" data-type="button"><span class="pb-widget-icon">&#128206;</span><span class="pb-widget-label">Botão</span></div>
+                </div>
+            </div>
+            <div class="pb-widget-group">
+                <div class="pb-widget-group-title">Educacional</div>
+                <div class="pb-widget-grid">
+                    <div class="pb-widget-item" draggable="true" data-type="callout"><span class="pb-widget-icon">&#9888;</span><span class="pb-widget-label">Callout</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="table"><span class="pb-widget-icon">&#9638;</span><span class="pb-widget-label">Tabela</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="math"><span class="pb-widget-icon">&Sigma;</span><span class="pb-widget-label">Matemática</span></div>
                 </div>
             </div>
         </div>

@@ -291,6 +291,12 @@ HTML;
             }
         }
 
+        $hasMath = $page->elements()->where('type', 'math')->exists()
+            || $page->elements()->where('type', 'text')->where('settings->content', 'LIKE', '%pb-math%')->exists();
+        if ($hasMath) {
+            $css .= "\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css\">\n";
+        }
+
         return $css;
     }
 
@@ -304,6 +310,13 @@ HTML;
 
         if ($page->settings['custom_js_footer'] ?? false) {
             $scripts .= "\n<script>\n{$page->settings['custom_js_footer']}\n</script>\n";
+        }
+
+        $hasMath = $page->elements()->where('type', 'math')->exists()
+            || $page->elements()->where('type', 'text')->where('settings->content', 'LIKE', '%pb-math%')->exists();
+        if ($hasMath) {
+            $scripts .= "\n<script src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js\"></script>\n";
+            $scripts .= "\n<script>\ndocument.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.pb-math').forEach(function(el){try{katex.render(el.getAttribute('data-formula'),el,{displayMode:el.getAttribute('data-display')==='true',throwOnError:false})}catch(e){el.textContent=el.getAttribute('data-formula')}})})\n</script>\n";
         }
 
         return $scripts;

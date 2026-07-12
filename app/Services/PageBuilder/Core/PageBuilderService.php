@@ -350,7 +350,7 @@ class PageBuilderService
             }
 
             if (is_string($item) && $this->containsHtml($item)) {
-                $allowed = '<p><br><strong><em><u><s><ul><ol><li><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><video><source><iframe>';
+                $allowed = '<p><br><strong><em><u><s><sup><sub><mark><ul><ol><li><dl><dt><dd><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><video><source><iframe>';
                 $clean = strip_tags($item, $allowed);
 
                 $clean = preg_replace_callback('/<a\s[^>]*href\s*=\s*["\']([^"\']*)["\'][^>]*>/i', function ($m) {
@@ -397,7 +397,7 @@ class PageBuilderService
                 } elseif (str_contains($key, 'url') || str_contains($key, 'link') || str_contains($key, 'src')) {
                     $sanitized[$key] = filter_var($value, FILTER_SANITIZE_URL);
                 } elseif (str_contains($key, 'content') || str_contains($key, 'html') || $key === 'content') {
-                    $allowed = '<p><br><strong><em><u><s><ul><ol><li><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><iframe>';
+                    $allowed = '<p><br><strong><em><u><s><sup><sub><mark><ul><ol><li><dl><dt><dd><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><iframe>';
                     $sanitized[$key] = strip_tags($value, $allowed);
                 } elseif (in_array($key, ['css_classes', 'css_id', 'name', 'title', 'alt', 'text', 'label'])) {
                     $sanitized[$key] = strip_tags($value);

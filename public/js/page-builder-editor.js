@@ -42,6 +42,7 @@ const editor = {
             .then(data => {
                 const prevSelected = this.selectedId;
                 this.renderCanvas(data.elements);
+                this.renderMath();
                 this.renderStructure(data.elements);
                 this.pushHistory(data.elements);
                 if (prevSelected && document.querySelector(`.pb-el[data-el-id="${prevSelected}"]`)) {
@@ -77,6 +78,24 @@ const editor = {
                 this.renderCanvas(el.children, childContainer);
             }
         });
+        if (!parentEl) this.renderMath();
+    },
+
+    renderMath() {
+        if (typeof katex === 'undefined') return;
+        document.querySelectorAll('#canvas-dropzone .pb-math, #settings-body .pb-math').forEach(el => {
+            if (el.closest('[contenteditable="true"]')) return;
+            if (el.dataset.katexRendered) return;
+            try {
+                katex.render(el.getAttribute('data-formula'), el, {
+                    displayMode: el.getAttribute('data-display') === 'true',
+                    throwOnError: false
+                });
+                el.dataset.katexRendered = '1';
+            } catch (e) {
+                el.textContent = el.getAttribute('data-formula');
+            }
+        });
     },
 
     elementHtml(el) {
@@ -101,6 +120,40 @@ const editor = {
                 const sz = sizeMap[s.size]||sizeMap.medium;
                 const btn = `<button style="background-color:${s.background_color||'#007bff'};color:${s.text_color||'#fff'};border:${s.border_width||'0px'} solid ${s.border_color||'transparent'};border-radius:${s.border_radius||'4px'};padding:${sz.p};font-size:${sz.f};font-weight:${s.font_weight||'500'};cursor:pointer;display:inline-block">${this.escHtml(s.text||'Button')}</button>`;
                 preview = s.alignment !== 'stretch' ? `<div style="text-align:${s.alignment||'left'}">${btn}</div>` : btn;
+                break;
+            }
+            case 'callout': {
+                const typeStyles = {info:{bg:'#e0f2fe',border:'#0284c7',icon:'&#8505;'},success:{bg:'#dcfce7',border:'#16a34a',icon:'&#10003;'},warning:{bg:'#fef9c3',border:'#ca8a04',icon:'&#9888;'},danger:{bg:'#fee2e2',border:'#dc2626',icon:'&#10007;'},tip:{bg:'#f0fdf4',border:'#22c55e',icon:'&#128161;'},definition:{bg:'#f3e8ff',border:'#9333ea',icon:'&#128218;'},theorem:{bg:'#fff7ed',border:'#ea580c',icon:'&#9878;'},exercise:{bg:'#ecfeff',border:'#0891b2',icon:'&#9998;'},note:{bg:'#f8fafc',border:'#64748b',icon:'&#128221;'}};
+                const st = typeStyles[s.type]||typeStyles.info;
+                const borderStyle = s.border_style==='none'?'border-left:none;':s.border_style==='full'?`border:2px solid ${st.border};`:`border-left:4px solid ${st.border};`;
+                preview = `<div style="background:${st.bg};${borderStyle}padding:${s.padding||'16px'};border-radius:${s.border_radius||'8px'}"><div style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:1.2em">${s.icon||st.icon}</span><div style="flex:1">${s.content||'<p>Conteúdo do callout</p>'}</div></div></div>`;
+                break;
+            }
+            case 'table': {
+                const rows = parseInt(s.rows)||3;
+                const cols = parseInt(s.cols)||3;
+                const hd = s.has_header!==false;
+                const bw = s.border_width||'1px';
+                const bc = s.border_color||'#e2e8f0';
+                let html = `<table style="width:${s.width||'100%'};border-collapse:collapse;font-size:${s.font_size||'14px'}"><tbody>`;
+                for (let r=0;r<rows;r++) {
+                    html += '<tr>';
+                    for (let c=0;c<cols;c++) {
+                        if (r===0&&hd) html += `<th style="background:#f1f5f9;border:${bw} solid ${bc};padding:${s.cell_padding||'10px 14px'};font-weight:600;text-align:left">Cabeçalho ${c+1}</th>`;
+                        else html += `<td style="border:${bw} solid ${bc};padding:${s.cell_padding||'10px 14px'}">Conteúdo</td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</tbody></table>';
+                preview = `<div style="overflow-x:auto">${html}</div>`;
+                break;
+            }
+            case 'math': {
+                const formula = s.formula||'x^2 + y^2 = z^2';
+                const mode = s.display_mode===false?'inline':'block';
+                preview = mode==='block'
+                    ? `<div style="text-align:${s.alignment||'center'};padding:16px 0"><span class="pb-math" data-formula="${this.escHtml(formula)}" data-display="true" style="font-size:${s.font_size||'24px'};color:${s.color||'#333'}"></span>${s.label?`<div style="margin-top:6px;font-size:0.8em;color:#666;font-style:italic">${this.escHtml(s.label)}</div>`:''}</div>`
+                    : `<span class="pb-math" data-formula="${this.escHtml(formula)}" data-display="false" style="font-size:${s.font_size||'16px'};color:${s.color||'#333'}"></span>`;
                 break;
             }
             default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
@@ -134,7 +187,7 @@ const editor = {
     },
 
     structureIcon(type) {
-        const icons = { section: '&#9638;', column: '&#9646;', heading: 'H', text: 'T', image: '&#128247;', button: '&#128206;' };
+        const icons = { section: '&#9638;', column: '&#9646;', heading: 'H', text: 'T', image: '&#128247;', button: '&#128206;', callout: '&#9888;', table: '&#9638;', math: '&Sigma;' };
         return icons[type] || '&#9679;';
     },
 
@@ -165,6 +218,7 @@ const editor = {
                 document.getElementById('settings-title').textContent = element.name || widget.label;
                 document.getElementById('settings-type').textContent = widget.type;
                 this.renderControls(widget.controls || {}, element.settings || {}, id);
+                this.renderMath();
             })
             .catch(err => { console.error('loadControls failed:', err); this.toastError('Falha ao carregar controles'); });
     },
@@ -503,6 +557,120 @@ const editor = {
 
                 toolbar.appendChild(makeBtn('&#8226;', 'Lista', 'insertUnorderedList'));
                 toolbar.appendChild(makeBtn('1.', 'Lista Numerada', 'insertOrderedList'));
+
+                const sep4 = document.createElement('span');
+                sep4.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px';
+                toolbar.appendChild(sep4);
+
+                const tableBtn = document.createElement('button');
+                tableBtn.type = 'button';
+                tableBtn.innerHTML = '&#9638;';
+                tableBtn.title = 'Inserir tabela';
+                tableBtn.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;font-size:13px';
+                tableBtn.onmouseenter = () => { tableBtn.style.background = 'var(--pb-border)'; };
+                tableBtn.onmouseleave = () => { tableBtn.style.background = 'transparent'; tableBtn.style.borderColor = 'transparent'; };
+                tableBtn.onmousedown = (e) => {
+                    e.preventDefault();
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999';
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:12px;padding:20px;width:320px;box-shadow:0 16px 48px rgba(0,0,0,.3)';
+                    modal.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--pb-text)">Inserir Tabela</div>' +
+                        '<div style="display:flex;gap:10px;margin-bottom:12px">' +
+                        '<label style="flex:1;font-size:12px;color:var(--pb-text2)">Linhas<input id="pb-tbl-rows" type="number" value="3" min="1" max="20" style="width:100%;margin-top:4px;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:13px"></label>' +
+                        '<label style="flex:1;font-size:12px;color:var(--pb-text2)">Colunas<input id="pb-tbl-cols" type="number" value="3" min="1" max="10" style="width:100%;margin-top:4px;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:13px"></label>' +
+                        '</div>' +
+                        '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--pb-text2);margin-bottom:14px"><input id="pb-tbl-header" type="checkbox" checked> Cabeçalho</label>' +
+                        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+                        '<button id="pb-tbl-cancel" style="padding:6px 14px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);cursor:pointer;font-size:12px">Cancelar</button>' +
+                        '<button id="pb-tbl-ok" style="padding:6px 14px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500">Inserir</button>' +
+                        '</div>';
+                    overlay.appendChild(modal);
+                    document.body.appendChild(overlay);
+                    modal.querySelector('#pb-tbl-rows').focus();
+                    const close = () => overlay.remove();
+                    modal.querySelector('#pb-tbl-cancel').onclick = close;
+                    overlay.onclick = (ev) => { if (ev.target === overlay) close(); };
+                    modal.querySelector('#pb-tbl-ok').onclick = () => {
+                        const rows = parseInt(modal.querySelector('#pb-tbl-rows').value) || 3;
+                        const cols = parseInt(modal.querySelector('#pb-tbl-cols').value) || 3;
+                        const hasHeader = modal.querySelector('#pb-tbl-header').checked;
+                        let html = '<table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px">';
+                        for (let r = 0; r < rows; r++) {
+                            html += '<tr>';
+                            for (let c = 0; c < cols; c++) {
+                                if (r === 0 && hasHeader) html += `<th style="background:#f1f5f9;border:1px solid #e2e8f0;padding:8px 12px;font-weight:600;text-align:left">Cabeçalho ${c + 1}</th>`;
+                                else html += `<td style="border:1px solid #e2e8f0;padding:8px 12px">Conteúdo</td>`;
+                            }
+                            html += '</tr>';
+                        }
+                        html += '</table>';
+                        focusContent();
+                        document.execCommand('insertHTML', false, html);
+                        setTimeout(() => { focusContent(); debounceSave(content.innerHTML); }, 50);
+                        close();
+                    };
+                };
+                toolbar.appendChild(tableBtn);
+
+                const mathBtn = document.createElement('button');
+                mathBtn.type = 'button';
+                mathBtn.innerHTML = '&Sigma;';
+                mathBtn.title = 'Inserir fórmula matemática (LaTeX)';
+                mathBtn.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;font-size:14px;font-weight:700';
+                mathBtn.onmouseenter = () => { mathBtn.style.background = 'var(--pb-border)'; };
+                mathBtn.onmouseleave = () => { mathBtn.style.background = 'transparent'; mathBtn.style.borderColor = 'transparent'; };
+                mathBtn.onmousedown = (e) => {
+                    e.preventDefault();
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999';
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:12px;padding:20px;width:420px;box-shadow:0 16px 48px rgba(0,0,0,.3)';
+                    modal.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--pb-text)">Fórmula Matemática (LaTeX)</div>' +
+                        '<label style="font-size:12px;color:var(--pb-text2)">Fórmula LaTeX</label>' +
+                        '<textarea id="pb-math-input" style="width:100%;margin-top:4px;padding:8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:13px;font-family:monospace;min-height:60px;resize:vertical" placeholder="Ex: x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}"></textarea>' +
+                        '<div id="pb-math-preview" style="min-height:36px;margin:8px 0;padding:8px;background:var(--pb-surface2);border-radius:6px;text-align:center;font-size:18px;color:var(--pb-text)"></div>' +
+                        '<label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--pb-text2);margin-bottom:14px"><input id="pb-math-display" type="checkbox" checked> Modo display (centralizado, maior)</label>' +
+                        '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+                        '<button id="pb-math-cancel" style="padding:6px 14px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);cursor:pointer;font-size:12px">Cancelar</button>' +
+                        '<button id="pb-math-ok" style="padding:6px 14px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500">Inserir</button>' +
+                        '</div>';
+                    overlay.appendChild(modal);
+                    document.body.appendChild(overlay);
+                    const input = modal.querySelector('#pb-math-input');
+                    const preview = modal.querySelector('#pb-math-preview');
+                    input.focus();
+                    const updatePreview = () => {
+                        const formula = input.value.trim();
+                        if (!formula) { preview.innerHTML = '<span style="color:var(--pb-text2);font-size:12px">Pré-visualização</span>'; return; }
+                        if (typeof katex !== 'undefined') {
+                            try { katex.render(formula, preview, { displayMode: modal.querySelector('#pb-math-display').checked, throwOnError: false }); } catch (err) { preview.textContent = formula; }
+                        } else {
+                            preview.textContent = formula;
+                        }
+                    };
+                    updatePreview();
+                    input.oninput = updatePreview;
+                    modal.querySelector('#pb-math-display').onchange = updatePreview;
+                    const close = () => overlay.remove();
+                    modal.querySelector('#pb-math-cancel').onclick = close;
+                    overlay.onclick = (ev) => { if (ev.target === overlay) close(); };
+                    modal.querySelector('#pb-math-ok').onclick = () => {
+                        const formula = input.value.trim();
+                        if (!formula) { this.toastError('Digite uma fórmula LaTeX'); return; }
+                        const isDisplay = modal.querySelector('#pb-math-display').checked;
+                        const span = `<span class="pb-math" data-formula="${formula.replace(/"/g, '&quot;')}" data-display="${isDisplay}" style="font-size:${isDisplay ? '1.3em' : '1em'};color:#1e293b">${formula}</span>`;
+                        focusContent();
+                        document.execCommand('insertHTML', false, isDisplay ? `<div style="text-align:center;padding:12px 0">${span}</div>` : span);
+                        setTimeout(() => {
+                            focusContent();
+                            debounceSave(content.innerHTML);
+                            this.renderMath();
+                        }, 50);
+                        close();
+                    };
+                };
+                toolbar.appendChild(mathBtn);
 
                 const sourceToggle = document.createElement('button');
                 sourceToggle.type = 'button';

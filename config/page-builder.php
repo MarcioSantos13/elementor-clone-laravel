@@ -18,6 +18,9 @@ return [
         \App\Services\PageBuilder\Widgets\ButtonWidget::class,
         \App\Services\PageBuilder\Widgets\SectionWidget::class,
         \App\Services\PageBuilder\Widgets\ColumnWidget::class,
+        \App\Services\PageBuilder\Widgets\CalloutWidget::class,
+        \App\Services\PageBuilder\Widgets\TableWidget::class,
+        \App\Services\PageBuilder\Widgets\MathWidget::class,
     ],
 
     'upload' => [
