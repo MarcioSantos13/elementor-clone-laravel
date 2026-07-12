@@ -22,6 +22,7 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::get('pages/{page}/elements', [ElementController::class, 'index'])->name('elements.index');
     Route::post('pages/{page}/elements', [ElementController::class, 'store'])->name('elements.store');
     Route::post('pages/{page}/elements/reorder', [ElementController::class, 'reorder'])->name('elements.reorder');
+    Route::post('pages/{page}/elements/restore-snapshot', [ElementController::class, 'restoreSnapshot'])->name('elements.restore-snapshot');
     Route::get('elements/{element}', [ElementController::class, 'show'])->name('elements.show');
     Route::put('elements/{element}', [ElementController::class, 'update'])->name('elements.update');
     Route::delete('elements/{element}', [ElementController::class, 'destroy'])->name('elements.destroy');

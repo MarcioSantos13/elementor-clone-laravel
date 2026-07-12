@@ -437,6 +437,28 @@ const editor = {
                     sel.addRange(range);
                 };
 
+                const insertHtmlAtCursor = (html) => {
+                    content.focus();
+                    const sel = window.getSelection();
+                    const range = document.createRange();
+                    if (sel.rangeCount > 0 && content.contains(sel.getRangeAt(0).startContainer)) {
+                        range.setStart(sel.getRangeAt(0).startContainer, sel.getRangeAt(0).startOffset);
+                    } else {
+                        range.selectNodeContents(content);
+                        range.collapse(false);
+                    }
+                    range.deleteContents();
+                    const frag = range.createContextualFragment(html);
+                    const lastNode = frag.lastChild;
+                    range.insertNode(frag);
+                    if (lastNode) {
+                        range.setStartAfter(lastNode);
+                        range.collapse(true);
+                    }
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                };
+
                 const execCmd = (cmd, val) => {
                     focusContent();
                     document.execCommand(cmd, false, val || null);
@@ -506,8 +528,7 @@ const editor = {
 
                 const insertImageInEditor = (url) => {
                     const html = `<img src="${url}" style="max-width:100%;height:auto;border-radius:4px" alt="">`;
-                    focusContent();
-                    document.execCommand('insertHTML', false, html);
+                    insertHtmlAtCursor(html);
                     setTimeout(() => {
                         focusContent();
                         debounceSave(content.innerHTML);
@@ -545,8 +566,7 @@ const editor = {
                     else if (m3) videoId = m3[1];
                     if (!videoId) { this.toastError('URL do YouTube não reconhecida'); return; }
                     const iframe = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin:12px 0"><iframe src="https://www.youtube-nocookie.com/embed/${videoId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
-                    focusContent();
-                    document.execCommand('insertHTML', false, iframe);
+                    insertHtmlAtCursor(iframe);
                     setTimeout(() => { focusContent(); debounceSave(content.innerHTML); }, 50);
                 };
                 toolbar.appendChild(ytBtn);
@@ -591,6 +611,9 @@ const editor = {
                     const close = () => { document.removeEventListener('keydown', escHandler); overlay.remove(); };
                     const escHandler = (ev) => { if (ev.key === 'Escape') close(); };
                     document.addEventListener('keydown', escHandler);
+                    const enterHandler = (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); modal.querySelector('#pb-tbl-ok').click(); } };
+                    modal.querySelector('#pb-tbl-rows').addEventListener('keydown', enterHandler);
+                    modal.querySelector('#pb-tbl-cols').addEventListener('keydown', enterHandler);
                     modal.querySelector('#pb-tbl-cancel').onclick = close;
                     overlay.onclick = (ev) => { if (ev.target === overlay) close(); };
                     modal.querySelector('#pb-tbl-ok').onclick = () => {
@@ -607,8 +630,7 @@ const editor = {
                             html += '</tr>';
                         }
                         html += '</table>';
-                        focusContent();
-                        document.execCommand('insertHTML', false, html);
+                        insertHtmlAtCursor(html);
                         setTimeout(() => { focusContent(); debounceSave(content.innerHTML); }, 50);
                         close();
                     };
@@ -665,8 +687,7 @@ const editor = {
                         const isDisplay = modal.querySelector('#pb-math-display').checked;
                         const escapedFormula = this.escHtml(formula);
                         const span = `<span class="pb-math" data-formula="${escapedFormula}" data-display="${isDisplay}" style="font-size:${isDisplay ? '1.3em' : '1em'};color:#1e293b">${escapedFormula}</span>`;
-                        focusContent();
-                        document.execCommand('insertHTML', false, isDisplay ? `<div style="text-align:center;padding:12px 0">${span}</div>` : span);
+                        insertHtmlAtCursor(isDisplay ? `<div style="text-align:center;padding:12px 0">${span}</div>` : span);
                         setTimeout(() => {
                             focusContent();
                             debounceSave(content.innerHTML);
@@ -755,7 +776,10 @@ const editor = {
             if (!r.ok) throw new Error(`HTTP ${r.status}`);
             return r.json();
         })
-        .then(() => { if (reload) this.reloadElement(elementId); })
+        .then(() => {
+            if (reload) this.reloadElement(elementId);
+            this.snapshotHistory();
+        })
         .catch(err => { console.error('updateSetting failed:', err); this.toastError('Falha ao atualizar configuração'); });
     },
 
@@ -855,6 +879,13 @@ const editor = {
         this.updateUndoButtons();
     },
 
+    snapshotHistory() {
+        fetch(`/page-builder/pages/${this.pageId}/elements`)
+            .then(r => r.json())
+            .then(data => this.pushHistory(data.elements))
+            .catch(() => {});
+    },
+
     undo() {
         if (this.historyIndex <= 0) return;
         this.historyIndex--;
@@ -868,9 +899,39 @@ const editor = {
     },
 
     restoreHistory() {
-        this.renderCanvas(this.history[this.historyIndex]);
-        this.renderStructure(this.history[this.historyIndex]);
+        const snapshot = this.history[this.historyIndex];
+        this.renderCanvas(snapshot);
+        this.renderMath();
+        this.renderStructure(snapshot);
         this.updateUndoButtons();
+
+        fetch(`/page-builder/pages/${this.pageId}/elements/restore-snapshot`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
+            body: JSON.stringify({ elements: snapshot }),
+        }).catch(() => {});
+
+        if (this.selectedId) {
+            const found = this._findElement(snapshot, this.selectedId);
+            if (found) {
+                this.loadControls(this.selectedId);
+            } else {
+                this.selectedId = null;
+                document.getElementById('settings-empty').style.display = '';
+                document.getElementById('settings-form').style.display = 'none';
+            }
+        }
+    },
+
+    _findElement(elements, id) {
+        for (const el of elements) {
+            if (el.id == id) return el;
+            if (el.children) {
+                const found = this._findElement(el.children, id);
+                if (found) return found;
+            }
+        }
+        return null;
     },
 
     updateUndoButtons() {
@@ -910,7 +971,16 @@ const editor = {
             e.dataTransfer.dropEffect = 'copy';
             const target = e.target.closest('.pb-el');
             document.querySelectorAll('.pb-el.drop-over').forEach(el => el.classList.remove('drop-over'));
-            if (target && target.dataset.isContainer === 'true') target.classList.add('drop-over');
+            if (target) {
+                if (target.dataset.isContainer === 'true') {
+                    target.classList.add('drop-over');
+                } else {
+                    const parentEl = target.parentElement ? target.parentElement.closest('.pb-el') : null;
+                    if (parentEl && parentEl.dataset.isContainer === 'true') {
+                        parentEl.classList.add('drop-over');
+                    }
+                }
+            }
             if (emptyCanvas) emptyCanvas.classList.add('drag-over');
         });
 
@@ -934,8 +1004,10 @@ const editor = {
                 if (target.dataset.isContainer === 'true') {
                     parentId = target.dataset.elId;
                 } else {
-                    this.toastError('Este widget não aceita outros widgets dentro dele');
-                    return;
+                    const parentEl = target.parentElement ? target.parentElement.closest('.pb-el') : null;
+                    if (parentEl && parentEl.dataset.isContainer === 'true') {
+                        parentId = parentEl.dataset.elId;
+                    }
                 }
             }
             this.showToast('Adicionando ' + type + '...', 'info');
@@ -1007,6 +1079,7 @@ const editor = {
         document.addEventListener('keydown', e => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); this.undo(); }
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) { e.preventDefault(); this.redo(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); this.redo(); }
             if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.save(); }
             if (e.key === 'Delete' && this.selectedId) { this.deleteSelected(); }
         });

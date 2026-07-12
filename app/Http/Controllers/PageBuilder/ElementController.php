@@ -281,6 +281,96 @@ class ElementController extends Controller
         ]);
     }
 
+    public function restoreSnapshot(Request $request, Page $page): JsonResponse
+    {
+        $this->authorize('update', $page);
+        $validated = $request->validate([
+            'elements' => 'required|array',
+        ]);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+
+        try {
+            $snapshotIds = $this->collectSnapshotIds($validated['elements']);
+            $page->elements()->whereNotIn('id', $snapshotIds)->forceDelete();
+
+            $this->importSnapshotElements($page, $validated['elements'], null);
+
+            $page->touch();
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            $elements = $page->allElements()->get();
+
+            return response()->json([
+                'message' => 'Snapshot restored successfully',
+                'elements' => $this->buildTree($elements),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return response()->json(['error' => 'Failed to restore snapshot: ' . $e->getMessage()], 500);
+        }
+    }
+
+    protected function collectSnapshotIds(array $elements): array
+    {
+        $ids = [];
+        foreach ($elements as $el) {
+            if (isset($el['id'])) $ids[] = $el['id'];
+            if (!empty($el['children']) && is_array($el['children'])) {
+                $ids = array_merge($ids, $this->collectSnapshotIds($el['children']));
+            }
+        }
+        return $ids;
+    }
+
+    protected function importSnapshotElements(Page $page, array $elements, ?int $parentId): void
+    {
+        foreach ($elements as $index => $snapshot) {
+            $existing = null;
+            if (isset($snapshot['id'])) {
+                $existing = Element::where('id', $snapshot['id'])
+                    ->where('page_id', $page->id)
+                    ->withTrashed()
+                    ->first();
+            }
+
+            if ($existing) {
+                if ($existing->trashed()) {
+                    $existing->restore();
+                }
+                $existing->update([
+                    'parent_id' => $parentId,
+                    'type' => $snapshot['type'] ?? $existing->type,
+                    'name' => $snapshot['name'] ?? $existing->name,
+                    'order' => $index,
+                    'settings' => $snapshot['settings'] ?? $existing->settings,
+                    'content' => $snapshot['content'] ?? $existing->content,
+                    'styles' => $snapshot['styles'] ?? $existing->styles,
+                ]);
+                $element = $existing;
+            } else {
+                $widget = $this->widgetManager->getWidget($snapshot['type'] ?? '');
+                $defaultSettings = $widget ? $widget->getDefaultSettings() : [];
+
+                $element = new Element();
+                $element->page_id = $page->id;
+                $element->parent_id = $parentId;
+                $element->type = $snapshot['type'] ?? 'text';
+                $element->name = $snapshot['name'] ?? ($snapshot['type'] ?? 'Element');
+                $element->order = $index;
+                $element->settings = $snapshot['settings'] ?? $defaultSettings;
+                $element->content = $snapshot['content'] ?? [];
+                $element->styles = $snapshot['styles'] ?? [];
+                $element->save();
+            }
+
+            if (!empty($snapshot['children']) && is_array($snapshot['children'])) {
+                $this->importSnapshotElements($page, $snapshot['children'], $element->id);
+            }
+        }
+    }
+
     protected function buildTree($elements): array
     {
         $byParent = [];
