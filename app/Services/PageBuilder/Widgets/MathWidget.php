@@ -38,35 +38,37 @@ class MathWidget extends BaseWidget
     public function render(array $settings, array $content = [], array $styles = []): string
     {
         $settings = $this->prepareSettings($settings);
-        $formula = htmlspecialchars($settings['formula'], ENT_QUOTES, 'UTF-8');
+        $formula = $settings['formula'];
         $displayMode = $settings['display_mode'];
-        $alignment = $settings['alignment'];
-        $fontSize = $settings['font_size'];
-        $color = $settings['color'];
-        $label = htmlspecialchars($settings['label'], ENT_QUOTES, 'UTF-8');
-        $marginTop = $settings['margin_top'];
-        $marginBottom = $settings['margin_bottom'];
+        $alignment = $this->safeCssValue($settings['alignment']);
+        $fontSize = $this->safeCssValue($settings['font_size']);
+        $color = $this->safeCssValue($settings['color']);
+        $label = $settings['label'];
+        $marginTop = $this->safeCssValue($settings['margin_top']);
+        $marginBottom = $this->safeCssValue($settings['margin_bottom']);
 
-        $labelHtml = $label ? "<span style=\"font-size:.85em;color:#64748b;margin-right:8px\">{$label}</span>" : '';
+        $formulaAttr = htmlspecialchars($formula, ENT_QUOTES, 'UTF-8');
+        $labelHtml = $label ? "<span style=\"font-size:.85em;color:#64748b;margin-right:8px\">" . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . "</span>" : '';
         $displayClass = $displayMode ? 'pb-math-display' : 'pb-math-inline';
 
-        return "<div class=\"pb-math-wrapper\" style=\"text-align:{$alignment};margin-top:{$marginTop};margin-bottom:{$marginBottom}\">{$labelHtml}<span class=\"pb-math {$displayClass}\" data-formula=\"{$formula}\" data-display=\"" . ($displayMode ? 'true' : 'false') . "\" style=\"font-size:{$fontSize};color:{$color}\">{$formula}</span></div>";
+        return "<div class=\"pb-math-wrapper\" style=\"text-align:{$alignment};margin-top:{$marginTop};margin-bottom:{$marginBottom}\">{$labelHtml}<span class=\"pb-math {$displayClass}\" data-formula=\"{$formulaAttr}\" data-display=\"" . ($displayMode ? 'true' : 'false') . "\" style=\"font-size:{$fontSize};color:{$color}\">{$formula}</span></div>";
     }
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
         $settings = $this->prepareSettings($settings);
-        $formula = htmlspecialchars($settings['formula'], ENT_QUOTES, 'UTF-8');
+        $formula = $settings['formula'];
         $displayMode = $settings['display_mode'];
-        $alignment = $settings['alignment'];
-        $fontSize = $settings['font_size'];
-        $color = $settings['color'];
-        $label = htmlspecialchars($settings['label'], ENT_QUOTES, 'UTF-8');
-        $marginTop = $settings['margin_top'];
-        $marginBottom = $settings['margin_bottom'];
+        $alignment = $this->safeCssValue($settings['alignment']);
+        $fontSize = $this->safeCssValue($settings['font_size']);
+        $color = $this->safeCssValue($settings['color']);
+        $label = $settings['label'];
+        $marginTop = $this->safeCssValue($settings['margin_top']);
+        $marginBottom = $this->safeCssValue($settings['margin_bottom']);
 
-        $labelHtml = $label ? "<span style=\"font-size:.85em;color:#64748b;margin-right:8px\">{$label}</span>" : '';
+        $formulaAttr = htmlspecialchars($formula, ENT_QUOTES, 'UTF-8');
+        $labelHtml = $label ? "<span style=\"font-size:.85em;color:#64748b;margin-right:8px\">" . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . "</span>" : '';
 
-        return "<div class=\"pb-math-wrapper\" style=\"text-align:{$alignment};margin-top:{$marginTop};margin-bottom:{$marginBottom}\">{$labelHtml}<span class=\"pb-math\" data-formula=\"{$formula}\" data-display=\"" . ($displayMode ? 'true' : 'false') . "\" style=\"font-size:{$fontSize};color:{$color}\">{$formula}</span></div>";
+        return "<div class=\"pb-math-wrapper\" style=\"text-align:{$alignment};margin-top:{$marginTop};margin-bottom:{$marginBottom}\">{$labelHtml}<span class=\"pb-math\" data-formula=\"{$formulaAttr}\" data-display=\"" . ($displayMode ? 'true' : 'false') . "\" style=\"font-size:{$fontSize};color:{$color}\">{$formula}</span></div>";
     }
 }

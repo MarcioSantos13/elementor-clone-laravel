@@ -115,8 +115,7 @@ class PageBuilderService
      */
     public function renderPage(Page $page, array $options = []): string
     {
-        $ts = $page->updated_at ? $page->updated_at->timestamp : 0;
-        $cacheKey = "page.{$page->id}.{$ts}.render." . md5(json_encode($options));
+        $cacheKey = "page.{$page->id}.render." . md5(json_encode($options));
 
         if ($this->config['template_cache']['enabled'] ?? false) {
             return Cache::remember($cacheKey, $this->config['template_cache']['ttl'] ?? 3600, function () use ($page, $options) {
@@ -369,7 +368,9 @@ class PageBuilderService
                     return str_replace($m[1], '', $m[0]);
                 }, $clean);
 
-                $clean = preg_replace('/<([a-z]+)[^>]*on\w+\s*=\s*["\'][^"\']*["\']/i', '<$1', $clean);
+                $clean = preg_replace('/\s+on\w+\s*=\s*"[^"]*"/i', '', $clean);
+                $clean = preg_replace("/\s+on\w+\s*=\s*'[^']*'/i", '', $clean);
+                $clean = preg_replace('/\s+on\w+\s*=\s*[^\s>]+/i', '', $clean);
                 $clean = preg_replace('/<([a-z]+)[^>]*javascript\s*:/i', '<$1', $clean);
 
                 return $clean;
@@ -397,7 +398,7 @@ class PageBuilderService
                 } elseif (str_contains($key, 'url') || str_contains($key, 'link') || str_contains($key, 'src')) {
                     $sanitized[$key] = filter_var($value, FILTER_SANITIZE_URL);
                 } elseif (str_contains($key, 'content') || str_contains($key, 'html') || $key === 'content') {
-                    $allowed = '<p><br><strong><em><u><s><sup><sub><mark><ul><ol><li><dl><dt><dd><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><iframe>';
+                    $allowed = '<p><br><strong><em><u><s><sup><sub><mark><ul><ol><li><dl><dt><dd><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><video><source><iframe>';
                     $sanitized[$key] = strip_tags($value, $allowed);
                 } elseif (in_array($key, ['css_classes', 'css_id', 'name', 'title', 'alt', 'text', 'label'])) {
                     $sanitized[$key] = strip_tags($value);
@@ -433,10 +434,9 @@ class PageBuilderService
      */
     protected function clearPageCache(Page $page): void
     {
-        $ts = $page->updated_at ? $page->updated_at->timestamp : 0;
-        Cache::forget("page.{$page->id}.render");
-        Cache::forget("page.{$page->id}.{$ts}.render." . md5(json_encode(['with_container' => true, 'theme' => 'default'])));
-        Cache::forget("page.{$page->id}.{$ts}.render." . md5(json_encode(['with_container' => false, 'theme' => 'default'])));
+        Cache::forget("page.{$page->id}.render." . md5(json_encode(['with_container' => true])));
+        Cache::forget("page.{$page->id}.render." . md5(json_encode(['with_container' => false])));
+        Cache::forget("page.{$page->id}.render." . md5(json_encode([])));
         Cache::forget("page.{$page->id}.json");
     }
 

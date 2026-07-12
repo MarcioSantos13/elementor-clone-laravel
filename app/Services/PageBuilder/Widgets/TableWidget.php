@@ -52,18 +52,34 @@ class TableWidget extends BaseWidget
         $cellPadding = $settings['padding'];
         $borderRadius = $settings['border_radius'];
 
-        $tableStyle = "width:100%;border-collapse:collapse;font-size:{$fontSize};text-align:{$alignment};border-radius:{$borderRadius};overflow:hidden;border:1px solid {$borderColor}";
+        $tableStyle = "width:100%;border-collapse:collapse;font-size:" . $this->safeCssValue($fontSize) . ";text-align:" . $this->safeCssValue($alignment) . ";border-radius:" . $this->safeCssValue($borderRadius) . ";overflow:hidden;border:1px solid " . $this->safeCssValue($borderColor);
+        $thStyle = "background:" . $this->safeCssValue($headerBg) . ";color:" . $this->safeCssValue($headerColor) . ";padding:" . $this->safeCssValue($cellPadding) . ";border:1px solid " . $this->safeCssValue($borderColor) . ";font-weight:600";
+        $tdStyle = "padding:" . $this->safeCssValue($cellPadding) . ";border:1px solid " . $this->safeCssValue($borderColor);
 
-        $styled = preg_replace('/<table([^>]*)>/i', '<table$1 style="' . $tableStyle . '">', $html, 1);
-        $styled = preg_replace('/<th([^>]*)>/i', '<th$1 style="background:' . $headerBg . ';color:' . $headerColor . ';padding:' . $cellPadding . ';border:1px solid ' . $borderColor . ';font-weight:600">', $styled);
-        $styled = preg_replace('/<td([^>]*)>/i', '<td$1 style="padding:' . $cellPadding . ';border:1px solid ' . $borderColor . '">', $styled);
+        $stripStyle = function ($tag) {
+            return preg_replace('/\s+style\s*=\s*"[^"]*"/i', '', $tag);
+        };
+
+        $styled = preg_replace_callback('/<table([^>]*)>/i', function ($m) use ($stripStyle, $tableStyle) {
+            $attrs = $stripStyle($m[1]);
+            return '<table' . $attrs . ' style="' . $tableStyle . '">';
+        }, $html, 1);
+        $styled = preg_replace_callback('/<th([^>]*)>/i', function ($m) use ($stripStyle, $thStyle) {
+            $attrs = $stripStyle($m[1]);
+            return '<th' . $attrs . ' style="' . $thStyle . '">';
+        }, $styled);
+        $styled = preg_replace_callback('/<td([^>]*)>/i', function ($m) use ($stripStyle, $tdStyle) {
+            $attrs = $stripStyle($m[1]);
+            return '<td' . $attrs . ' style="' . $tdStyle . '">';
+        }, $styled);
 
         if ($stripe) {
             $rowIndex = 0;
-            $styled = preg_replace_callback('/<tr([^>]*)>/i', function ($m) use (&$rowIndex, $stripeColor) {
+            $styled = preg_replace_callback('/<tr([^>]*)>/i', function ($m) use (&$rowIndex, $stripeColor, $stripStyle) {
                 $rowIndex++;
-                $bg = ($rowIndex % 2 === 0) ? " background:{$stripeColor};" : '';
-                return "<tr{$m[1]} style=\"{$bg}\">";
+                $bg = ($rowIndex % 2 === 0) ? "background:{$stripeColor};" : '';
+                $attrs = $stripStyle($m[1]);
+                return '<tr' . $attrs . ' style="' . $bg . '">';
             }, $styled);
         }
 

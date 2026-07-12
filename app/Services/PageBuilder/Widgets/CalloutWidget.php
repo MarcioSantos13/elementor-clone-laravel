@@ -94,8 +94,11 @@ class CalloutWidget extends BaseWidget
         $titleHtml = $title ? "<div style=\"font-weight:700;font-size:1rem;margin-bottom:6px;color:{$config['title_color']}\">{$title}</div>" : '';
 
         $children = $content['children'] ?? '';
+        $safeBR = $this->safeCssValue($borderRadius);
+        $safePad = $this->safeCssValue($padding);
+        $safeMB = $this->safeCssValue($marginBottom);
 
-        return "<div class=\"pb-callout pb-callout-{$type}\" style=\"background:{$config['bg']};border-left:4px solid {$config['border']};border-radius:{$borderRadius};padding:{$padding};margin-bottom:{$marginBottom};color:{$config['text_color']}\"><div style=\"display:flex;align-items:flex-start\">{$iconHtml}<div style=\"flex:1\">{$titleHtml}<div class=\"pb-callout-content\">{$text}{$children}</div></div></div></div>";
+        return "<div class=\"pb-callout pb-callout-{$type}\" style=\"background:{$config['bg']};border-left:4px solid {$config['border']};border-radius:{$safeBR};padding:{$safePad};margin-bottom:{$safeMB};color:{$config['text_color']}\"><div style=\"display:flex;align-items:flex-start\">{$iconHtml}<div style=\"flex:1\">{$titleHtml}<div class=\"pb-callout-content\">{$text}{$children}</div></div></div></div>";
     }
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
@@ -114,7 +117,10 @@ class CalloutWidget extends BaseWidget
         $titleHtml = $title ? "<div style=\"font-weight:700;font-size:1rem;margin-bottom:6px;color:{$config['title_color']}\">{$title}</div>" : '';
 
         $children = $content['children'] ?? '';
+        $safeBR = $this->safeCssValue($borderRadius);
+        $safePad = $this->safeCssValue($padding);
+        $safeMB = $this->safeCssValue($marginBottom);
 
-        return "<div class=\"pb-callout-editor\" style=\"background:{$config['bg']};border-left:4px solid {$config['border']};border-radius:{$borderRadius};padding:{$padding};margin-bottom:{$marginBottom};color:{$config['text_color']}\"><div style=\"display:flex;align-items:flex-start\">{$iconHtml}<div style=\"flex:1\">{$titleHtml}<div>{$text}{$children}</div></div></div></div>";
+        return "<div class=\"pb-callout-editor\" style=\"background:{$config['bg']};border-left:4px solid {$config['border']};border-radius:{$safeBR};padding:{$safePad};margin-bottom:{$safeMB};color:{$config['text_color']}\"><div style=\"display:flex;align-items:flex-start\">{$iconHtml}<div style=\"flex:1\">{$titleHtml}<div>{$text}{$children}</div></div></div></div>";
     }
 }

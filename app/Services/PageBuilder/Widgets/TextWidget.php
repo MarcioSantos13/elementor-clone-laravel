@@ -49,10 +49,10 @@ class TextWidget extends BaseWidget
         $fontFamily = $settings['font_family'];
         $children = $content['children'] ?? '';
 
-        $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight};";
+        $style = "text-align: {$this->safeCssValue($alignment)}; color: {$this->safeCssValue($color)}; font-size: {$this->safeCssValue($fontSize)}; font-weight: {$this->safeCssValue($fontWeight)}; line-height: {$this->safeCssValue($lineHeight)};";
 
         if ($fontFamily) {
-            $style .= " font-family: {$fontFamily};";
+            $style .= " font-family: {$this->safeCssValue($fontFamily)};";
         }
 
         $dropCss = '';
@@ -62,7 +62,7 @@ class TextWidget extends BaseWidget
 
         $columnStyle = '';
         if ($settings['column_count'] > 1) {
-            $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$settings['column_gap']};";
+            $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$this->safeCssValue($settings['column_gap'])};";
         }
 
         return "<div class=\"pb-text{$dropCss}\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
@@ -80,15 +80,15 @@ class TextWidget extends BaseWidget
         $fontFamily = $settings['font_family'];
         $children = $content['children'] ?? '';
 
-        $style = "text-align: {$alignment}; color: {$color}; font-size: {$fontSize}; font-weight: {$fontWeight}; line-height: {$lineHeight};";
+        $style = "text-align: {$this->safeCssValue($alignment)}; color: {$this->safeCssValue($color)}; font-size: {$this->safeCssValue($fontSize)}; font-weight: {$this->safeCssValue($fontWeight)}; line-height: {$this->safeCssValue($lineHeight)};";
 
         if ($fontFamily) {
-            $style .= " font-family: {$fontFamily};";
+            $style .= " font-family: {$this->safeCssValue($fontFamily)};";
         }
 
         $columnStyle = '';
         if ($settings['column_count'] > 1) {
-            $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$settings['column_gap']};";
+            $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$this->safeCssValue($settings['column_gap'])};";
         }
 
         return "<div class=\"pb-text-editor\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";

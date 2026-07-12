@@ -126,7 +126,7 @@ const editor = {
                 const typeStyles = {info:{bg:'#e0f2fe',border:'#0284c7',icon:'&#8505;'},success:{bg:'#dcfce7',border:'#16a34a',icon:'&#10003;'},warning:{bg:'#fef9c3',border:'#ca8a04',icon:'&#9888;'},danger:{bg:'#fee2e2',border:'#dc2626',icon:'&#10007;'},tip:{bg:'#f0fdf4',border:'#22c55e',icon:'&#128161;'},definition:{bg:'#f3e8ff',border:'#9333ea',icon:'&#128218;'},theorem:{bg:'#fff7ed',border:'#ea580c',icon:'&#9878;'},exercise:{bg:'#ecfeff',border:'#0891b2',icon:'&#9998;'},note:{bg:'#f8fafc',border:'#64748b',icon:'&#128221;'}};
                 const st = typeStyles[s.type]||typeStyles.info;
                 const borderStyle = s.border_style==='none'?'border-left:none;':s.border_style==='full'?`border:2px solid ${st.border};`:`border-left:4px solid ${st.border};`;
-                preview = `<div style="background:${st.bg};${borderStyle}padding:${s.padding||'16px'};border-radius:${s.border_radius||'8px'}"><div style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:1.2em">${s.icon||st.icon}</span><div style="flex:1">${s.content||'<p>Conteúdo do callout</p>'}</div></div></div>`;
+                preview = `<div style="background:${st.bg};${borderStyle}padding:${s.padding||'16px'};border-radius:${s.border_radius||'8px'}"><div style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:1.2em">${this.escHtml(s.icon)||st.icon}</span><div style="flex:1">${s.content||'<p>Conteúdo do callout</p>'}</div></div></div>`;
                 break;
             }
             case 'table': {
@@ -158,7 +158,7 @@ const editor = {
             }
             default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
         }
-        return `<div class="pb-el-toolbar"><span class="pb-el-name">${name}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;
+        return `<div class="pb-el-toolbar"><span class="pb-el-name">${this.escHtml(name)}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;
     },
 
     escHtml(str) {
@@ -588,7 +588,9 @@ const editor = {
                     overlay.appendChild(modal);
                     document.body.appendChild(overlay);
                     modal.querySelector('#pb-tbl-rows').focus();
-                    const close = () => overlay.remove();
+                    const close = () => { document.removeEventListener('keydown', escHandler); overlay.remove(); };
+                    const escHandler = (ev) => { if (ev.key === 'Escape') close(); };
+                    document.addEventListener('keydown', escHandler);
                     modal.querySelector('#pb-tbl-cancel').onclick = close;
                     overlay.onclick = (ev) => { if (ev.target === overlay) close(); };
                     modal.querySelector('#pb-tbl-ok').onclick = () => {
@@ -652,14 +654,17 @@ const editor = {
                     updatePreview();
                     input.oninput = updatePreview;
                     modal.querySelector('#pb-math-display').onchange = updatePreview;
-                    const close = () => overlay.remove();
+                    const close = () => { document.removeEventListener('keydown', escHandler); overlay.remove(); };
+                    const escHandler = (ev) => { if (ev.key === 'Escape') close(); };
+                    document.addEventListener('keydown', escHandler);
                     modal.querySelector('#pb-math-cancel').onclick = close;
                     overlay.onclick = (ev) => { if (ev.target === overlay) close(); };
                     modal.querySelector('#pb-math-ok').onclick = () => {
                         const formula = input.value.trim();
                         if (!formula) { this.toastError('Digite uma fórmula LaTeX'); return; }
                         const isDisplay = modal.querySelector('#pb-math-display').checked;
-                        const span = `<span class="pb-math" data-formula="${formula.replace(/"/g, '&quot;')}" data-display="${isDisplay}" style="font-size:${isDisplay ? '1.3em' : '1em'};color:#1e293b">${formula}</span>`;
+                        const escapedFormula = this.escHtml(formula);
+                        const span = `<span class="pb-math" data-formula="${escapedFormula}" data-display="${isDisplay}" style="font-size:${isDisplay ? '1.3em' : '1em'};color:#1e293b">${escapedFormula}</span>`;
                         focusContent();
                         document.execCommand('insertHTML', false, isDisplay ? `<div style="text-align:center;padding:12px 0">${span}</div>` : span);
                         setTimeout(() => {
@@ -737,7 +742,7 @@ const editor = {
         return (types[ctrl.type] || types.text)();
     },
 
-    updateSetting(key, value, elementId) {
+    updateSetting(key, value, elementId, reload = true) {
         this.dirty = true;
         const settings = {};
         settings[key] = value;
@@ -750,22 +755,26 @@ const editor = {
             if (!r.ok) throw new Error(`HTTP ${r.status}`);
             return r.json();
         })
-        .then(() => this.reloadElement(elementId))
+        .then(() => { if (reload) this.reloadElement(elementId); })
         .catch(err => { console.error('updateSetting failed:', err); this.toastError('Falha ao atualizar configuração'); });
     },
 
     reloadElement(id) {
-        fetch(`/page-builder/elements/${id}/render`)
-            .then(r => r.json())
+        fetch(`/page-builder/elements/${id}/render`, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
             .then(data => {
                 const el = document.querySelector(`.pb-el[data-el-id="${id}"]`);
                 if (el) {
                     const oldContent = el.querySelector('.pb-el-content');
                     if (oldContent) oldContent.innerHTML = data.html;
                     else el.innerHTML = `<div class="pb-el-content">${data.html}</div>`;
+                    this.renderMath();
                 }
             })
-            .catch(() => this.toastError('Falha ao recarregar elemento'));
+            .catch(err => { console.error('reloadElement failed:', err); this.toastError('Falha ao recarregar elemento'); });
     },
 
     deleteElement(id) {
@@ -788,13 +797,16 @@ const editor = {
             .catch(() => this.toastError('Falha ao duplicar elemento'));
     },
 
-    save() {
+    save(silent) {
         if (this.saving) return;
         this.saving = true;
-        const overlay = document.createElement('div');
-        overlay.className = 'saving-overlay';
-        overlay.innerHTML = '<div class="saving-card"><div class="spinner"></div><span class="saving-text">Salvando...</span></div>';
-        document.body.appendChild(overlay);
+        let overlay = null;
+        if (!silent) {
+            overlay = document.createElement('div');
+            overlay.className = 'saving-overlay';
+            overlay.innerHTML = '<div class="saving-card"><div class="spinner"></div><span class="saving-text">Salvando...</span></div>';
+            document.body.appendChild(overlay);
+        }
         fetch(`/page-builder/pages/${this.pageId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
@@ -802,11 +814,12 @@ const editor = {
         })
         .then(r => r.json())
         .then(() => {
+            this.saving = false;
             this.dirty = false;
-            overlay.remove();
-            this.toastSuccess('Página salva!');
+            if (overlay) overlay.remove();
+            if (!silent) this.toastSuccess('Página salva!');
         })
-        .catch(() => { overlay.remove(); this.toastError('Falha ao salvar'); });
+        .catch(() => { this.saving = false; if (overlay) overlay.remove(); this.toastError('Falha ao salvar'); });
     },
 
     publish() {
@@ -939,10 +952,18 @@ const editor = {
 
     bindInlineEditing() {
         const dz = document.getElementById('canvas-dropzone');
+        const editableTypes = ['heading', 'text', 'button', 'callout'];
         dz.addEventListener('dblclick', (e) => {
             const el = e.target.closest('.pb-el');
             if (!el) return;
-            const textEl = e.target.closest('h1, h2, h3, h4, h5, h6, p, span, a, button, label');
+            if (e.target.closest('.pb-el-toolbar')) return;
+            const type = el.dataset.elType;
+            if (!editableTypes.includes(type)) return;
+            let textEl = e.target.closest('h1, h2, h3, h4, h5, h6, p, span, a, button, label');
+            if (!textEl) {
+                const contentDiv = e.target.closest('.pb-el-content > div');
+                if (contentDiv) textEl = contentDiv;
+            }
             if (!textEl) return;
             if (el.dataset._editing) return;
             el.dataset._editing = '1';
@@ -958,19 +979,27 @@ const editor = {
                 if (!el.dataset._editing) return;
                 textEl.contentEditable = 'false';
                 delete el.dataset._editing;
+                if (textEl._inlineKeydown) { textEl.removeEventListener('keydown', textEl._inlineKeydown); textEl._inlineKeydown = null; }
                 const newHtml = textEl.innerHTML.trim();
-                const origHtml = textEl.dataset._origHtml || '';
+                const origHtml = el.dataset._origHtml || '';
                 if (newHtml && newHtml !== origHtml) {
                     const type = el.dataset.elType;
-                    const key = { heading: 'title', text: 'content', button: 'text' }[type] || 'title';
-                    this.updateSetting(key, newHtml, el.dataset.elId);
+                    const key = { heading: 'title', text: 'content', button: 'text', callout: 'content' }[type] || 'title';
+                    const elId = el.dataset.elId;
+                    this.updateSetting(key, newHtml, elId, false);
+                    if (this.selectedId == elId) {
+                        const self = this;
+                        setTimeout(function() { self.loadControls(elId); }, 100);
+                    }
                 }
             };
             textEl.addEventListener('blur', finish, { once: true });
-            textEl.addEventListener('keydown', (k) => {
+            if (textEl._inlineKeydown) textEl.removeEventListener('keydown', textEl._inlineKeydown);
+            textEl._inlineKeydown = (k) => {
                 if (k.key === 'Enter' && !k.shiftKey) { k.preventDefault(); textEl.blur(); }
                 if (k.key === 'Escape') { textEl.innerHTML = el.dataset._origHtml || ''; textEl.blur(); }
-            });
+            };
+            textEl.addEventListener('keydown', textEl._inlineKeydown);
         });
     },
 
@@ -985,7 +1014,7 @@ const editor = {
 
     autoSave() {
         setInterval(() => {
-            if (this.dirty) this.save();
+            if (this.dirty) this.save(true);
         }, 60000);
     },
 
@@ -996,7 +1025,7 @@ const editor = {
         t.className = 'pb-toast';
         if (type === 'error') t.style.borderColor = 'rgba(239,68,68,.4)';
         if (type === 'success') t.style.borderColor = 'rgba(34,197,94,.4)';
-        t.innerHTML = `<span>${msg}</span>`;
+        t.textContent = msg;
         document.body.appendChild(t);
         setTimeout(() => { t.classList.add('pb-toast-out'); setTimeout(() => t.remove(), 300); }, 2500);
     },

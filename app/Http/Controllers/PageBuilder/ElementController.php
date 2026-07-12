@@ -210,18 +210,22 @@ class ElementController extends Controller
             return response()->json(['html' => '<!-- Unknown widget -->', 'element_id' => $element->id]);
         }
 
-        $childrenHtml = '';
-        if ($element->children->isNotEmpty()) {
-            foreach ($element->children as $child) {
-                $childrenHtml .= $this->renderer->renderSingleElement($child);
+        try {
+            $childrenHtml = '';
+            if ($element->children->isNotEmpty()) {
+                foreach ($element->children as $child) {
+                    $childrenHtml .= $this->renderer->renderSingleElement($child);
+                }
             }
-        }
 
-        $innerHtml = $widget->renderEditor(
-            $element->settings ?? [],
-            array_merge($element->content ?? [], ['children' => $childrenHtml]),
-            $element->styles ?? []
-        );
+            $innerHtml = $widget->renderEditor(
+                $element->settings ?? [],
+                array_merge($element->content ?? [], ['children' => $childrenHtml]),
+                $element->styles ?? []
+            );
+        } catch (\Throwable $e) {
+            $innerHtml = '<!-- Render error: ' . htmlspecialchars($e->getMessage()) . ' -->';
+        }
 
         return response()->json([
             'html' => $innerHtml,

@@ -226,6 +226,11 @@ abstract class BaseWidget implements WidgetInterface
         return array_merge($this->defaultSettings, $settings);
     }
 
+    protected function safeCssValue(string $value): string
+    {
+        return preg_replace('/[<>"\'\\]/', '', $value);
+    }
+
     protected function renderTemplate(string $template, array $data = []): string
     {
         $result = $template;

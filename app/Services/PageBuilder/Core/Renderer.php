@@ -44,9 +44,11 @@ HTML;
 
         if ($options['with_container'] ?? true) {
             $lang = $options['lang'] ?? 'en';
-            $title = $page->title;
-            $renderStyles = $this->renderStyles($page);
-            $renderScripts = $this->renderScripts($page);
+            $hasMath = $page->elements()->where('type', 'math')->exists()
+                || $page->elements()->where('type', 'text')->where('settings->content', 'LIKE', '%pb-math%')->exists();
+            $renderStyles = $this->renderStyles($page, $hasMath);
+            $renderScripts = $this->renderScripts($page, $hasMath);
+            $title = htmlspecialchars($page->title, ENT_QUOTES, 'UTF-8');
             $content = <<<HTML
 <!DOCTYPE html>
 <html lang="{$lang}">
@@ -134,8 +136,10 @@ HTML;
         }
 
         $childrenHtml = '';
-        if ($element->children->isNotEmpty()) {
-            $childrenHtml = $this->renderElementEditor($element->children);
+        if ($widget->isContainer() && $element->children->isNotEmpty()) {
+            foreach ($element->children as $child) {
+                $childrenHtml .= $this->renderElementEditor($child);
+            }
         }
 
         $innerHtml = $widget->renderEditor(
@@ -276,7 +280,7 @@ HTML;
         return $processed;
     }
 
-    protected function renderStyles(Page $page): string
+    protected function renderStyles(Page $page, bool $hasMath = false): string
     {
         $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n</style>\n";
 
@@ -291,8 +295,6 @@ HTML;
             }
         }
 
-        $hasMath = $page->elements()->where('type', 'math')->exists()
-            || $page->elements()->where('type', 'text')->where('settings->content', 'LIKE', '%pb-math%')->exists();
         if ($hasMath) {
             $css .= "\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css\">\n";
         }
@@ -300,7 +302,7 @@ HTML;
         return $css;
     }
 
-    protected function renderScripts(Page $page): string
+    protected function renderScripts(Page $page, bool $hasMath = false): string
     {
         $scripts = '';
 
@@ -312,8 +314,6 @@ HTML;
             $scripts .= "\n<script>\n{$page->settings['custom_js_footer']}\n</script>\n";
         }
 
-        $hasMath = $page->elements()->where('type', 'math')->exists()
-            || $page->elements()->where('type', 'text')->where('settings->content', 'LIKE', '%pb-math%')->exists();
         if ($hasMath) {
             $scripts .= "\n<script src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js\"></script>\n";
             $scripts .= "\n<script>\ndocument.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.pb-math').forEach(function(el){try{katex.render(el.getAttribute('data-formula'),el,{displayMode:el.getAttribute('data-display')==='true',throwOnError:false})}catch(e){el.textContent=el.getAttribute('data-formula')}})})\n</script>\n";
