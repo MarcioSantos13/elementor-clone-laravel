@@ -106,11 +106,43 @@ HTML;
         $innerHtml = $this->processEmbeds($innerHtml);
 
         $attributes = $this->buildAttributes($element);
-        $styles = $this->buildStyleString($element->styles ?? []);
+        $styleStr = $this->buildStyleString($element->styles ?? []);
+        $styleAttr = $styleStr ? " style=\"{$styleStr}\"" : '';
         $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
+        $cssClasses = "pb-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}";
 
-        return <<<HTML
-<div{$cssId} class="pb-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}" data-element-id="{$element->id}" data-element-type="{$element->type}"{$attributes}>
+        $settings = $element->settings ?? [];
+
+        if (!empty($settings['animation']) && $settings['animation'] !== 'none') {
+            $animClass = 'pb-animate ' . htmlspecialchars($settings['animation'], ENT_QUOTES);
+            $duration = $settings['animation_duration'] ?? 'normal';
+            if ($duration === 'slow') $animClass .= ' pb-animate-slow';
+            elseif ($duration === 'fast') $animClass .= ' pb-animate-fast';
+            $delay = (int) ($settings['animation_delay'] ?? 0);
+            if ($delay > 0) $styleStr .= " animation-delay: {$delay}ms;";
+            $styleAttr = $styleStr ? " style=\"{$styleStr}\"" : '';
+            $cssClasses .= ' ' . $animClass;
+        }
+
+        $visDesktop = $settings['visibility_desktop'] ?? true;
+        $visTablet = $settings['visibility_tablet'] ?? true;
+        $visMobile = $settings['visibility_mobile'] ?? true;
+        $visCss = '';
+        if (!$visDesktop) $visCss .= ".pb-element[data-element-id=\"{$element->id}\"]{display:none !important;}";
+        if (!$visTablet) $visCss .= "@media(max-width:1024px){.pb-element[data-element-id=\"{$element->id}\"]{display:none !important;}}";
+        if (!$visMobile) $visCss .= "@media(max-width:767px){.pb-element[data-element-id=\"{$element->id}\"]{display:none !important;}}";
+
+        $customCss = $settings['custom_css'] ?? '';
+        $customStyle = '';
+        if ($customCss) {
+            $selector = $cssId ? "#{$element->css_id}" : ".pb-element[data-element-id=\"{$element->id}\"]";
+            $customStyle = "<style>{$selector} { {$customCss} }</style>";
+        }
+
+        $visStyle = $visCss ? "<style>{$visCss}</style>" : '';
+
+        return $visStyle . $customStyle . <<<HTML
+<div{$cssId} class="{$cssClasses}" data-element-id="{$element->id}" data-element-type="{$element->type}"{$attributes}{$styleAttr}>
     {$innerHtml}
 </div>
 HTML;
@@ -153,7 +185,27 @@ HTML;
         $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
         $classes = "pb-editor-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}";
 
-        return <<<HTML
+        $settings = $element->settings ?? [];
+        $visDesktop = $settings['visibility_desktop'] ?? true;
+        $visTablet = $settings['visibility_tablet'] ?? true;
+        $visMobile = $settings['visibility_mobile'] ?? true;
+        $visStyle = '';
+        if (!$visDesktop || !$visTablet || !$visMobile) {
+            $visCss = '';
+            if (!$visDesktop) $visCss .= ".pb-editor-element[data-element-id=\"{$element->id}\"]{opacity:.3;}";
+            if (!$visTablet) $visCss .= "@media(max-width:1024px){.pb-editor-element[data-element-id=\"{$element->id}\"]{opacity:.3;}}";
+            if (!$visMobile) $visCss .= "@media(max-width:767px){.pb-editor-element[data-element-id=\"{$element->id}\"]{opacity:.3;}}";
+            $visStyle = "<style>{$visCss}</style>";
+        }
+
+        $customCss = $settings['custom_css'] ?? '';
+        $customStyle = '';
+        if ($customCss) {
+            $selector = $cssId ? "#{$element->css_id}" : ".pb-editor-element[data-element-id=\"{$element->id}\"]";
+            $customStyle = "<style>{$selector} { {$customCss} }</style>";
+        }
+
+        return $visStyle . $customStyle . <<<HTML
 <div{$cssId} class="{$classes}" data-element-id="{$element->id}" data-element-type="{$element->type}" draggable="true">
     <div class="pb-element-toolbar">
         <span class="pb-element-name">{$element->name}</span>
@@ -282,7 +334,15 @@ HTML;
 
     protected function renderStyles(Page $page, bool $hasMath = false): string
     {
+        $hasAnimations = $page->elements()->where('settings->animation', '!=', 'none')
+            ->whereNotNull('settings->animation')->exists();
+
         $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n</style>\n";
+
+        if ($hasAnimations) {
+            $css .= "\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css\">\n";
+            $css .= "\n<style>.pb-animate { animation-fill-mode: both; }\n.pb-animate-slow { animation-duration: 1s; }\n.pb-animate-fast { animation-duration: 0.5s; }\n</style>\n";
+        }
 
         if ($page->settings['custom_css'] ?? false) {
             $css .= "\n<style>\n{$page->settings['custom_css']}\n</style>\n";
@@ -346,10 +406,43 @@ HTML;
         $innerHtml = $this->processEmbeds($innerHtml);
 
         $attributes = $this->buildAttributes($element);
+        $styleStr = $this->buildStyleString($element->styles ?? []);
+        $styleAttr = $styleStr ? " style=\"{$styleStr}\"" : '';
         $cssId = $element->css_id ? " id=\"{$element->css_id}\"" : '';
+        $cssClasses = "pb-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}";
 
-        return <<<HTML
-<div{$cssId} class="pb-element pb-{$element->type} {$element->column_size} {$this->getCssClasses($element)}" data-element-id="{$element->id}" data-element-type="{$element->type}"{$attributes}>
+        $settings = $element->settings ?? [];
+
+        if (!empty($settings['animation']) && $settings['animation'] !== 'none') {
+            $animClass = 'pb-animate ' . htmlspecialchars($settings['animation'], ENT_QUOTES);
+            $duration = $settings['animation_duration'] ?? 'normal';
+            if ($duration === 'slow') $animClass .= ' pb-animate-slow';
+            elseif ($duration === 'fast') $animClass .= ' pb-animate-fast';
+            $delay = (int) ($settings['animation_delay'] ?? 0);
+            if ($delay > 0) $styleStr .= " animation-delay: {$delay}ms;";
+            $styleAttr = $styleStr ? " style=\"{$styleStr}\"" : '';
+            $cssClasses .= ' ' . $animClass;
+        }
+
+        $visDesktop = $settings['visibility_desktop'] ?? true;
+        $visTablet = $settings['visibility_tablet'] ?? true;
+        $visMobile = $settings['visibility_mobile'] ?? true;
+        $visCss = '';
+        if (!$visDesktop) $visCss .= ".pb-element[data-element-id=\"{$element->id}\"]{display:none !important;}";
+        if (!$visTablet) $visCss .= "@media(max-width:1024px){.pb-element[data-element-id=\"{$element->id}\"]{display:none !important;}}";
+        if (!$visMobile) $visCss .= "@media(max-width:767px){.pb-element[data-element-id=\"{$element->id}\"]{display:none !important;}}";
+
+        $customCss = $settings['custom_css'] ?? '';
+        $customStyle = '';
+        if ($customCss) {
+            $selector = $cssId ? "#{$element->css_id}" : ".pb-element[data-element-id=\"{$element->id}\"]";
+            $customStyle = "<style>{$selector} { {$customCss} }</style>";
+        }
+
+        $visStyle = $visCss ? "<style>{$visCss}</style>" : '';
+
+        return $visStyle . $customStyle . <<<HTML
+<div{$cssId} class="{$cssClasses}" data-element-id="{$element->id}" data-element-type="{$element->type}"{$attributes}{$styleAttr}>
     <div class="pb-element-toolbar">
         <span class="pb-el-name">{$element->name}</span>
         <span class="pb-el-type">{$element->type}</span>

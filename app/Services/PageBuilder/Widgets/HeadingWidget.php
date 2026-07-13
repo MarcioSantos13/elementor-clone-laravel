@@ -34,10 +34,22 @@ class HeadingWidget extends BaseWidget
             'tag' => ['type' => 'select', 'label' => 'HTML Tag', 'options' => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div'], 'default' => 'h2'],
             'alignment' => ['type' => 'select', 'label' => 'Alignment', 'options' => ['left', 'center', 'right', 'justify']],
             'size' => ['type' => 'select', 'label' => 'Size', 'options' => ['small', 'default', 'medium', 'large', 'xl', 'xxl']],
-            'color' => ['type' => 'color', 'label' => 'Color'],
-            'font_family' => ['type' => 'text', 'label' => 'Font Family'],
-            'font_weight' => ['type' => 'select', 'label' => 'Font Weight', 'options' => ['300', '400', '500', '600', '700', '800', '900']],
+            'color' => ['type' => 'color', 'label' => 'Color', 'tab' => 'style'],
+            'font_family' => ['type' => 'text', 'label' => 'Font Family', 'tab' => 'style'],
+            'font_weight' => ['type' => 'select', 'label' => 'Font Weight', 'options' => ['300', '400', '500', '600', '700', '800', '900'], 'tab' => 'style'],
             'link' => ['type' => 'url', 'label' => 'Link'],
+            'typography' => ['type' => 'typography', 'label' => 'Typography', 'tab' => 'style'],
+            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
+            'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
+            'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
+            'hover' => ['type' => 'hover', 'label' => 'Hover Effects', 'tab' => 'style'],
+            'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
+            'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
+            'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
+            'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
+            'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
 
@@ -79,13 +91,15 @@ class HeadingWidget extends BaseWidget
 
         $innerHtml = "<{$tag} class=\"pb-heading\" style=\"{$style}\">{$title}</{$tag}>";
 
+        $hoverStyle = $this->buildHoverStyle('pb-heading', $styles);
+
         if ($link) {
             $target = htmlspecialchars($linkTarget, ENT_QUOTES, 'UTF-8');
             $href = htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
             $innerHtml = "<a href=\"{$href}\" target=\"{$target}\" class=\"pb-heading-link\">{$innerHtml}</a>";
         }
 
-        return $innerHtml;
+        return $hoverStyle . $innerHtml;
     }
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
@@ -122,6 +136,8 @@ class HeadingWidget extends BaseWidget
             $style .= " letter-spacing: {$letterSpacing};";
         }
 
-        return "<{$tag} class=\"pb-heading-editor\" style=\"{$style}\">{$title}</{$tag}>";
+        $hoverStyle = $this->buildHoverStyle('pb-heading-editor', $styles);
+
+        return $hoverStyle . "<{$tag} class=\"pb-heading-editor\" style=\"{$style}\">{$title}</{$tag}>";
     }
 }

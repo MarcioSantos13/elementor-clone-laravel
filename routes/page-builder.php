@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageBuilder\PageController;
 use App\Http\Controllers\PageBuilder\ElementController;
 use App\Http\Controllers\PageBuilder\RevisionController;
+use App\Http\Controllers\PageBuilder\FormController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::resource('pages', PageController::class)->except(['show', 'edit']);
@@ -42,4 +43,7 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::delete('revisions/{revision}', [RevisionController::class, 'destroy'])->name('revisions.destroy');
     Route::post('pages/{page}/revisions/prune', [RevisionController::class, 'prune'])->name('revisions.prune');
     Route::post('pages/{page}/revisions/auto-save', [RevisionController::class, 'autoSave'])->name('revisions.auto-save');
+
+    Route::post('pages/{page}/form/submit', [FormController::class, 'submit'])->name('form.submit');
+    Route::get('pages/{page}/form/submissions', [FormController::class, 'submissions'])->name('form.submissions');
 });

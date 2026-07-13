@@ -29,11 +29,23 @@ class TextWidget extends BaseWidget
         $this->controls = [
             'content' => ['type' => 'wysiwyg', 'label' => 'Content', 'required' => true],
             'alignment' => ['type' => 'select', 'label' => 'Alignment', 'options' => ['left', 'center', 'right', 'justify']],
-            'color' => ['type' => 'color', 'label' => 'Color'],
-            'font_size' => ['type' => 'number', 'label' => 'Font Size', 'min' => 8, 'max' => 200],
-            'font_family' => ['type' => 'text', 'label' => 'Font Family'],
-            'line_height' => ['type' => 'number', 'label' => 'Line Height', 'min' => 0.5, 'max' => 5],
             'drop_cap' => ['type' => 'boolean', 'label' => 'Drop Cap'],
+            'color' => ['type' => 'color', 'label' => 'Color', 'tab' => 'style'],
+            'font_size' => ['type' => 'number', 'label' => 'Font Size', 'min' => 8, 'max' => 200, 'tab' => 'style'],
+            'font_family' => ['type' => 'text', 'label' => 'Font Family', 'tab' => 'style'],
+            'line_height' => ['type' => 'number', 'label' => 'Line Height', 'min' => 0.5, 'max' => 5, 'tab' => 'style'],
+            'typography' => ['type' => 'typography', 'label' => 'Typography', 'tab' => 'style'],
+            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
+            'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
+            'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
+            'hover' => ['type' => 'hover', 'label' => 'Hover Effects', 'tab' => 'style'],
+            'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
+            'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
+            'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
+            'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
+            'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
 
@@ -65,7 +77,9 @@ class TextWidget extends BaseWidget
             $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$this->safeCssValue($settings['column_gap'])};";
         }
 
-        return "<div class=\"pb-text{$dropCss}\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
+        $hoverStyle = $this->buildHoverStyle('pb-text', $styles);
+
+        return $hoverStyle . "<div class=\"pb-text{$dropCss}\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
     }
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
@@ -91,6 +105,8 @@ class TextWidget extends BaseWidget
             $columnStyle = " column-count: {$settings['column_count']}; column-gap: {$this->safeCssValue($settings['column_gap'])};";
         }
 
-        return "<div class=\"pb-text-editor\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
+        $hoverStyle = $this->buildHoverStyle('pb-text-editor', $styles);
+
+        return $hoverStyle . "<div class=\"pb-text-editor\" style=\"{$style}{$columnStyle}\">{$text}{$children}</div>";
     }
 }

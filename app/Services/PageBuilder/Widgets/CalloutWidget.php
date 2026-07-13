@@ -28,9 +28,19 @@ class CalloutWidget extends BaseWidget
             'title' => ['type' => 'text', 'label' => 'Title'],
             'content' => ['type' => 'wysiwyg', 'label' => 'Content', 'required' => true],
             'show_icon' => ['type' => 'boolean', 'label' => 'Show Icon'],
-            'border_radius' => ['type' => 'text', 'label' => 'Border Radius'],
-            'padding' => ['type' => 'text', 'label' => 'Padding'],
-            'margin_bottom' => ['type' => 'text', 'label' => 'Margin Bottom'],
+            'border_radius' => ['type' => 'text', 'label' => 'Border Radius', 'tab' => 'style'],
+            'padding' => ['type' => 'text', 'label' => 'Padding', 'tab' => 'style'],
+            'margin_bottom' => ['type' => 'text', 'label' => 'Margin Bottom', 'tab' => 'style'],
+            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
+            'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
+            'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
+            'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
+            'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
+            'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
+            'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
+            'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
 

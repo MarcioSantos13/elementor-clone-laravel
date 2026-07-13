@@ -1044,6 +1044,138 @@ php artisan db:seed</code></pre>
                     <strong>&#128161; Dica Final:</strong> O template Showcase Completo é o melhor exemplo de construção avançada de páginas. Ele demonstra: <strong>layouts full_width e boxed</strong>, <strong>colunas com larguras variadas</strong> (col-3, col-4, col-12), <strong>cores escuras e claras alternadas</strong> para ritmo visual, e <strong>todos os tipos de widget</strong> (Título, Texto, Botão). Para ver exatamente como cada elemento está configurado, crie uma página com o template e abra no editor — clique em cada elemento para inspecionar suas configurações no painel direito.
                 </div>
 
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.7 Usando os Novos Recursos no Showcase</h3>
+                <p>Com as melhorias implementadas (Fases 1–3), o showcase agora suporta muito mais do que o básico. Veja como aplicar os novos recursos em cada seção:</p>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Background na Seção Hero</h4>
+                <p>Selecione a Seção Hero → aba <strong>Style</strong> → grupo <strong>Background</strong>:</p>
+                <ul>
+                    <li><strong>Background Color:</strong> <code>#0f172a</code> (aplica <code>background-color</code> via styles)</li>
+                    <li><strong>Background Image:</strong> adicione uma imagem de fundo (URL pública)</li>
+                    <li><strong>Size:</strong> <code>cover</code> para preencher toda a seção</li>
+                    <li><strong>Repeat:</strong> <code>no-repeat</code></li>
+                </ul>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O Style Tab aplica estilos via <code>PUT /elements/{id}/styles</code>, que gera CSS inline no wrapper do elemento. Assim, a imagem de fundo funciona mesmo no Moodle.
+                </div>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Border e Box Shadow nos Cards de Serviços</h4>
+                <p>Selecione uma Coluna de serviço → aba <strong>Style</strong> → grupo <strong>Border</strong>:</p>
+                <ul>
+                    <li><strong>Border Width:</strong> <code>1px</code></li>
+                    <li><strong>Border Color:</strong> <code>#e2e8f0</code></li>
+                    <li><strong>Border Radius:</strong> <code>12px</code></li>
+                    <li><strong>Border Style:</strong> <code>solid</code></li>
+                </ul>
+                <p>No grupo <strong>Box Shadow</strong>:</p>
+                <ul>
+                    <li><strong>Horizontal:</strong> <code>0</code>, <strong>Vertical:</strong> <code>4</code>, <strong>Blur:</strong> <code>12</code>, <strong>Spread:</strong> <code>0</code></li>
+                    <li><strong>Color:</strong> <code>rgba(0,0,0,0.1)</code></li>
+                </ul>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Hover Effects no Botão CTA</h4>
+                <p>Selecione o Botão "Fale Conosco" → aba <strong>Style</strong> → grupo <strong>Hover Effects</strong>:</p>
+                <ul>
+                    <li><strong>Background Color:</strong> <code>#2563eb</code> (azul mais escuro no hover)</li>
+                    <li><strong>Transform:</strong> <code>scale(1.05)</code> (botão cresce 5%)</li>
+                    <li><strong>Transition:</strong> <code>300</code> ms (animação suave)</li>
+                </ul>
+                <p>O editor gera automaticamente uma tag <code>&lt;style&gt;</code> inline com <code>.pb-button:hover</code> — compatível com Moodle.</p>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Typography nos Títulos</h4>
+                <p>Selecione qualquer Título → aba <strong>Style</strong> → grupo <strong>Typography</strong>:</p>
+                <ul>
+                    <li><strong>Font Family:</strong> <code>'Inter', sans-serif</code></li>
+                    <li><strong>Font Size:</strong> <code>2.5rem</code></li>
+                    <li><strong>Font Weight:</strong> <code>800</code></li>
+                    <li><strong>Line Height:</strong> <code>1.2</code></li>
+                    <li><strong>Letter Spacing:</strong> <code>-0.02em</code></li>
+                    <li><strong>Text Transform:</strong> <code>uppercase</code></li>
+                </ul>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Tabs e Accordion no Showcase</h4>
+                <p>Para demonstrar os novos widgets de <strong>Abas</strong> e <strong>Accordion</strong>, adicione uma nova seção ao showcase:</p>
+                <ol>
+                    <li><strong>Arraste um widget Tabs</strong> para uma coluna. Configure no painel Content:
+                        <ul>
+                            <li>Adicione 3 abas: "Visão Geral", "Funcionalidades", "Preços"</li>
+                            <li>Orientação: <code>horizontal</code></li>
+                        </ul>
+                    </li>
+                    <li>Na aba <strong>Style</strong>:
+                        <ul>
+                            <li><strong>Active Tab Color:</strong> <code>#3b82f6</code></li>
+                            <li><strong>Border Color:</strong> <code>#e2e8f0</code></li>
+                            <li><strong>Content Padding:</strong> <code>20</code>px</li>
+                        </ul>
+                    </li>
+                    <li><strong>Arraste um widget Accordion</strong> abaixo das tabs. Configure:
+                        <ul>
+                            <li>3 itens: "O que está incluído?", "Como funciona?", "Posso cancelar?"</li>
+                            <li>Abra o primeiro item (<em>Open by Default</em>)</li>
+                        </ul>
+                    </li>
+                    <li>Na aba <strong>Style</strong> do Accordion:
+                        <ul>
+                            <li><strong>Active Color:</strong> <code>#3b82f6</code></li>
+                            <li><strong>Border Color:</strong> <code>#e2e8f0</code></li>
+                            <li><strong>Content Padding:</strong> <code>16</code>px</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Navigator — Gerenciando Elementos</h4>
+                <p>O <strong>Navigator</strong> (botão ☰ no canto inferior direito) mostra a árvore completa de elementos. Veja como usá-lo no showcase:</p>
+                <ol>
+                    <li><strong>Abrir Navigator:</strong> clique no botão flutuante ☰ → painel aparece com a árvore</li>
+                    <li><strong>Navegar:</strong> clique em qualquer item para selecioná-lo no canvas</li>
+                    <li><strong>Reordenar:</strong> arraste um item para cima/baixo na árvore → a ordem muda no canvas</li>
+                    <li><strong>Mover entre colunas:</strong> arraste um widget de uma coluna para outra</li>
+                    <li><strong>Renomear:</strong> duplo clique no nome → digite novo nome → Enter para salvar</li>
+                    <li><strong>Context menu:</strong> clique direito → Duplicate, Delete, Copy, Paste, Move Up/Down</li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O Navigator é especialmente útil quando a página tem muitos elementos empilhados. Em vez de clicar no canvas para achar um widget específico, use o Navigator para localizá-lo instantaneamente.
+                </div>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Advanced Tab — Padding e Margin</h4>
+                <p>Selecione qualquer elemento → aba <strong>Advanced</strong> → grupo <strong>Padding &amp; Margin</strong>:</p>
+                <ul>
+                    <li><strong>Padding Top:</strong> <code>20px</code></li>
+                    <li><strong>Padding Bottom:</strong> <code>20px</code></li>
+                    <li><strong>Margin Top:</strong> <code>40px</code></li>
+                    <li><strong>Margin Bottom:</strong> <code>0</code></li>
+                </ul>
+                <p>No grupo abaixo, você pode adicionar <strong>CSS Classes</strong> (ex: <code>meu-estilo-custom</code>) e <strong>CSS ID</strong> (ex: <code>hero-titulo</code>) para referenciar em stylesheets externos.</p>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Widget de Vídeo na Seção Hero</h4>
+                <p>Para transformar a Hero em uma seção com vídeo de fundo:</p>
+                <ol>
+                    <li><strong>Arraste o widget Vídeo</strong> para dentro da Seção Hero</li>
+                    <li>Configure: <strong>Video Type:</strong> <code>youtube</code>, <strong>URL:</strong> <code>https://youtube.com/watch?v=...</code></li>
+                    <li><strong>Aspect Ratio:</strong> <code>16:9</code>, <strong>Mute:</strong> ligado, <strong>Loop:</strong> ligado</li>
+                    <li>No Style Tab → <strong>Border Radius:</strong> <code>0</code> para preencher toda a seção</li>
+                </ol>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Widget de Galeria na Seção de Equipe</h4>
+                <p>Substitua os cards de equipe por fotos usando o widget Galeria:</p>
+                <ol>
+                    <li><strong>Arraste o widget Galeria</strong> para a coluna de um membro da equipe</li>
+                    <li>Configure: <strong>Columns:</strong> <code>1</code>, <strong>Image Fit:</strong> <code>cover</code></li>
+                    <li>No Style Tab → <strong>Border Radius:</strong> <code>50%</code> (formato circular para fotos)</li>
+                    <li><strong>Box Shadow:</strong> <code>0 4px 12px rgba(0,0,0,0.1)</code></li>
+                </ol>
+
+                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Widget de Formulário no CTA</h4>
+                <p>Adicione um formulário de contato na seção CTA:</p>
+                <ol>
+                    <li><strong>Arraste o widget Formulário</strong> para a coluna CTA</li>
+                    <li>Configure os campos: Nome (text), Email (email), Mensagem (textarea)</li>
+                    <li><strong>Button Text:</strong> <code>"Enviar Mensagem"</code></li>
+                    <li>No Style Tab → <strong>Button Color:</strong> <code>#ffffff</code>, <strong>Button Text Color:</strong> <code>#3b82f6</code></li>
+                    <li><strong>Field Border Radius:</strong> <code>8</code>px</li>
+                </ol>
+
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Paleta de Cores Utilizada</h3>
                 <table class="widget-table">
                     <tr><th>Cor</th><th>Código</th><th>Uso</th></tr>
@@ -1326,6 +1458,10 @@ php artisan test --verbose</pre>
             <div class="step-body">
                 <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. Abaixo estão as melhorias propostas, organizadas por prioridade.</p>
 
+                <div class="tip">
+                    <strong>&#128209; Plano Completo:</strong> O arquivo <code>IMPROVEMENTS.md</code> na raiz do projeto contém <strong>42 passos detalhados</strong> para implementar todas as melhorias, organizados em 8 fases. Cada passo pode ser testado individualmente. Siga a ordem recomendada no arquivo para implementar semana a semana.
+                </div>
+
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Alta Prioridade (Segurança &amp; Confiabilidade)</h3>
                 <table class="widget-table">
                     <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
@@ -1345,6 +1481,18 @@ php artisan test --verbose</pre>
                     <tr><td>9</td><td><strong>Widget de Espaçador</strong></td><td>Espaço em branco com altura configurável para respiração visual</td><td>Funcionalidade</td></tr>
                     <tr><td>10</td><td><strong>Galeria de Imagens</strong></td><td>Widget para exibir múltiplas imagens em grid ou carrossel</td><td>Funcionalidade</td></tr>
                     <tr><td>11</td><td><strong>Formulário de Contato</strong></td><td>Widget de formulário com campos configuráveis e envio por email</td><td>Funcionalidade</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Resumo do Plano (42 Passos)</h3>
+                <table class="widget-table">
+                    <tr><th>Fase</th><th>Passos</th><th>Descrição</th><th>Semana</th></tr>
+                    <tr><td>1</td><td>1–8</td><td>Novos Widgets: Vídeo, Divisor, Espaçador, Ícone, Galeria, Form, Tabs, Accordion</td><td>1–2</td></tr>
+                    <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover, abas Content/Style/Advanced</td><td>3</td></tr>
+                    <tr><td>3</td><td>14–17</td><td>Navigator: Árvore de elementos, drag-and-drop, rename, context menu</td><td>4</td></tr>
+                    <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS custom, Animações, Responsividade</td><td>5</td></tr>
+                    <tr><td>5</td><td>24–31</td><td>UX do Editor: Live preview, Ctrl+Z visual, context menu, zoom, fullscreen, search</td><td>6</td></tr>
+                    <tr><td>6</td><td>32–35</td><td>Atalhos: Ctrl+D, Copy/Paste, Multi-select</td><td>7</td></tr>
+                    <tr><td>7</td><td>36–42</td><td>Temas, Presets, Responsividade completa</td><td>8</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Baixa Prioridade (UX &amp; Performance)</h3>
@@ -1370,6 +1518,23 @@ php artisan test --verbose</pre>
                     <li><strong>Upload de imagens no texto</strong> — botão de imagem + colar (Ctrl+V) no editor WYSIWYG</li>
                     <li><strong>Vídeos YouTube</strong> — botão na toolbar que converte URL em embed responsivo com privacidade</li>
                     <li><strong>Edição inline corrigida</strong> — preserva HTML (innerHTML) ao invés de destruir com textContent</li>
+                    <li><strong>Widget de Vídeo</strong> — <em>Passo 1 do IMPROVEMENTS.md</em> — widget dedicado com suporte a YouTube (youtube-nocookie.com), Vimeo e URL customizada; controles de autoplay, loop, mute, start/end time, aspect ratio e alinhamento; preview responsivo no canvas</li>
+                    <li><strong>Widget de Divisor</strong> — <em>Passo 2 do IMPROVEMENTS.md</em> — linha horizontal com estilo (solid, dashed, dotted, double), largura, espessura, cor e espaçamento superior/inferior configuráveis</li>
+                    <li><strong>Widget de Espaçador</strong> — <em>Passo 3 do IMPROVEMENTS.md</em> — espaço em branco com altura configurável (0–500px); preview com faixa tracejada e indicação de pixels no editor</li>
+                    <li><strong>Widget de Ícone</strong> — <em>Passo 4 do IMPROVEMENTS.md</em> — biblioteca de 90+ ícones Font Awesome com grid de seleção, busca, cor, tamanho, alinhamento e link; novo tipo de controle <code>icon</code> no editor</li>
+                    <li><strong>Widget de Galeria</strong> — <em>Passo 5 do IMPROVEMENTS.md</em> — upload múltiplo com modal de seleção, grid 1–6 colunas, layout masonry, captions, border radius, drag-to-reorder; novo tipo de controle <code>gallery</code> no editor</li>
+                    <li><strong>Widget de Formulário</strong> — <em>Passo 6 do IMPROVEMENTS.md</em> — campos configuráveis (text, email, tel, number, textarea, select, checkbox, radio) com controles repeater; submit via AJAX; migration <code>form_submissions</code>; rotas de envio e listagem</li>
+                    <li><strong>Widget de Abas</strong> — <em>Passo 7 do IMPROVEMENTS.md</em> — abas com título e conteúdo rich-text; orientação horizontal/vertical; troca de aba com JS; cor ativa configurável</li>
+                    <li><strong>Widget de Accordion</strong> — <em>Passo 8 do IMPROVEMENTS.md</em> — itens expandíveis/colapsáveis com título e conteúdo; ícone de seta; open by default; animation de rotação; estilização por cor</li>
+                    <li><strong>Style Tab — Abas Content/Style/Advanced</strong> — <em>Passos 9–12 do IMPROVEMENTS.md</em> — painel direito com 3 abas; controles de Background (cor, imagem, posição, size, repeat), Border (width, color, radius, style), Box Shadow (horizontal, vertical, blur, spread, color), Typography (font family, size, weight, line height, letter spacing, text transform, color), e Advanced (dimensions padding/margin, CSS classes, CSS ID). Todos os 17 widgets atualizados com abas Style e Advanced.</li>
+                    <li><strong>Style Tab — Hover Effects</strong> — <em>Passo 13 do IMPROVEMENTS.md</em> — controles de hover (background color, text color, border color, transform, transition) para Button, Heading e Text; gera <code>&lt;style&gt;</code> tag inline com escopo por classe; transição configurável em ms</li>
+                    <li><strong>Navigator</strong> — <em>Passos 14–17 do IMPROVEMENTS.md</em> — painel flutuante no canto inferior direito com árvore de elementos; toggle show/hide; highlight no hover e click; drag &amp; drop para reordenar; duplo clique para renomear; menu de contexto (right-click) com Duplicate, Delete, Copy, Paste, Move Up/Down</li>
+                    <li><strong>Advanced Tab — Dimensions com Link</strong> — <em>Passo 18 do IMPROVEMENTS.md</em> — controle de margem/padding com grid visual 4 lados (Top/Right/Bottom/Left); botão de link/unlink (🔗/🔓) para sincronizar todos os lados; layout em grid 4 colunas com labels;</li>
+                    <li><strong>Advanced Tab — Z-Index</strong> — <em>Passo 19 do IMPROVEMENTS.md</em> — controle numérico de Z-Index em todos os 17 widgets; controla empilhamento de camadas no layout</li>
+                    <li><strong>Advanced Tab — CSS ID &amp; Classes</strong> — <em>Passo 20 do IMPROVEMENTS.md</em> — campos de CSS ID e CSS Classes em todos os 17 widgets; CSS ID gera <code>id=""</code> no wrapper; CSS Classes gera classes adicionais</li>
+                    <li><strong>Advanced Tab — Custom CSS</strong> — <em>Passo 21 do IMPROVEMENTS.md</em> — editor de código monospace para CSS customizado por widget; gera <code>&lt;style&gt;</code> tag com seletor automático (<code>#css-id</code> ou <code>[data-element-id]</code>); todos os 17 widgets</li>
+                    <li><strong>Advanced Tab — Animações de Entrada</strong> — <em>Passo 22 do IMPROVEMENTS.md</em> — seletor com 20 animações (fadeIn, slideInUp, zoomIn, bounceIn, etc.); duração (slow/normal/fast); delay em ms; carrega Animate.css via CDN; suporte inline no Moodle via <code>data-element-id</code></li>
+                    <li><strong>Advanced Tab — Responsividade por Widget</strong> — <em>Passo 23 do IMPROVEMENTS.md</em> — toggle de visibilidade por dispositivo (Desktop/Tablet/Mobile); gera <code>@media</code> queries com <code>display:none</code> no render público; no editor, widgets ocultos aparecem com opacity reduzida</li>
                 </ul>
             </div>
         </section>

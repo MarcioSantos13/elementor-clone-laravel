@@ -1,6 +1,11 @@
 const editor = {
     pageId: null,
     selectedId: null,
+    activeTab: 'content',
+    cachedControls: null,
+    cachedSettings: null,
+    cachedStyles: null,
+    cachedElementId: null,
     history: [],
     historyIndex: -1,
     responsiveMode: 'desktop',
@@ -53,6 +58,7 @@ const editor = {
             .then(r => r.json())
             .then(data => {
                 const prevSelected = this.selectedId;
+                this._lastElements = data.elements || [];
                 this.renderCanvas(data.elements);
                 this.renderMath();
                 this.renderStructure(data.elements);
@@ -168,6 +174,147 @@ const editor = {
                     : `<span class="pb-math" data-formula="${this.escHtml(formula)}" data-display="false" style="font-size:${s.font_size||'16px'};color:${s.color||'#333'}"></span>`;
                 break;
             }
+            case 'video': {
+                if (s.video_url) {
+                    const ratioMap = {'16:9':'56.25%','4:3':'75%','1:1':'100%','21:9':'42.86%'};
+                    const pad = ratioMap[s.aspect_ratio]||'56.25%';
+                    let embedUrl = s.video_url;
+                    const ytMatch = s.video_url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+                    if (ytMatch) {
+                        const params = ['rel=0'];
+                        params.push(s.controls!==false?'controls=1':'controls=0');
+                        params.push(s.autoplay?'autoplay=1':'autoplay=0');
+                        params.push(s.loop?'loop=1':'loop=0');
+                        params.push(s.mute?'mute=1':'mute=0');
+                        if (s.loop) params.push('playlist='+ytMatch[1]);
+                        if (s.start_time>0) params.push('start='+s.start_time);
+                        if (s.end_time>0) params.push('end='+s.end_time);
+                        embedUrl = 'https://www.youtube-nocookie.com/embed/'+ytMatch[1]+'?'+params.join('&');
+                    } else {
+                        const vmMatch = s.video_url.match(/vimeo\.com\/(\d+)/);
+                        if (vmMatch) {
+                            const params = [];
+                            params.push(s.autoplay?'autoplay=1':'autoplay=0');
+                            params.push(s.loop?'loop=1':'loop=0');
+                            params.push(s.mute?'muted=1':'muted=0');
+                            params.push('title=0','byline=0','portrait=0');
+                            embedUrl = 'https://player.vimeo.com/video/'+vmMatch[1]+'?'+params.join('&');
+                        }
+                    }
+                    const wStyle = `width:${s.width||'100%'};max-width:${s.max_width||'100%'};margin:0`;
+                    const mAlign = s.alignment==='center'?'margin-left:auto;margin-right:auto':s.alignment==='right'?'margin-left:auto':'';
+                    preview = `<div style="${wStyle};${mAlign}"><div style="position:relative;padding-bottom:${pad};height:0;overflow:hidden;border-radius:8px"><iframe src="${this.escHtml(embedUrl)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" title="video"></iframe></div></div>`;
+                } else {
+                    preview = '<div style="text-align:center;padding:2rem;color:#999;background:#f5f5f5;border-radius:8px">🎬 Nenhum vídeo selecionado</div>';
+                }
+                break;
+            }
+            case 'divider': {
+                const w = s.width != null ? s.width : 100;
+                const t = s.thickness || 1;
+                const st = s.style || 'solid';
+                const c = s.color || '#e2e8f0';
+                const mt = s.space_before != null ? s.space_before : 20;
+                const mb = s.space_after != null ? s.space_after : 20;
+                preview = `<hr style="border:none;border-top:${t}px ${st} ${c};width:${w}%;margin:${mt}px auto ${mb}px">`;
+                break;
+            }
+            case 'spacer': {
+                const sp = s.space != null ? s.space : 50;
+                preview = `<div style="height:${sp}px;background:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(99,102,241,.06) 5px,rgba(99,102,241,.06) 10px);border:1px dashed rgba(99,102,241,.25);border-radius:4px;position:relative"><span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.7rem;color:rgba(99,102,241,.6);pointer-events:none">${sp}px</span></div>`;
+                break;
+            }
+            case 'icon': {
+                const ic = s.icon || 'fas fa-star';
+                const isz = s.icon_size || 48;
+                const icc = s.color || '#6366f1';
+                const ica = s.align || 'center';
+                let icHtml = `<i class="${ic}" style="font-size:${isz}px;color:${icc};line-height:1"></i>`;
+                if (s.link) {
+                    const icTarget = s.link_new_tab ? ' target="_blank" rel="noopener noreferrer"' : '';
+                    icHtml = `<a href="${s.link}"${icTarget} style="text-decoration:none;display:inline-block">${icHtml}</a>`;
+                }
+                preview = `<div style="text-align:${ica};padding:8px 0">${icHtml}</div>`;
+                break;
+            }
+            case 'gallery': {
+                const imgs = Array.isArray(s.images) ? s.images : [];
+                const cols = s.columns || 3;
+                const gGap = s.gap != null ? s.gap : 10;
+                const br = s.border_radius != null ? s.border_radius : 4;
+                if (imgs.length === 0) {
+                    preview = '<div style="text-align:center;padding:2rem;color:#999;background:#f5f5f5;border-radius:8px">🖼️ Nenhuma imagem selecionada</div>';
+                } else {
+                    let ghtml = `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:${gGap}px">`;
+                    imgs.slice(0, 12).forEach(img => {
+                        ghtml += `<div style="overflow:hidden;border-radius:${br}px;aspect-ratio:1;background:#f1f5f9"><img src="${this.escHtml(img.url||'')}" alt="${this.escHtml(img.alt||'')}" style="width:100%;height:100%;object-fit:cover;border-radius:${br}px"></div>`;
+                    });
+                    if (imgs.length > 12) ghtml += `<div style="display:flex;align-items:center;justify-content:center;aspect-ratio:1;background:#f1f5f9;border-radius:${br}px;font-size:.75rem;color:#666">+${imgs.length - 12}</div>`;
+                    ghtml += '</div>';
+                    preview = ghtml;
+                }
+                break;
+            }
+            case 'form': {
+                const fields = Array.isArray(s.fields) ? s.fields : [];
+                const fbr = s.field_radius != null ? s.field_radius : 6;
+                const fsp = s.field_spacing != null ? s.field_spacing : 12;
+                const bc = s.button_color || '#6366f1';
+                const btc = s.button_text_color || '#fff';
+                const bw = s.button_width === 'full' ? 'width:100%;' : '';
+                let fhtml = '';
+                fields.forEach(f => {
+                    const req = f.required ? ' <span style="color:#ef4444">*</span>' : '';
+                    fhtml += `<div style="margin-bottom:${fsp}px"><label style="display:block;margin-bottom:4px;font-size:13px;font-weight:500;color:#374151">${this.escHtml(f.label||'')}${req}</label>`;
+                    if (f.type === 'textarea') {
+                        fhtml += `<div style="width:100%;min-height:50px;padding:8px;border:1px solid #d1d5db;border-radius:${fbr}px;background:#f9fafb;font-size:12px;color:#9ca3af">Textarea</div>`;
+                    } else if (f.type === 'select') {
+                        fhtml += `<div style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:${fbr}px;background:#fff;font-size:12px;color:#9ca3af;display:flex;justify-content:space-between"><span>Select...</span><span>▼</span></div>`;
+                    } else if (f.type === 'checkbox' || f.type === 'radio') {
+                        fhtml += `<div style="display:flex;align-items:center;gap:6px"><input type="${f.type}" disabled style="width:auto"><span style="font-size:12px;color:#374151">${this.escHtml(f.label||'')}</span></div>`;
+                    } else {
+                        fhtml += `<div style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:${fbr}px;background:#f9fafb;font-size:12px;color:#9ca3af">${this.escHtml(f.type||'text')}</div>`;
+                    }
+                    fhtml += '</div>';
+                });
+                const btnLabel = this.escHtml(s.button_text || 'Send');
+                fhtml += `<button type="button" style="padding:10px 24px;background:${bc};color:${btc};border:none;border-radius:${fbr}px;font-size:13px;font-weight:500;cursor:default;${bw}">${btnLabel}</button>`;
+                preview = fhtml;
+                break;
+            }
+            case 'tabs': {
+                const tabs = Array.isArray(s.tabs) ? s.tabs : [];
+                const tc = s.tab_color || '#6366f1';
+                const bc2 = s.border_color || '#e2e8f0';
+                const ati = s.active_tab || 0;
+                if (tabs.length === 0) { preview = '<div style="text-align:center;padding:1rem;color:#999">No tabs</div>'; break; }
+                let thead = '<div style="display:flex;border-bottom:2px solid ' + bc2 + '">';
+                let tbody = '';
+                tabs.forEach((t, i) => {
+                    const active = i === ati;
+                    thead += `<button type="button" style="padding:8px 16px;font-size:13px;border:none;border-bottom:3px solid ${active?tc:'transparent'};margin-bottom:-2px;background:${active?'#fff':'transparent'};color:${active?tc:'#6b7280'};font-weight:${active?'600':'400'};cursor:default">${this.escHtml(t.title||'Tab '+(i+1))}</button>`;
+                    tbody += `<div style="display:${active?'block':'none'};padding:16px;font-size:13px;color:#6b7280">${t.content?this.escHtml(String(t.content).substring(0,100)):'...'}</div>`;
+                });
+                thead += '</div>';
+                preview = thead + tbody;
+                break;
+            }
+            case 'accordion': {
+                const items = Array.isArray(s.items) ? s.items : [];
+                const ac = s.tab_color || '#6366f1';
+                const ab = s.border_color || '#e2e8f0';
+                if (items.length === 0) { preview = '<div style="text-align:center;padding:1rem;color:#999">No items</div>'; break; }
+                let ahtml = '';
+                items.forEach((item, i) => {
+                    const isOpen = item.open;
+                    ahtml += `<div style="border:1px solid ${ab};border-radius:8px;overflow:hidden;margin-bottom:2px">`;
+                    ahtml += `<div style="display:flex;align-items:center;padding:10px 14px;font-size:13px;font-weight:500;background:${isOpen?ac:'#f9fafb'};color:${isOpen?'#fff':'#374151'}"><span style="display:inline-block;transform:rotate(${isOpen?'90':'0'}deg);margin-right:8px;font-size:10px">▶</span>${this.escHtml(item.title||'Section '+(i+1))}</div>`;
+                    if (isOpen) ahtml += `<div style="padding:12px;font-size:12px;color:#6b7280;background:#fff">${item.content?this.escHtml(String(item.content).substring(0,80)):'...'}</div>`;
+                    ahtml += '</div>';
+                });
+                preview = ahtml;
+                break;
+            }
             default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
         }
         return `<div class="pb-el-toolbar"><span class="pb-el-name">${this.escHtml(name)}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;
@@ -229,16 +376,32 @@ const editor = {
                 sf.style.display = '';
                 document.getElementById('settings-title').textContent = element.name || widget.label;
                 document.getElementById('settings-type').textContent = widget.type;
-                this.renderControls(widget.controls || {}, element.settings || {}, id);
+                this.cachedControls = widget.controls || {};
+                this.cachedSettings = element.settings || {};
+                this.cachedStyles = element.styles || {};
+                this.cachedElementId = id;
+                this.activeTab = 'content';
+                this.syncEditorTabs();
+                this.renderControls();
                 this.renderMath();
             })
             .catch(err => { console.error('loadControls failed:', err); this.toastError('Falha ao carregar controles'); });
     },
 
-    renderControls(controls, settings, elementId) {
+    renderControls() {
         const body = document.getElementById('settings-body');
         body.innerHTML = '';
-        const sections = this.groupControls(controls);
+        const controls = this.cachedControls || {};
+        const settings = this.cachedSettings || {};
+        const styles = this.cachedStyles || {};
+        const elementId = this.cachedElementId;
+        const tab = this.activeTab;
+        const filtered = {};
+        for (const [key, ctrl] of Object.entries(controls)) {
+            const ctrlTab = ctrl.tab || 'content';
+            if (ctrlTab === tab) filtered[key] = ctrl;
+        }
+        const sections = this.groupControls(filtered);
         for (const [section, ctrls] of Object.entries(sections)) {
             const secDiv = document.createElement('div');
             secDiv.className = 'pb-settings-section';
@@ -249,7 +412,14 @@ const editor = {
                 secDiv.appendChild(title);
             }
             ctrls.forEach(([key, ctrl]) => {
-                const val = settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : '');
+                let val;
+                if (tab === 'style') {
+                    val = styles[key] !== undefined ? styles[key] : (ctrl.default !== undefined ? ctrl.default : '');
+                } else if (tab === 'advanced') {
+                    val = styles[key] !== undefined ? styles[key] : (settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : ''));
+                } else {
+                    val = settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : '');
+                }
                 const control = document.createElement('div');
                 control.className = 'pb-control';
                 const label = document.createElement('label');
@@ -261,6 +431,19 @@ const editor = {
             });
             body.appendChild(secDiv);
         }
+    },
+
+    switchEditorTab(tab) {
+        this.activeTab = tab;
+        this.syncEditorTabs();
+        this.renderControls();
+    },
+
+    syncEditorTabs() {
+        const tab = this.activeTab;
+        document.querySelectorAll('#editor-tabs .pb-editor-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.etab === tab);
+        });
     },
 
     groupControls(controls) {
@@ -771,12 +954,607 @@ const editor = {
                 wrap.appendChild(content);
                 return wrap;
             },
-        };
-        return (types[ctrl.type] || types.text)();
+            icon: () => {
+                const container = document.createElement('div');
+                container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                const icons = [
+                    'fas fa-star','fas fa-heart','fas fa-check','fas fa-times','fas fa-plus','fas fa-minus',
+                    'fas fa-arrow-right','fas fa-arrow-left','fas fa-arrow-up','fas fa-arrow-down',
+                    'fas fa-chevron-right','fas fa-chevron-left','fas fa-chevron-up','fas fa-chevron-down',
+                    'fas fa-check-circle','fas fa-times-circle','fas fa-exclamation-circle','fas fa-info-circle',
+                    'fas fa-question-circle','fas fa-lightbulb','fas fa-bell','fas fa-envelope',
+                    'fas fa-phone','fas fa-map-marker-alt','fas fa-user','fas fa-users',
+                    'fas fa-home','fas fa-cog','fas fa-search','fas fa-lock','fas fa-unlock',
+                    'fas fa-download','fas fa-upload','fas fa-share','fas fa-link','fas fa-unlink',
+                    'fas fa-edit','fas fa-trash','fas fa-copy','fas fa-folder','fas fa-file',
+                    'fas fa-image','fas fa-video','fas fa-music','fas fa-book','fas fa-bookmark',
+                    'fas fa-calendar','fas fa-clock','fas fa-sync','fas fa-spinner','fas fa-flag',
+                    'fas fa-tag','fas fa-tags','fas fa-shopping-cart','fas fa-credit-card','fas fa-wallet',
+                    'fas fa-chart-bar','fas fa-chart-line','fas fa-chart-pie','fas fa-trophy',
+                    'fas fa-rocket','fas fa-bolt','fas fa-fire','fas fa-sun','fas fa-moon',
+                    'fas fa-cloud','fas fa-umbrella','fas fa-leaf','fas fa-tree','fas fa-flower',
+                    'fas fa-globe','fas fa-code','fas fa-terminal','fas fa-database','fas fa-server',
+                    'fas fa-wifi','fas fa-bluetooth','fas fa-battery-full','fas fa-battery-half',
+                    'fab fa-github','fab fa-google','fab fa-facebook','fab fa-twitter','fab fa-instagram',
+                    'fab fa-youtube','fab fa-linkedin','fab fa-discord','fab fa-slack','fab fa-figma',
+                ];
+                const preview = document.createElement('div');
+                preview.style.cssText = 'text-align:center;padding:8px;font-size:2rem;color:var(--pb-text)';
+                const currentIcon = value || 'fas fa-star';
+                preview.innerHTML = `<i class="${this.escHtml(currentIcon)}"></i>`;
+                const search = document.createElement('input');
+                search.type = 'text'; search.value = currentIcon;
+                search.placeholder = 'fas fa-star';
+                search.style.cssText = 'width:100%;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:12px;font-family:monospace';
+                const grid = document.createElement('div');
+                grid.style.cssText = 'display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:180px;overflow-y:auto;padding:4px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px';
+                const renderGrid = (filter) => {
+                    grid.innerHTML = '';
+                    const filtered = filter ? icons.filter(i => i.includes(filter.toLowerCase())) : icons;
+                    filtered.forEach(ic => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.innerHTML = `<i class="${ic}" style="font-size:14px"></i>`;
+                        btn.title = ic;
+                        btn.style.cssText = 'width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;transition:all .15s';
+                        btn.onmouseenter = () => { btn.style.background = 'var(--pb-border)'; btn.style.borderColor = 'var(--pb-accent)'; };
+                        btn.onmouseleave = () => { btn.style.background = 'transparent'; btn.style.borderColor = 'transparent'; };
+                        btn.onclick = (e) => { e.preventDefault(); search.value = ic; preview.innerHTML = `<i class="${ic}"></i>`; this.updateSetting(key, ic, elementId); };
+                        grid.appendChild(btn);
+                    });
+                };
+                renderGrid('');
+                search.oninput = () => { renderGrid(search.value); preview.innerHTML = `<i class="${this.escHtml(search.value)}"></i>`; this.updateSetting(key, search.value, elementId); };
+                container.appendChild(preview);
+                container.appendChild(search);
+                    container.appendChild(grid);
+                    return container;
+                },
+                gallery: () => {
+                    const container = document.createElement('div');
+                    container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    let images = Array.isArray(value) ? [...value] : [];
+                    const update = () => { this.updateSetting(key, images, elementId); };
+                    const renderList = () => {
+                        list.innerHTML = '';
+                        images.forEach((img, idx) => {
+                            const item = document.createElement('div');
+                            item.style.cssText = 'display:flex;align-items:center;gap:.5rem;padding:6px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;cursor:grab';
+                            item.draggable = true;
+                            item.dataset.idx = idx;
+                            item.innerHTML = `<img src="${this.escHtml(img.url||'')}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;flex-shrink:0"><div style="flex:1;min-width:0"><input type="text" value="${this.escHtml(img.alt||'')}" placeholder="Alt text" style="width:100%;padding:3px 6px;background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:11px;box-sizing:border-box"></div><button type="button" title="Move up" style="background:none;border:none;color:var(--pb-text2);cursor:pointer;font-size:12px;padding:2px">▲</button><button type="button" title="Move down" style="background:none;border:none;color:var(--pb-text2);cursor:pointer;font-size:12px;padding:2px">▼</button><button type="button" title="Remove" style="background:none;border:none;color:var(--pb-danger);cursor:pointer;font-size:14px;padding:2px">×</button>`;
+                            item.querySelector('input').onchange = (e) => { images[idx].alt = e.target.value; update(); };
+                            const btns = item.querySelectorAll('button');
+                            btns[0].onclick = () => { if (idx > 0) { [images[idx-1], images[idx]] = [images[idx], images[idx-1]]; update(); renderList(); }};
+                            btns[1].onclick = () => { if (idx < images.length-1) { [images[idx+1], images[idx]] = [images[idx], images[idx+1]]; update(); renderList(); }};
+                            btns[2].onclick = () => { images.splice(idx, 1); update(); renderList(); };
+                            item.ondragstart = (e) => { e.dataTransfer.setData('text/plain', idx); item.style.opacity = '.4'; };
+                            item.ondragend = () => { item.style.opacity = '1'; };
+                            item.ondragover = (e) => { e.preventDefault(); item.style.borderColor = 'var(--pb-accent)'; };
+                            item.ondragleave = () => { item.style.borderColor = 'var(--pb-border)'; };
+                            item.ondrop = (e) => { e.preventDefault(); item.style.borderColor = 'var(--pb-border)'; const from = parseInt(e.dataTransfer.getData('text/plain')); if (!isNaN(from) && from !== idx) { const moved = images.splice(from, 1)[0]; images.splice(idx, 0, moved); update(); renderList(); }};
+                            list.appendChild(item);
+                        });
+                    };
+                    const list = document.createElement('div');
+                    list.style.cssText = 'display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto';
+                    renderList();
+                    const btnRow = document.createElement('div');
+                    btnRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap';
+                    const addBtn = document.createElement('button');
+                    addBtn.type = 'button';
+                    addBtn.textContent = '+ Add Images';
+                    addBtn.style.cssText = 'flex:1;padding:8px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500';
+                    addBtn.onclick = () => {
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999';
+                        const modal = document.createElement('div');
+                        modal.style.cssText = 'background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:12px;padding:20px;width:500px;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.3)';
+                        modal.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--pb-text)">Add Images</div>' +
+                            '<div id="gallery-dropzone" style="border:2px dashed var(--pb-border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px"><div style="font-size:1.5rem;margin-bottom:.35rem;opacity:.5">🖼️</div><div style="font-size:.72rem;color:var(--pb-text2)"><strong style="color:var(--pb-accent);cursor:pointer">Click to select</strong><br>or drag images here</div></div>' +
+                            '<div id="gallery-url-row" style="display:flex;gap:6px;margin-bottom:12px"><input id="gallery-url-input" type="url" placeholder="Or paste image URL..." style="flex:1;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:12px"><button id="gallery-url-add" type="button" style="padding:6px 12px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px">Add</button></div>' +
+                            '<div id="gallery-selected" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px"></div>' +
+                            '<div style="display:flex;gap:8px;justify-content:flex-end"><button id="gallery-cancel" style="padding:6px 14px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);cursor:pointer;font-size:12px">Cancel</button><button id="gallery-ok" style="padding:6px 14px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500">Add to Gallery</button></div>';
+                        overlay.appendChild(modal);
+                        document.body.appendChild(overlay);
+                        let selected = [];
+                        const renderSelected = () => {
+                            const grid = modal.querySelector('#gallery-selected');
+                            grid.innerHTML = '';
+                            selected.forEach((s, i) => {
+                                const d = document.createElement('div');
+                                d.style.cssText = 'position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--pb-border)';
+                                d.innerHTML = `<img src="${this.escHtml(s.url)}" style="width:100%;height:100%;object-fit:cover"><button type="button" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">×</button>`;
+                                d.querySelector('button').onclick = () => { selected.splice(i, 1); renderSelected(); };
+                                grid.appendChild(d);
+                            });
+                        };
+                        const addFile = (file) => {
+                            if (!file || !file.type.startsWith('image/')) return;
+                            this.uploadImageFile(file, (url) => { selected.push({ url, alt: '' }); renderSelected(); });
+                        };
+                        const dz = modal.querySelector('#gallery-dropzone');
+                        const fi = document.createElement('input');
+                        fi.type = 'file'; fi.multiple = true; fi.accept = 'image/*'; fi.style.display = 'none';
+                        dz.appendChild(fi);
+                        dz.onclick = () => fi.click();
+                        dz.ondragover = (e) => { e.preventDefault(); dz.style.borderColor = 'var(--pb-accent)'; };
+                        dz.ondragleave = () => { dz.style.borderColor = 'var(--pb-border)'; };
+                        dz.ondrop = (e) => { e.preventDefault(); dz.style.borderColor = 'var(--pb-border)'; Array.from(e.dataTransfer.files).forEach(addFile); };
+                        fi.onchange = () => { Array.from(fi.files).forEach(addFile); };
+                        modal.querySelector('#gallery-url-add').onclick = () => {
+                            const url = modal.querySelector('#gallery-url-input').value.trim();
+                            if (url) { selected.push({ url, alt: '' }); renderSelected(); modal.querySelector('#gallery-url-input').value = ''; }
+                        };
+                        const close = () => { overlay.remove(); };
+                        modal.querySelector('#gallery-cancel').onclick = close;
+                        overlay.onclick = (ev) => { if (ev.target === overlay) close(); };
+                        modal.querySelector('#gallery-ok').onclick = () => { images = images.concat(selected); update(); renderList(); close(); };
+                    };
+                    btnRow.appendChild(addBtn);
+                    container.appendChild(list);
+                    container.appendChild(btnRow);
+                    return container;
+                },
+                repeater: () => {
+                    const container = document.createElement('div');
+                    container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    let items = Array.isArray(value) ? value.map(v => ({...v})) : [];
+                    const subFields = ctrl.fields || {};
+                    const renderItems = () => {
+                        list.innerHTML = '';
+                        items.forEach((item, idx) => {
+                            const card = document.createElement('div');
+                            card.style.cssText = 'background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px';
+                            card.draggable = true;
+                            card.dataset.idx = idx;
+                            const header = document.createElement('div');
+                            header.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:.7rem;color:var(--pb-text2);cursor:grab';
+                            header.innerHTML = `<span style="cursor:grab">⣿</span><span style="flex:1;font-weight:500;color:var(--pb-text)">${this.escHtml(item.label||item.type||'Field '+(idx+1))}</span>`;
+                            const delBtn = document.createElement('button');
+                            delBtn.type = 'button';
+                            delBtn.textContent = '×';
+                            delBtn.style.cssText = 'background:none;border:none;color:var(--pb-danger);cursor:pointer;font-size:14px;padding:0 2px';
+                            delBtn.onclick = () => { items.splice(idx, 1); renderItems(); updateRepeater(); };
+                            header.appendChild(delBtn);
+                            card.appendChild(header);
+                            for (const [fk, fc] of Object.entries(subFields)) {
+                                const fRow = document.createElement('div');
+                                fRow.style.cssText = 'display:flex;align-items:center;gap:6px';
+                                const fLabel = document.createElement('label');
+                                fLabel.textContent = fc.label || fk;
+                                fLabel.style.cssText = 'font-size:.65rem;color:var(--pb-text2);min-width:60px';
+                                fRow.appendChild(fLabel);
+                                if (fc.type === 'select') {
+                                    const sel = document.createElement('select');
+                                    sel.style.cssText = 'flex:1;padding:3px 6px;background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:11px';
+                                    (fc.options||[]).forEach(opt => {
+                                        const o = document.createElement('option');
+                                        o.value = opt; o.textContent = opt;
+                                        if (opt === item[fk]) o.selected = true;
+                                        sel.appendChild(o);
+                                    });
+                                    sel.onchange = (e) => { items[idx][fk] = e.target.value; updateRepeater(); renderItems(); };
+                                    fRow.appendChild(sel);
+                                } else if (fc.type === 'boolean') {
+                                    const cb = document.createElement('input');
+                                    cb.type = 'checkbox';
+                                    cb.checked = !!item[fk];
+                                    cb.onchange = (e) => { items[idx][fk] = e.target.checked; updateRepeater(); };
+                                    fRow.appendChild(cb);
+                                } else {
+                                    const inp = document.createElement('input');
+                                    inp.type = 'text';
+                                    inp.value = item[fk] || '';
+                                    inp.style.cssText = 'flex:1;padding:3px 6px;background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:11px';
+                                    inp.onchange = (e) => { items[idx][fk] = e.target.value; updateRepeater(); renderItems(); };
+                                    fRow.appendChild(inp);
+                                }
+                                card.appendChild(fRow);
+                            }
+                            card.ondragstart = (e) => { e.dataTransfer.setData('text/plain', idx); card.style.opacity = '.4'; };
+                            card.ondragend = () => { card.style.opacity = '1'; };
+                            card.ondragover = (e) => { e.preventDefault(); card.style.borderColor = 'var(--pb-accent)'; };
+                            card.ondragleave = () => { card.style.borderColor = 'var(--pb-border)'; };
+                            card.ondrop = (e) => { e.preventDefault(); card.style.borderColor = 'var(--pb-border)'; const from = parseInt(e.dataTransfer.getData('text/plain')); if (!isNaN(from) && from !== idx) { const moved = items.splice(from, 1)[0]; items.splice(idx, 0, moved); renderItems(); updateRepeater(); }};
+                            list.appendChild(card);
+                        });
+                    };
+                    const updateRepeater = () => { this.updateSetting(key, items, elementId); };
+                    const list = document.createElement('div');
+                    list.style.cssText = 'display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto';
+                    renderItems();
+                    const addBtn = document.createElement('button');
+                    addBtn.type = 'button';
+                    addBtn.textContent = '+ Add Item';
+                    addBtn.style.cssText = 'padding:6px;background:var(--pb-surface2);border:1px dashed var(--pb-border);border-radius:6px;color:var(--pb-text2);cursor:pointer;font-size:11px;text-align:center;transition:all .2s';
+                    addBtn.onmouseenter = () => { addBtn.style.borderColor = 'var(--pb-accent)'; addBtn.style.color = 'var(--pb-text)'; };
+                    addBtn.onmouseleave = () => { addBtn.style.borderColor = 'var(--pb-border)'; addBtn.style.color = 'var(--pb-text2)'; };
+                    addBtn.onclick = () => {
+                        const newItem = {};
+                        for (const [fk, fc] of Object.entries(subFields)) {
+                            if (fc.type === 'boolean') newItem[fk] = false;
+                            else if (fc.type === 'select' && fc.options && fc.options.length) newItem[fk] = fc.options[0];
+                            else newItem[fk] = '';
+                        }
+                        items.push(newItem);
+                        updateRepeater();
+                        renderItems();
+                    };
+                    container.appendChild(list);
+                    container.appendChild(addBtn);
+                    return container;
+                },
+                typography: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const defs = [
+                        { fk: 'typography_font_family', label: 'Font Family', type: 'text' },
+                        { fk: 'typography_font_size', label: 'Font Size', type: 'text' },
+                        { fk: 'typography_font_weight', label: 'Font Weight', type: 'select', options: ['300','400','500','600','700','800','900'] },
+                        { fk: 'typography_line_height', label: 'Line Height', type: 'text' },
+                        { fk: 'typography_letter_spacing', label: 'Letter Spacing', type: 'text' },
+                        { fk: 'typography_text_transform', label: 'Text Transform', type: 'select', options: ['none','uppercase','lowercase','capitalize'] },
+                        { fk: 'typography_color', label: 'Text Color', type: 'color' },
+                    ];
+                    defs.forEach(({fk, label, type, options}) => {
+                        const row = document.createElement('div');
+                        row.className = 'pb-control';
+                        const lbl = document.createElement('label');
+                        lbl.textContent = label;
+                        row.appendChild(lbl);
+                        if (type === 'select') {
+                            const sel = document.createElement('select');
+                            options.forEach(opt => {
+                                const o = document.createElement('option');
+                                o.value = opt; o.textContent = opt;
+                                if (opt === (value || '')) o.selected = true;
+                                sel.appendChild(o);
+                            });
+                            sel.onchange = () => this.updateStyle(fk, sel.value, elementId);
+                            row.appendChild(sel);
+                        } else {
+                            const inp = document.createElement('input');
+                            inp.type = type; inp.value = value || '';
+                            if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+                            inp.onchange = () => this.updateStyle(fk, inp.value, elementId);
+                            row.appendChild(inp);
+                        }
+                        c.appendChild(row);
+                    });
+                    return c;
+                },
+                background: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const defs = [
+                        { fk: 'backgroundColor', label: 'Background Color', type: 'color' },
+                        { fk: 'backgroundImage', label: 'Background Image', type: 'url' },
+                        { fk: 'backgroundPosition', label: 'Position', type: 'select', options: ['center center','left top','left center','left bottom','right top','right center','right bottom','center top','center bottom'] },
+                        { fk: 'backgroundSize', label: 'Size', type: 'select', options: ['auto','cover','contain'] },
+                        { fk: 'backgroundRepeat', label: 'Repeat', type: 'select', options: ['no-repeat','repeat','repeat-x','repeat-y'] },
+                    ];
+                    defs.forEach(({fk, label, type, options}) => {
+                        const row = document.createElement('div');
+                        row.className = 'pb-control';
+                        const lbl = document.createElement('label');
+                        lbl.textContent = label;
+                        row.appendChild(lbl);
+                        if (type === 'select') {
+                            const sel = document.createElement('select');
+                            options.forEach(opt => {
+                                const o = document.createElement('option');
+                                o.value = opt; o.textContent = opt;
+                                if (opt === (value || '')) o.selected = true;
+                                sel.appendChild(o);
+                            });
+                            sel.onchange = () => {
+                                let v = sel.value;
+                                if (fk === 'backgroundImage' && v && !v.startsWith('url(')) v = v ? `url('${v}')` : '';
+                                this.updateStyle(fk, v, elementId);
+                            };
+                            row.appendChild(sel);
+                        } else {
+                            const inp = document.createElement('input');
+                            inp.type = type; inp.value = value || '';
+                            if (fk === 'backgroundColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+                            inp.onchange = () => {
+                                let v = inp.value;
+                                if (fk === 'backgroundImage' && v && !v.startsWith('url(')) v = v ? `url('${v}')` : '';
+                                this.updateStyle(fk, v, elementId);
+                            };
+                            row.appendChild(inp);
+                        }
+                        c.appendChild(row);
+                    });
+                    return c;
+                },
+                border: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const defs = [
+                        { fk: 'borderWidth', label: 'Border Width', type: 'text', def: '0' },
+                        { fk: 'borderColor', label: 'Border Color', type: 'color', def: '#000000' },
+                        { fk: 'borderRadius', label: 'Border Radius', type: 'text', def: '0' },
+                        { fk: 'borderStyle', label: 'Border Style', type: 'select', options: ['none','solid','dashed','dotted','double'], def: 'solid' },
+                    ];
+                    defs.forEach(({fk, label, type, options, def}) => {
+                        const row = document.createElement('div');
+                        row.className = 'pb-control';
+                        const lbl = document.createElement('label');
+                        lbl.textContent = label;
+                        row.appendChild(lbl);
+                        if (type === 'select') {
+                            const sel = document.createElement('select');
+                            options.forEach(opt => {
+                                const o = document.createElement('option');
+                                o.value = opt; o.textContent = opt;
+                                if (opt === (value || def || '')) o.selected = true;
+                                sel.appendChild(o);
+                            });
+                            sel.onchange = () => this.updateStyle(fk, sel.value, elementId);
+                            row.appendChild(sel);
+                        } else {
+                            const inp = document.createElement('input');
+                            inp.type = type; inp.value = value || def || '';
+                            if (fk === 'borderColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+                            inp.onchange = () => this.updateStyle(fk, inp.value, elementId);
+                            row.appendChild(inp);
+                        }
+                        c.appendChild(row);
+                    });
+                    return c;
+                },
+                box_shadow: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const defs = [
+                        { fk: 'shadowHorizontal', label: 'Horizontal', type: 'text', def: '0' },
+                        { fk: 'shadowVertical', label: 'Vertical', type: 'text', def: '0' },
+                        { fk: 'shadowBlur', label: 'Blur', type: 'text', def: '0' },
+                        { fk: 'shadowSpread', label: 'Spread', type: 'text', def: '0' },
+                        { fk: 'shadowColor', label: 'Color', type: 'color', def: 'rgba(0,0,0,0.3)' },
+                    ];
+                    const readAll = () => {
+                        const h = c.querySelector('[data-fk="shadowHorizontal"]')?.value || '0';
+                        const v = c.querySelector('[data-fk="shadowVertical"]')?.value || '0';
+                        const b = c.querySelector('[data-fk="shadowBlur"]')?.value || '0';
+                        const s = c.querySelector('[data-fk="shadowSpread"]')?.value || '0';
+                        const co = c.querySelector('[data-fk="shadowColor"]')?.value || 'rgba(0,0,0,0.3)';
+                        return `${h}px ${v}px ${b}px ${s}px ${co}`;
+                    };
+                    defs.forEach(({fk, label, type, def}) => {
+                        const row = document.createElement('div');
+                        row.className = 'pb-control';
+                        const lbl = document.createElement('label');
+                        lbl.textContent = label;
+                        row.appendChild(lbl);
+                        const inp = document.createElement('input');
+                        inp.type = type; inp.value = value || def || '';
+                        inp.dataset.fk = fk;
+                        if (fk === 'shadowColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+                        inp.onchange = () => this.updateStyle('boxShadow', readAll(), elementId);
+                        row.appendChild(inp);
+                        c.appendChild(row);
+                    });
+                    return c;
+                },
+                dimensions: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const isLinked = { padding: true, margin: true };
+                    const groups = [
+                        { prefix: 'padding', label: 'Padding', keys: ['Top','Right','Bottom','Left'] },
+                        { prefix: 'margin', label: 'Margin', keys: ['Top','Right','Bottom','Left'] },
+                    ];
+                    groups.forEach(group => {
+                        const header = document.createElement('div');
+                        header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-top:.25rem';
+                        const hLabel = document.createElement('span');
+                        hLabel.style.cssText = 'font-size:12px;font-weight:600;color:var(--pb-text2)';
+                        hLabel.textContent = group.label;
+                        header.appendChild(hLabel);
+                        const lockBtn = document.createElement('button');
+                        lockBtn.type = 'button';
+                        lockBtn.innerHTML = '🔗';
+                        lockBtn.title = 'Link values (all sides equal)';
+                        lockBtn.style.cssText = 'background:none;border:1px solid var(--pb-border);border-radius:4px;padding:2px 6px;cursor:pointer;font-size:12px;transition:all .15s';
+                        lockBtn.onclick = () => {
+                            isLinked[group.prefix] = !isLinked[group.prefix];
+                            lockBtn.innerHTML = isLinked[group.prefix] ? '🔗' : '🔓';
+                            lockBtn.style.borderColor = isLinked[group.prefix] ? 'var(--pb-accent)' : 'var(--pb-border)';
+                            lockBtn.title = isLinked[group.prefix] ? 'Link values (all sides equal)' : 'Unlink values (independent sides)';
+                        };
+                        lockBtn.innerHTML = '🔗';
+                        lockBtn.style.borderColor = 'var(--pb-accent)';
+                        header.appendChild(lockBtn);
+                        c.appendChild(header);
+                        const grid = document.createElement('div');
+                        grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:4px';
+                        const inputs = [];
+                        group.keys.forEach((side, idx) => {
+                            const fk = group.prefix + side;
+                            const wrap = document.createElement('div');
+                            wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px';
+                            const sideLabel = document.createElement('span');
+                            sideLabel.style.cssText = 'font-size:10px;color:var(--pb-text2);text-transform:uppercase';
+                            sideLabel.textContent = side;
+                            const inp = document.createElement('input');
+                            inp.type = 'text';
+                            inp.value = value || '';
+                            inp.placeholder = '0';
+                            inp.style.cssText = 'width:100%;padding:4px;text-align:center;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:12px;box-sizing:border-box';
+                            inp.onchange = () => {
+                                this.updateStyle(fk, inp.value, elementId);
+                                if (isLinked[group.prefix]) {
+                                    inputs.forEach((otherInp, oi) => {
+                                        if (oi !== idx) {
+                                            otherInp.value = inp.value;
+                                            this.updateStyle(group.prefix + group.keys[oi], inp.value, elementId);
+                                        }
+                                    });
+                                }
+                            };
+                            inputs.push(inp);
+                            wrap.appendChild(sideLabel);
+                            wrap.appendChild(inp);
+                            grid.appendChild(wrap);
+                        });
+                        c.appendChild(grid);
+                    });
+                    return c;
+                },
+                hover: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const defs = [
+                        { fk: 'hoverBackgroundColor', label: 'Background Color', type: 'color' },
+                        { fk: 'hoverTextColor', label: 'Text Color', type: 'color' },
+                        { fk: 'hoverBorderColor', label: 'Border Color', type: 'color' },
+                        { fk: 'hoverTransform', label: 'Transform', type: 'select', options: ['none','scale(1.05)','scale(0.98)','translateY(-2px)','translateY(2px)'] },
+                        { fk: 'hoverTransition', label: 'Transition (ms)', type: 'text' },
+                    ];
+                    defs.forEach(({fk, label, type, options}) => {
+                        const row = document.createElement('div');
+                        row.className = 'pb-control';
+                        const lbl = document.createElement('label');
+                        lbl.textContent = label;
+                        row.appendChild(lbl);
+                        if (type === 'select') {
+                            const sel = document.createElement('select');
+                            options.forEach(opt => {
+                                const o = document.createElement('option');
+                                o.value = opt; o.textContent = opt;
+                                if (opt === (value || 'none')) o.selected = true;
+                                sel.appendChild(o);
+                            });
+                            sel.onchange = () => this.updateStyle(fk, sel.value, elementId);
+                            row.appendChild(sel);
+                        } else {
+                            const inp = document.createElement('input');
+                            inp.type = type; inp.value = value || '';
+                            if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+                            inp.onchange = () => this.updateStyle(fk, inp.value, elementId);
+                            row.appendChild(inp);
+                        }
+                        c.appendChild(row);
+                    });
+                    return c;
+                },
+                custom_css: () => {
+                    const ta = document.createElement('textarea');
+                    ta.id = `ctrl-${key}`;
+                    ta.value = typeof value === 'string' ? value : '';
+                    ta.placeholder = 'Ex: color: red !important;\nbackground: #fff;';
+                    ta.spellcheck = false;
+                    ta.style.cssText = 'width:100%;padding:.45rem .6rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:.78rem;min-height:80px;font-family:"SF Mono",Menlo,Monaco,Consolas,monospace;resize:vertical;box-sizing:border-box';
+                    ta.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
+                    return ta;
+                },
+                animation: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const animRow = document.createElement('div');
+                    animRow.className = 'pb-control';
+                    const animLabel = document.createElement('label');
+                    animLabel.textContent = 'Entrance Animation';
+                    animRow.appendChild(animLabel);
+                    const animSel = document.createElement('select');
+                    animSel.id = `ctrl-${key}`;
+                    ['none','fadeIn','fadeInUp','fadeInDown','fadeInLeft','fadeInRight','slideInUp','slideInDown','slideInLeft','slideInRight','zoomIn','zoomInUp','zoomInDown','bounceIn','bounceInUp','bounceInDown','flipInX','flipInY','rotateIn','lightSpeedIn'].forEach(opt => {
+                        const o = document.createElement('option');
+                        o.value = opt; o.textContent = opt;
+                        if (opt === (value || 'none')) o.selected = true;
+                        animSel.appendChild(o);
+                    });
+                    animSel.onchange = () => this.updateSetting(key, animSel.value, elementId);
+                    animRow.appendChild(animSel);
+                    c.appendChild(animRow);
+                    const durRow = document.createElement('div');
+                    durRow.className = 'pb-control';
+                    const durLabel = document.createElement('label');
+                    durLabel.textContent = 'Duration';
+                    durRow.appendChild(durLabel);
+                    const durSel = document.createElement('select');
+                    ['slow','normal','fast'].forEach(opt => {
+                        const o = document.createElement('option');
+                        o.value = opt; o.textContent = opt;
+                        const curDur = (value === 'none' || !value) ? 'normal' : 'normal';
+                        durRow.style.display = (value && value !== 'none') ? '' : 'none';
+                        if (opt === 'normal') o.selected = true;
+                        durSel.appendChild(o);
+                    });
+                    const durKey = key + '_duration';
+                    durSel.onchange = () => this.updateSetting(durKey, durSel.value, elementId);
+                    durRow.appendChild(durSel);
+                    c.appendChild(durRow);
+                    const delayRow = document.createElement('div');
+                    delayRow.className = 'pb-control';
+                    delayRow.style.display = (value && value !== 'none') ? '' : 'none';
+                    const delayLabel = document.createElement('label');
+                    delayLabel.textContent = 'Delay (ms)';
+                    delayRow.appendChild(delayLabel);
+                    const delayInp = document.createElement('input');
+                    delayInp.type = 'number'; delayInp.min = 0; delayInp.max = 5000; delayInp.step = 100;
+                    delayInp.value = 0;
+                    const delayKey = key + '_delay';
+                    delayInp.onchange = () => this.updateSetting(delayKey, parseInt(delayInp.value) || 0, elementId);
+                    delayRow.appendChild(delayInp);
+                    c.appendChild(delayRow);
+                    animSel.onchange = () => {
+                        this.updateSetting(key, animSel.value, elementId);
+                        const show = animSel.value && animSel.value !== 'none';
+                        durRow.style.display = show ? '' : 'none';
+                        delayRow.style.display = show ? '' : 'none';
+                    };
+                    return c;
+                },
+                visibility: () => {
+                    const c = document.createElement('div');
+                    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+                    const defs = [
+                        { fk: 'visibility_desktop', label: '🖥️ Visible on Desktop', default: true },
+                        { fk: 'visibility_tablet', label: '📱 Visible on Tablet', default: true },
+                        { fk: 'visibility_mobile', label: '📲 Visible on Mobile', default: true },
+                    ];
+                    defs.forEach(({fk, label, default: def}) => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px';
+                        const lbl = document.createElement('span');
+                        lbl.style.cssText = 'font-size:12px;color:var(--pb-text)';
+                        lbl.textContent = label;
+                        const sw = document.createElement('label');
+                        sw.style.cssText = 'position:relative;display:inline-block;width:36px;height:20px;cursor:pointer';
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = value !== undefined ? !!value : def;
+                        cb.style.cssText = 'opacity:0;width:0;height:0';
+                        const slider = document.createElement('span');
+                        slider.style.cssText = 'position:absolute;inset:0;background:var(--pb-border);border-radius:20px;transition:.2s';
+                        const before = document.createElement('span');
+                        before.style.cssText = 'position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.2s';
+                        slider.appendChild(before);
+                        const updateSlider = () => {
+                            slider.style.background = cb.checked ? 'var(--pb-accent)' : 'var(--pb-border)';
+                            before.style.transform = cb.checked ? 'translateX(16px)' : '';
+                        };
+                        updateSlider();
+                        cb.onchange = () => { updateSlider(); this.updateSetting(fk, cb.checked, elementId); };
+                        sw.appendChild(cb);
+                        sw.appendChild(slider);
+                        row.appendChild(lbl);
+                        row.appendChild(sw);
+                        c.appendChild(row);
+                    });
+                    return c;
+                },
+            };
+            return (types[ctrl.type] || types.text)();
     },
 
     updateSetting(key, value, elementId, reload = true) {
         this.dirty = true;
+        if (this.cachedSettings) this.cachedSettings[key] = value;
         const settings = {};
         settings[key] = value;
         fetch(`/page-builder/elements/${elementId}/settings`, {
@@ -793,6 +1571,27 @@ const editor = {
             this.snapshotHistory();
         })
         .catch(err => { console.error('updateSetting failed:', err); this.toastError('Falha ao atualizar configuração'); });
+    },
+
+    updateStyle(key, value, elementId, reload = true) {
+        this.dirty = true;
+        if (this.cachedStyles) this.cachedStyles[key] = value;
+        const styles = {};
+        styles[key] = value;
+        fetch(`/page-builder/elements/${elementId}/styles`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
+            body: JSON.stringify({ styles }),
+        })
+        .then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+        })
+        .then(() => {
+            if (reload) this.reloadElement(elementId);
+            this.snapshotHistory();
+        })
+        .catch(err => { console.error('updateStyle failed:', err); this.toastError('Falha ao atualizar estilo'); });
     },
 
     reloadElement(id) {
@@ -912,6 +1711,7 @@ const editor = {
 
     restoreHistory() {
         const snapshot = this.history[this.historyIndex];
+        this._lastElements = snapshot || [];
         this.renderCanvas(snapshot);
         this.renderMath();
         this.renderStructure(snapshot);
@@ -1275,5 +2075,302 @@ const editor = {
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
             body: JSON.stringify({ settings }),
         }).catch(() => this.toastError('Falha ao atualizar configuração da página'));
+    },
+
+    toggleNavigator() {
+        const nav = document.getElementById('navigator');
+        nav.classList.toggle('open');
+        if (nav.classList.contains('open')) this.renderNavigator();
+    },
+
+    renderNavigator() {
+        const body = document.getElementById('navigator-body');
+        body.innerHTML = '';
+        const els = this._lastElements || [];
+        this._renderNavItems(els, body, 0);
+    },
+
+    _renderNavItems(elements, container, depth) {
+        (elements || []).forEach(el => {
+            const item = document.createElement('div');
+            item.className = 'pb-nav-item' + (this.selectedId === el.id ? ' active' : '');
+            item.dataset.elId = el.id;
+            item.dataset.elType = el.type;
+            item.style.paddingLeft = (.6 + depth * .8) + 'rem';
+
+            const hasChildren = el.children && el.children.length > 0;
+
+            const toggle = document.createElement('span');
+            toggle.className = 'nav-toggle' + (hasChildren ? ' expanded' : '');
+            toggle.innerHTML = hasChildren ? '&#9654;' : '';
+            toggle.style.visibility = hasChildren ? 'visible' : 'hidden';
+            toggle.onclick = (e) => {
+                e.stopPropagation();
+                const ch = item.nextElementSibling;
+                if (ch && ch.classList.contains('pb-nav-children')) {
+                    const visible = ch.style.display !== 'none';
+                    ch.style.display = visible ? 'none' : '';
+                    toggle.classList.toggle('expanded', !visible);
+                }
+            };
+
+            const icon = document.createElement('span');
+            icon.className = 'nav-icon';
+            icon.innerHTML = this.structureIcon(el.type);
+
+            const name = document.createElement('span');
+            name.className = 'nav-name';
+            name.textContent = el.name || el.type;
+
+            const type = document.createElement('span');
+            type.className = 'nav-type';
+            type.textContent = el.type;
+
+            item.appendChild(toggle);
+            item.appendChild(icon);
+            item.appendChild(name);
+            item.appendChild(type);
+
+            item.onclick = (e) => {
+                e.stopPropagation();
+                this.selectElement(el.id);
+                this.renderNavigator();
+            };
+
+            item.ondblclick = (e) => {
+                e.stopPropagation();
+                this._startNavRename(item, name, el);
+            };
+
+            item.oncontextmenu = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.selectElement(el.id);
+                this.renderNavigator();
+                this._showNavContext(e.clientX, e.clientY, el);
+            };
+
+            item.ondragover = (e) => { e.preventDefault(); item.classList.add('drag-over'); };
+            item.ondragleave = () => item.classList.remove('drag-over');
+            item.ondrop = (e) => {
+                e.preventDefault();
+                item.classList.remove('drag-over');
+                const dragId = parseInt(e.dataTransfer.getData('text/plain'));
+                if (dragId && dragId !== el.id) this._navMoveElement(dragId, el.id);
+            };
+
+            item.draggable = true;
+            item.ondragstart = (e) => {
+                e.dataTransfer.setData('text/plain', el.id);
+                e.dataTransfer.effectAllowed = 'move';
+            };
+
+            container.appendChild(item);
+
+            if (hasChildren) {
+                const childDiv = document.createElement('div');
+                childDiv.className = 'pb-nav-children';
+                container.appendChild(childDiv);
+                this._renderNavItems(el.children, childDiv, depth + 1);
+            }
+        });
+    },
+
+    _startNavRename(item, nameEl, el) {
+        const input = document.createElement('input');
+        input.className = 'pb-nav-rename-input';
+        input.value = el.name || el.type;
+        nameEl.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const save = () => {
+            const newName = input.value.trim() || el.type;
+            el.name = newName;
+            nameEl.textContent = newName;
+            input.replaceWith(nameEl);
+            fetch(`/page-builder/elements/${el.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
+                body: JSON.stringify({ name: newName }),
+            }).catch(() => {});
+        };
+
+        input.onblur = save;
+        input.onkeydown = (e) => {
+            if (e.key === 'Enter') save();
+            if (e.key === 'Escape') { input.replaceWith(nameEl); }
+        };
+    },
+
+    _showNavContext(x, y, el) {
+        this._hideNavContext();
+        const ctx = document.createElement('div');
+        ctx.className = 'pb-nav-context';
+        ctx.style.left = x + 'px';
+        ctx.style.top = y + 'px';
+
+        const items = [
+            { label: '✎ Rename', action: () => { const item = document.querySelector(`.pb-nav-item[data-el-id="${el.id}"] .nav-name`); if (item) this._startNavRename(item, item, el); } },
+            { label: '⧉ Duplicate', action: () => this.duplicateElement(el.id) },
+            { sep: true },
+            { label: '↑ Move Up', action: () => this._navMoveRelative(el.id, -1) },
+            { label: '↓ Move Down', action: () => this._navMoveRelative(el.id, 1) },
+            { sep: true },
+            { label: '⧉ Copy', action: () => { this._clipboard = JSON.parse(JSON.stringify(el)); this.toast('Elemento copiado'); } },
+            { label: '📋 Paste (após)', action: () => this._navPasteAfter(el.id) },
+            { sep: true },
+            { label: '✕ Delete', cls: 'danger', action: () => this.deleteElement(el.id) },
+        ];
+
+        items.forEach(m => {
+            if (m.sep) {
+                const sep = document.createElement('div');
+                sep.className = 'pb-nav-context-sep';
+                ctx.appendChild(sep);
+                return;
+            }
+            const btn = document.createElement('div');
+            btn.className = 'pb-nav-context-item' + (m.cls ? ' ' + m.cls : '');
+            btn.textContent = m.label;
+            btn.onclick = (e) => { e.stopPropagation(); this._hideNavContext(); m.action(); };
+            ctx.appendChild(btn);
+        });
+
+        document.body.appendChild(ctx);
+
+        const closeCtx = (e) => {
+            if (!ctx.contains(e.target)) { this._hideNavContext(); document.removeEventListener('click', closeCtx); }
+        };
+        setTimeout(() => document.addEventListener('click', closeCtx), 10);
+    },
+
+    _hideNavContext() {
+        document.querySelectorAll('.pb-nav-context').forEach(c => c.remove());
+    },
+
+    _navMoveElement(dragId, targetId) {
+        const findParent = (elements, id, parent) => {
+            for (const el of elements) {
+                if (el.id === id) return parent;
+                if (el.children) {
+                    const found = findParent(el.children, id, el);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const findEl = (elements, id) => {
+            for (const el of elements) {
+                if (el.id === id) return el;
+                if (el.children) {
+                    const found = findEl(el.children, id);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const els = this._lastElements || [];
+        const dragEl = findEl(els, dragId);
+        const targetEl = findEl(els, targetId);
+        if (!dragEl || !targetEl) return;
+
+        const dragParent = findParent(els, dragId, null);
+        const targetParent = findParent(els, targetId, null);
+
+        if (dragParent && dragParent.children) {
+            dragParent.children = dragParent.children.filter(e => e.id !== dragId);
+        } else {
+            this._lastElements = els.filter(e => e.id !== dragId);
+        }
+
+        const insertInto = (el) => {
+            if (!el.children) el.children = [];
+            el.children.push(dragEl);
+        };
+
+        if (targetParent) {
+            const siblings = dragParent && dragParent.id === targetParent.id ? (dragParent.children || this._lastElements) : (targetParent.children || this._lastElements);
+            const idx = siblings.findIndex(e => e.id === targetId);
+            siblings.splice(idx + 1, 0, dragEl);
+        } else {
+            const idx = this._lastElements.findIndex(e => e.id === targetId);
+            this._lastElements.splice(idx + 1, 0, dragEl);
+        }
+
+        this.renderCanvas(this._lastElements);
+        this.renderStructure(this._lastElements);
+        this.renderNavigator();
+        this.renderMath();
+        this._saveElementOrder(dragId, targetId);
+    },
+
+    _navMoveRelative(elId, direction) {
+        const els = this._lastElements || [];
+        const findAndMove = (list) => {
+            const idx = list.findIndex(e => e.id === elId);
+            if (idx !== -1) {
+                const newIdx = idx + direction;
+                if (newIdx >= 0 && newIdx < list.length) {
+                    [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+                    return true;
+                }
+                return false;
+            }
+            for (const el of list) {
+                if (el.children && findAndMove(el.children)) return true;
+            }
+            return false;
+        };
+
+        if (findAndMove(els)) {
+            this.renderCanvas(els);
+            this.renderStructure(els);
+            this.renderNavigator();
+            this.renderMath();
+        }
+    },
+
+    _navPasteAfter(targetId) {
+        if (!this._clipboard) return;
+        const els = this._lastElements || [];
+        const clone = JSON.parse(JSON.stringify(this._clipboard));
+        delete clone.id;
+
+        const findAndInsert = (list) => {
+            const idx = list.findIndex(e => e.id === targetId);
+            if (idx !== -1) {
+                list.splice(idx + 1, 0, clone);
+                return true;
+            }
+            for (const el of list) {
+                if (el.children && findAndInsert(el.children)) return true;
+            }
+            return false;
+        };
+
+        if (findAndInsert(els)) {
+            this.renderCanvas(els);
+            this.renderStructure(els);
+            this.renderNavigator();
+            this.renderMath();
+        }
+    },
+
+    _saveElementOrder(dragId, targetId) {
+        const buildOrder = (elements) => {
+            return elements.map(el => ({
+                id: el.id,
+                children: el.children ? buildOrder(el.children) : [],
+            }));
+        };
+        const order = buildOrder(this._lastElements || []);
+        fetch(`/page-builder/pages/${this.pageId}/elements/reorder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
+            body: JSON.stringify({ order }),
+        }).catch(() => this.toastError('Falha ao reordenar'));
     },
 };

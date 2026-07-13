@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <style>
 :root {
@@ -205,6 +206,17 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .pb-settings-body::-webkit-scrollbar { width: 5px; }
 .pb-settings-body::-webkit-scrollbar-track { background: transparent; }
 .pb-settings-body::-webkit-scrollbar-thumb { background: var(--pb-border); border-radius: 10px; }
+.pb-editor-tabs {
+    display: flex; border-bottom: 1px solid var(--pb-border); flex-shrink: 0;
+}
+.pb-editor-tab {
+    flex: 1; padding: .55rem .5rem; text-align: center; font-size: .7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .5px; cursor: pointer;
+    background: none; border: none; color: var(--pb-text2);
+    border-bottom: 2px solid transparent; transition: all .2s;
+}
+.pb-editor-tab:hover { color: var(--pb-text); background: rgba(255,255,255,.03); }
+.pb-editor-tab.active { color: var(--pb-accent); border-bottom-color: var(--pb-accent); }
 .pb-settings-section { margin-bottom: 1.25rem; }
 .pb-settings-section-title {
     font-size: .65rem; text-transform: uppercase; color: var(--pb-text2);
@@ -259,6 +271,71 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     border-radius: 6px; font-size: .8rem; font-weight: 500;
     box-shadow: 0 8px 24px rgba(99,102,241,.4); transform: translate(-50%, -50%);
 }
+
+.pb-navigator-toggle {
+    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9990;
+    width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+    background: var(--pb-primary); color: #fff; font-size: 1.2rem;
+    box-shadow: 0 4px 16px rgba(99,102,241,.4); transition: all .2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.pb-navigator-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(99,102,241,.5); }
+
+.pb-navigator {
+    position: fixed; bottom: 5rem; right: 1.5rem; z-index: 9991;
+    width: 280px; max-height: 60vh; background: var(--pb-surface);
+    border: 1px solid var(--pb-border); border-radius: 12px;
+    box-shadow: 0 12px 48px rgba(0,0,0,.3); display: none;
+    flex-direction: column; overflow: hidden;
+}
+.pb-navigator.open { display: flex; }
+.pb-navigator-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .6rem .8rem; border-bottom: 1px solid var(--pb-border);
+    background: rgba(0,0,0,.1); flex-shrink: 0;
+}
+.pb-navigator-header span { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.pb-navigator-header button { background: none; border: none; color: var(--pb-text2); cursor: pointer; font-size: .9rem; padding: 2px 6px; border-radius: 4px; }
+.pb-navigator-header button:hover { background: var(--pb-surface2); color: var(--pb-text); }
+.pb-navigator-body { overflow-y: auto; flex: 1; padding: .4rem 0; }
+.pb-navigator-body::-webkit-scrollbar { width: 4px; }
+.pb-navigator-body::-webkit-scrollbar-thumb { background: var(--pb-border); border-radius: 10px; }
+
+.pb-nav-item {
+    display: flex; align-items: center; gap: .4rem; padding: .35rem .6rem;
+    cursor: pointer; font-size: .75rem; transition: background .15s;
+    border-left: 3px solid transparent; user-select: none;
+}
+.pb-nav-item:hover { background: var(--pb-surface2); }
+.pb-nav-item.active { background: rgba(99,102,241,.1); border-left-color: var(--pb-accent); color: var(--pb-accent); font-weight: 600; }
+.pb-nav-item .nav-icon { font-size: .8rem; width: 18px; text-align: center; flex-shrink: 0; }
+.pb-nav-item .nav-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pb-nav-item .nav-type { font-size: .6rem; color: var(--pb-text2); flex-shrink: 0; }
+.pb-nav-item .nav-toggle { font-size: .6rem; cursor: pointer; padding: 0 2px; color: var(--pb-text2); transition: transform .2s; flex-shrink: 0; }
+.pb-nav-item .nav-toggle.expanded { transform: rotate(90deg); }
+.pb-nav-children { padding-left: 1rem; }
+
+.pb-nav-item.drag-over { background: rgba(99,102,241,.15); border-left-color: var(--pb-accent); }
+.pb-nav-item.draggingindicator { border-top: 2px solid var(--pb-accent); }
+
+.pb-nav-context {
+    position: fixed; z-index: 99999; background: var(--pb-surface);
+    border: 1px solid var(--pb-border); border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3); padding: .3rem 0; min-width: 160px;
+}
+.pb-nav-context-item {
+    display: flex; align-items: center; gap: .5rem; padding: .4rem .8rem;
+    font-size: .75rem; cursor: pointer; transition: background .1s;
+}
+.pb-nav-context-item:hover { background: var(--pb-surface2); }
+.pb-nav-context-item.danger { color: var(--pb-danger); }
+.pb-nav-context-sep { height: 1px; background: var(--pb-border); margin: .2rem 0; }
+
+.pb-nav-rename-input {
+    font-size: .75rem; padding: 1px 4px; background: var(--pb-surface2);
+    border: 1px solid var(--pb-accent); border-radius: 3px; color: var(--pb-text);
+    width: 120px; outline: none;
+}
 </style>
 
 <div class="pb-toolbar">
@@ -304,6 +381,14 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
                     <div class="pb-widget-item" draggable="true" data-type="text"><span class="pb-widget-icon">T</span><span class="pb-widget-label">Texto</span></div>
                     <div class="pb-widget-item" draggable="true" data-type="image"><span class="pb-widget-icon">&#128247;</span><span class="pb-widget-label">Imagem</span></div>
                     <div class="pb-widget-item" draggable="true" data-type="button"><span class="pb-widget-icon">&#128206;</span><span class="pb-widget-label">Botão</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="video"><span class="pb-widget-icon">&#127909;</span><span class="pb-widget-label">Vídeo</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="divider"><span class="pb-widget-icon">&#128901;</span><span class="pb-widget-label">Divisor</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="spacer"><span class="pb-widget-icon">&#8693;</span><span class="pb-widget-label">Espaçador</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="icon"><span class="pb-widget-icon">&#11088;</span><span class="pb-widget-label">Ícone</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="gallery"><span class="pb-widget-icon">&#128444;</span><span class="pb-widget-label">Galeria</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="form"><span class="pb-widget-icon">&#128203;</span><span class="pb-widget-label">Formulário</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="tabs"><span class="pb-widget-icon">&#128209;</span><span class="pb-widget-label">Abas</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="accordion"><span class="pb-widget-icon">&#129703;</span><span class="pb-widget-label">Accordion</span></div>
                 </div>
             </div>
             <div class="pb-widget-group">
@@ -348,6 +433,11 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
                     </div>
                     <button onclick="editor.deleteSelected()" style="background:none;border:none;color:var(--pb-danger);cursor:pointer;font-size:1.1rem" title="Excluir elemento">&#128465;</button>
                 </div>
+                <div class="pb-editor-tabs" id="editor-tabs">
+                    <button class="pb-editor-tab active" data-etab="content" onclick="editor.switchEditorTab('content')">Content</button>
+                    <button class="pb-editor-tab" data-etab="style" onclick="editor.switchEditorTab('style')">Style</button>
+                    <button class="pb-editor-tab" data-etab="advanced" onclick="editor.switchEditorTab('advanced')">Advanced</button>
+                </div>
                 <div class="pb-settings-body" id="settings-body"></div>
             </div>
             <div id="page-settings-form" style="display:none;height:100%;flex-direction:column">
@@ -364,11 +454,20 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     </div>
 </div>
 
+<button class="pb-navigator-toggle" id="nav-toggle" onclick="editor.toggleNavigator()" title="Navigator">&#9776;</button>
+<div class="pb-navigator" id="navigator">
+    <div class="pb-navigator-header">
+        <span>&#9776; Navigator</span>
+        <button onclick="editor.toggleNavigator()" title="Fechar">&#10005;</button>
+    </div>
+    <div class="pb-navigator-body" id="navigator-body"></div>
+</div>
+
 <script src="{{ asset('js/page-builder-editor.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => editor.init({{ $page->id }}, '{{ csrf_token() }}'));
 document.addEventListener('click', (e) => {
-    if (!e.target.closest('.pb-el') && !e.target.closest('.pb-structure-item') && !e.target.closest('.pb-settings') && !e.target.closest('.pb-toolbar')) {
+    if (!e.target.closest('.pb-el') && !e.target.closest('.pb-structure-item') && !e.target.closest('.pb-settings') && !e.target.closest('.pb-toolbar') && !e.target.closest('.pb-nav-context')) {
         document.querySelectorAll('.pb-el.selected').forEach(el => el.classList.remove('selected'));
         document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
         editor.selectedId = null;

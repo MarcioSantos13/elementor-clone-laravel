@@ -21,6 +21,14 @@ return [
         \App\Services\PageBuilder\Widgets\CalloutWidget::class,
         \App\Services\PageBuilder\Widgets\TableWidget::class,
         \App\Services\PageBuilder\Widgets\MathWidget::class,
+        \App\Services\PageBuilder\Widgets\VideoWidget::class,
+        \App\Services\PageBuilder\Widgets\DividerWidget::class,
+        \App\Services\PageBuilder\Widgets\SpacerWidget::class,
+        \App\Services\PageBuilder\Widgets\IconWidget::class,
+        \App\Services\PageBuilder\Widgets\GalleryWidget::class,
+        \App\Services\PageBuilder\Widgets\FormWidget::class,
+        \App\Services\PageBuilder\Widgets\TabsWidget::class,
+        \App\Services\PageBuilder\Widgets\AccordionWidget::class,
     ],
 
     'upload' => [

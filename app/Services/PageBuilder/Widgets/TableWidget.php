@@ -27,14 +27,21 @@ class TableWidget extends BaseWidget
 
         $this->controls = [
             'content' => ['type' => 'wysiwyg', 'label' => 'Table Content (HTML)', 'required' => true],
-            'header_bg' => ['type' => 'color', 'label' => 'Header Background'],
-            'header_color' => ['type' => 'color', 'label' => 'Header Text Color'],
-            'border_color' => ['type' => 'color', 'label' => 'Border Color'],
-            'stripe' => ['type' => 'boolean', 'label' => 'Alternating Rows'],
-            'alignment' => ['type' => 'select', 'label' => 'Text Alignment', 'options' => ['left', 'center', 'right']],
-            'font_size' => ['type' => 'text', 'label' => 'Font Size'],
-            'padding' => ['type' => 'text', 'label' => 'Cell Padding'],
-            'border_radius' => ['type' => 'text', 'label' => 'Border Radius'],
+            'header_bg' => ['type' => 'color', 'label' => 'Header Background', 'tab' => 'style'],
+            'header_color' => ['type' => 'color', 'label' => 'Header Text Color', 'tab' => 'style'],
+            'border_color' => ['type' => 'color', 'label' => 'Border Color', 'tab' => 'style'],
+            'stripe' => ['type' => 'boolean', 'label' => 'Alternating Rows', 'tab' => 'style'],
+            'alignment' => ['type' => 'select', 'label' => 'Text Alignment', 'options' => ['left', 'center', 'right'], 'tab' => 'style'],
+            'font_size' => ['type' => 'text', 'label' => 'Font Size', 'tab' => 'style'],
+            'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
+            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
+            'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
+            'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
+            'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
+            'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
+            'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
 

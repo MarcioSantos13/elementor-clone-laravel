@@ -44,10 +44,23 @@ class ButtonWidget extends BaseWidget
             'link' => ['type' => 'url', 'label' => 'Link'],
             'alignment' => ['type' => 'select', 'label' => 'Alignment', 'options' => ['left', 'center', 'right', 'stretch']],
             'size' => ['type' => 'select', 'label' => 'Size', 'options' => ['small', 'medium', 'large', 'xl']],
-            'background_color' => ['type' => 'color', 'label' => 'Background Color'],
-            'text_color' => ['type' => 'color', 'label' => 'Text Color'],
-            'border_radius' => ['type' => 'text', 'label' => 'Border Radius'],
-            'font_size' => ['type' => 'number', 'label' => 'Font Size', 'min' => 10, 'max' => 100],
+            'icon' => ['type' => 'icon', 'label' => 'Icon'],
+            'icon_position' => ['type' => 'select', 'label' => 'Icon Position', 'options' => ['left', 'right']],
+            'background_color' => ['type' => 'color', 'label' => 'Background Color', 'tab' => 'style'],
+            'text_color' => ['type' => 'color', 'label' => 'Text Color', 'tab' => 'style'],
+            'border_radius' => ['type' => 'text', 'label' => 'Border Radius', 'tab' => 'style'],
+            'font_size' => ['type' => 'number', 'label' => 'Font Size', 'min' => 10, 'max' => 100, 'tab' => 'style'],
+            'typography' => ['type' => 'typography', 'label' => 'Typography', 'tab' => 'style'],
+            'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
+            'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
+            'hover' => ['type' => 'hover', 'label' => 'Hover Effects', 'tab' => 'style'],
+            'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
+            'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
+            'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
+            'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
+            'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
 
@@ -119,11 +132,13 @@ class ButtonWidget extends BaseWidget
         $hoverData = "data-hover-style=\"{$hoverStyle}\"";
         $buttonHtml = "<a href=\"{$link}\" target=\"{$target}\" class=\"pb-button pb-button-{$size}\" style=\"{$style}\" {$hoverData}>{$buttonContent}</a>";
 
+        $hoverStyle = $this->buildHoverStyle("pb-button-{$size}", $styles);
+
         if ($alignment !== 'stretch') {
             $buttonHtml = "<div style=\"text-align: {$alignment};\">{$buttonHtml}</div>";
         }
 
-        return $buttonHtml;
+        return $hoverStyle . $buttonHtml;
     }
 
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
@@ -163,12 +178,15 @@ class ButtonWidget extends BaseWidget
             $style .= ' width: 100%; text-align: center;';
         }
 
-        $buttonHtml = "<button class=\"pb-button-editor pb-button-{$size}\" style=\"{$style}\">{$text}</button>";
+        $hoverClass = "pb-button-{$size}-editor";
+        $buttonHtml = "<button class=\"pb-button-editor {$hoverClass}\" style=\"{$style}\">{$text}</button>";
+
+        $hoverStyle = $this->buildHoverStyle($hoverClass, $styles);
 
         if ($alignment !== 'stretch') {
             $buttonHtml = "<div style=\"text-align: {$alignment};\">{$buttonHtml}</div>";
         }
 
-        return $buttonHtml;
+        return $hoverStyle . $buttonHtml;
     }
 }

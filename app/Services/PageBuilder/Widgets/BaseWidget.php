@@ -244,4 +244,29 @@ abstract class BaseWidget implements WidgetInterface
 
         return $result;
     }
+
+    protected function buildHoverStyle(string $cssClass, array $styles): string
+    {
+        if (empty($styles)) return '';
+
+        $hoverCss = '';
+        if (!empty($styles['hoverBackgroundColor'])) {
+            $hoverCss .= "background-color: {$this->safeCssValue($styles['hoverBackgroundColor'])}; ";
+        }
+        if (!empty($styles['hoverTextColor'])) {
+            $hoverCss .= "color: {$this->safeCssValue($styles['hoverTextColor'])}; ";
+        }
+        if (!empty($styles['hoverBorderColor'])) {
+            $hoverCss .= "border-color: {$this->safeCssValue($styles['hoverBorderColor'])}; ";
+        }
+        if (!empty($styles['hoverTransform']) && $styles['hoverTransform'] !== 'none') {
+            $hoverCss .= "transform: {$this->safeCssValue($styles['hoverTransform'])}; ";
+        }
+        if (empty($hoverCss)) return '';
+
+        $transition = $styles['hoverTransition'] ?? '300';
+        $transition = $this->safeCssValue($transition);
+
+        return "<style>.{$cssClass}:hover { {$hoverCss} transition: all {$transition}ms ease; }</style>";
+    }
 }

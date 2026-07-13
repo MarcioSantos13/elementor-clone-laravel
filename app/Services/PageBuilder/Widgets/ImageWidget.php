@@ -37,10 +37,20 @@ class ImageWidget extends BaseWidget
             'image' => ['type' => 'image', 'label' => 'Image'],
             'caption' => ['type' => 'text', 'label' => 'Caption', 'max_length' => 300],
             'alignment' => ['type' => 'select', 'label' => 'Alignment', 'options' => ['left', 'center', 'right']],
-            'width' => ['type' => 'text', 'label' => 'Width'],
-            'border_radius' => ['type' => 'text', 'label' => 'Border Radius'],
             'link' => ['type' => 'url', 'label' => 'Link'],
             'enable_lightbox' => ['type' => 'boolean', 'label' => 'Enable Lightbox'],
+            'width' => ['type' => 'text', 'label' => 'Width', 'tab' => 'style'],
+            'border_radius' => ['type' => 'text', 'label' => 'Border Radius', 'tab' => 'style'],
+            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
+            'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
+            'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
+            'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
+            'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
+            'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
+            'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
+            'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
 
