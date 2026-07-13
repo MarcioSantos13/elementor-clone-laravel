@@ -103,13 +103,11 @@ class ImageWidget extends BaseWidget
             $imgHtml = "<figure class=\"pb-image-wrapper\" style=\"text-align: {$alignment};\">{$imgHtml}</figure>";
         }
 
-        if ($link) {
+        if ($link && !$enableLightbox) {
             $target = htmlspecialchars($linkTarget, ENT_QUOTES, 'UTF-8');
             $href = htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
             $imgHtml = "<a href=\"{$href}\" target=\"{$target}\" class=\"pb-image-link\">{$imgHtml}</a>";
-        }
-
-        if ($enableLightbox) {
+        } elseif ($enableLightbox) {
             $imgHtml = "<a href=\"{$image['url']}\" class=\"pb-lightbox-trigger\" data-lightbox=\"{$image['alt']}\">{$imgHtml}</a>";
         }
 

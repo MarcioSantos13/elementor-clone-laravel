@@ -424,7 +424,7 @@ Controles visuais como o Elementor:
 
 ## FASE 5 — UX do Editor (Média Prioridade)
 
-### Passo 24: Preview em tempo real (live update)
+### Passo 24: Preview em tempo real (live update) ✅ IMPLEMENTADO
 **Arquivo:** `public/js/page-builder-editor.js`
 
 Atualmente o canvas só atualiza ao perder foco do input. Mudar para atualizar enquanto digita:
@@ -438,7 +438,7 @@ Atualmente o canvas só atualiza ao perder foco do input. Mudar para atualizar e
 
 ---
 
-### Passo 25: Ctrl+Z Visual (botão de desfazer)
+### Passo 25: Ctrl+Z Visual (botão de desfazer) ✅ IMPLEMENTADO
 **Arquivo:** `resources/views/page-builder/editor.blade.php`
 
 Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
@@ -452,7 +452,7 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ---
 
-### Passo 26: Right-click context menu no canvas
+### Passo 26: Right-click context menu no canvas ✅ IMPLEMENTADO
 - Botão direito em qualquer widget → Menu flutuante
 - Opções: Edit, Duplicate, Copy, Paste, Delete, Move Up/Down, Navigator
 - Implementar com `<div>` posicionado com `position: fixed`
@@ -464,7 +464,7 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ---
 
-### Passo 27: Drag handle melhorado
+### Passo 27: Drag handle melhorado ✅ IMPLEMENTADO
 - Barra de arrastar mais visível (hover no widget)
 - Cursor `grab` em vez de `pointer`
 - Tooltip "Drag to reorder"
@@ -477,7 +477,7 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ---
 
-### Passo 28: Zoom do canvas
+### Passo 28: Zoom do canvas ✅ IMPLEMENTADO
 - Botão +/- na toolbar ou Ctrl+Scroll
 - Indicador de zoom atual (100%, 75%, 50%)
 - Reset com botão ou Ctrl+0
@@ -489,7 +489,7 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ---
 
-### Passo 29: Fullscreen mode
+### Passo 29: Fullscreen mode ✅ IMPLEMENTADO
 - Botão para expandir canvas (esconder painéis laterais)
 - ESC para sair
 - Botão no canto superior direito

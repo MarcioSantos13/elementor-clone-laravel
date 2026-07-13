@@ -115,20 +115,20 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Números do Projeto</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th></tr>
-                    <tr><td>Widgets disponíveis</td><td>9 (Título, Texto, Imagem, Botão, Seção, Coluna, Callout, Table, Math)</td></tr>
+                    <tr><td>Widgets disponíveis</td><td>17 (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</td></tr>
                     <tr><td>Templates prontos</td><td>5 (Blank, Landing, About, Contact, Showcase Completo)</td></tr>
                     <tr><td>Rotas definidas</td><td>35+ (CRUD páginas, elementos, revisões, templates)</td></tr>
                     <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>3 principais (pages, elements, revisions)</td></tr>
                     <tr><td>Views Blade</td><td>9 (login, register, tutorial, editor, pages)</td></tr>
-                    <tr><td>Linhas de JS do editor</td><td>~900</td></tr>
+                    <tr><td>Linhas de JS do editor</td><td>~2600</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades</h3>
                 <ul>
                     <li>Criar páginas com título e status (rascunho / publicado)</li>
                     <li>Abrir um <strong>editor visual</strong> em tela cheia com tema escuro</li>
-                    <li>Arrastar <strong>9 widgets</strong> (Título, Texto, Imagem, Botão, Seção, Coluna, Callout, Table, Math)</li>
+                    <li>Arrastar <strong>17 widgets</strong> (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</li>
                     <li>Selecionar qualquer elemento e editar suas <strong>configurações</strong> no painel direito</li>
                     <li><strong>Editor de texto rich-text (WYSIWYG)</strong> com toolbar: negrito, itálico, links, imagens, vídeos YouTube, listas, código fonte</li>
                     <li><strong>Inserir imagens</strong> no texto via upload ou colar (Ctrl+V) — imagem inline no conteúdo</li>
@@ -140,6 +140,13 @@ php artisan db:seed</code></pre>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
                     <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
                     <li>Duplicar, exportar (JSON), importar, copiar HTML, excluir páginas</li>
+                    <li><strong>Navegador (Navigator)</strong> — painel flutuante com árvore de elementos, drag-and-drop, renomear, menu de contexto</li>
+                    <li><strong>Right-click context menu</strong> no canvas e no Navigator (Editar, Duplicar, Copiar, Colar, Mover, Excluir)</li>
+                    <li><strong>Drag handle</strong> com indicadores visuais de posição (drop-before/drop-after)</li>
+                    <li><strong>Zoom do canvas</strong> com Ctrl+Scroll, botões +/-, reset com Ctrl+0 (25%-200%)</li>
+                    <li><strong>Tela cheia (Fullscreen)</strong> — esconder painéis laterais com botão ou F11</li>
+                    <li><strong>Preview em tempo real</strong> — debounce 300ms em todos os controles (text, color, number, etc.)</li>
+                    <li><strong>Estilo por widget</strong> — 3 abas (Content, Style, Advanced): tipografia, fundo, borda, sombra, hover, dimensões, animação, CSS customizado, visibilidade responsiva</li>
                     <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
                 </ul>
 
@@ -148,20 +155,22 @@ php artisan db:seed</code></pre>
 <pre style="margin:0">┌──────────────────────────────────────────────────┐
 │                  FRONTEND                         │
 │   editor.blade.php + page-builder-editor.js       │
-│   (900+ linhas JS vanilla, sem frameworks)         │
+│   (2600+ linhas JS vanilla, sem frameworks)         │
 ├──────────────────────────────────────────────────┤
 │                CONTROLLERS                        │
 │   PageController │ ElementController              │
-│   RevisionController                              │
+│   RevisionController │ FormController             │
 ├──────────────────────────────────────────────────┤
 │                 SERVICES                          │
 │   PageBuilderService │ Renderer │ WidgetManager   │
 │   TemplateManager │ ElementManager                │
 ├──────────────────────────────────────────────────┤
-│                  WIDGETS                          │
+│                  WIDGETS (17)                     │
 │   BaseWidget → Heading │ Text │ Image │ Button    │
-│              Section │ Column                     │
-│              Callout │ Table │ Math               │
+│              Section │ Column │ Callout            │
+│              Table │ Math │ Video │ Divider        │
+│              Spacer │ Icon │ Gallery │ Form        │
+│              Tabs │ Accordion                      │
 ├──────────────────────────────────────────────────┤
 │              DATABASE (SQLite)                    │
 │   pages → elements (árvore) → revisions           │
@@ -244,7 +253,7 @@ php artisan db:seed</code></pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Esquerdo — Widgets</h3>
                 <ul>
-                    <li>Lista os 9 widgets disponíveis: Título, Texto, Imagem, Botão, Seção, Coluna, Callout, Table, Math</li>
+                    <li>Lista os 17 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion</li>
                     <li>Cada widget mostra um ícone (emoji) e nome</li>
                     <li>O painel começa colapsado — clique no ícone de widgets (☰) na barra superior para expandir</li>
                     <li>Clique em um widget para adicioná-lo à página (ou arraste para o canvas)</li>
@@ -495,6 +504,103 @@ php artisan db:seed</code></pre>
                     <tr><td><code>\lim_{x \to 0}</code></td><td>limite quando x tende a 0</td></tr>
                     <tr><td><code>\alpha, \beta, \gamma</code></td><td>letras gregas &#945;, &#946;, &#947;</td></tr>
                     <tr><td><code>\leq, \geq, \neq</code></td><td>menor ou igual, maior ou igual, diferente</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Video (Vídeo)</h3>
+                <p>Incorporar vídeos do YouTube e Vimeo com configuracoes de aspect ratio, autoplay, loop e mute.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Video URL</td><td>url</td><td>URL do YouTube ou Vimeo</td></tr>
+                    <tr><td>Aspect Ratio</td><td>select</td><td>16:9, 4:3, 1:1, 21:9</td></tr>
+                    <tr><td>Autoplay</td><td>boolean</td><td>Reproduzir automaticamente</td></tr>
+                    <tr><td>Loop</td><td>boolean</td><td>Repetir vídeo</td></tr>
+                    <tr><td>Mute</td><td>boolean</td><td>Silenciar áudio</td></tr>
+                    <tr><td>Controls</td><td>boolean</td><td>Mostrar controles do player</td></tr>
+                    <tr><td>Start/End Time</td><td>number</td><td>Tempo de início/fim em segundos</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Divider (Divisor)</h3>
+                <p>Linha horizontal com configuracoes de estilo, espessura, cor e espacamento.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Style</td><td>select</td><td>solid, dashed, dotted, double</td></tr>
+                    <tr><td>Width</td><td>number</td><td>Largura em % (0-100)</td></tr>
+                    <tr><td>Thickness</td><td>number</td><td>Espessura em px (1-20)</td></tr>
+                    <tr><td>Color</td><td>color</td><td>Cor da linha</td></tr>
+                    <tr><td>Space Before/After</td><td>number</td><td>Espaçamento antes/depois em px</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Spacer (Espaçador)</h3>
+                <p>Espaço em branco configurável para ajustar distâncias entre elementos.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Space</td><td>number</td><td>Altura em px (0-500, padrão: 50)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Icon (Ícone)</h3>
+                <p>Ícone Font Awesome com configuracoes de tamanho, cor e link.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Icon</td><td>icon picker</td><td>70+ ícones Font Awesome (fas/fab)</td></tr>
+                    <tr><td>Icon Size</td><td>number</td><td>Tamanho em px (12-200)</td></tr>
+                    <tr><td>Color</td><td>color</td><td>Cor do ícone</td></tr>
+                    <tr><td>Align</td><td>select</td><td>left, center, right</td></tr>
+                    <tr><td>Link</td><td>url</td><td>Link opcional</td></tr>
+                    <tr><td>Link New Tab</td><td>boolean</td><td>Abrir em nova aba</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Gallery (Galeria)</h3>
+                <p>Galeria de imagens em layout grid ou masonry com suporte a upload múltiplo.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Images</td><td>gallery</td><td>Upload múltiplo com drag-and-drop</td></tr>
+                    <tr><td>Columns</td><td>select</td><td>1-6 colunas</td></tr>
+                    <tr><td>Gap</td><td>number</td><td>Espaçamento entre imagens (px)</td></tr>
+                    <tr><td>Layout</td><td>select</td><td>grid, masonry</td></tr>
+                    <tr><td>Show Captions</td><td>boolean</td><td>Mostrar legendas</td></tr>
+                    <tr><td>Border Radius</td><td>number</td><td>Raio da borda (px)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Form (Formulário)</h3>
+                <p>Formulário de contato com campos dinâmicos (text, email, textarea, select, checkbox, radio).</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Fields</td><td>repeater</td><td>Label, type, required — adicionar/remover campos</td></tr>
+                    <tr><td>Button Text</td><td>text</td><td>Texto do botão de envio</td></tr>
+                    <tr><td>Button Color</td><td>color</td><td>Cor de fundo do botão</td></tr>
+                    <tr><td>Button Width</td><td>select</td><td>auto, full (largura total)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabs (Abas)</h3>
+                <p>Abas de conteúdo com navigacao horizontal.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Tabs</td><td>repeater</td><td>Title, content — adicionar/remover abas</td></tr>
+                    <tr><td>Active Tab</td><td>number</td><td>Aba ativa por padrão</td></tr>
+                    <tr><td>Tab Color</td><td>color</td><td>Cor da aba ativa</td></tr>
+                    <tr><td>Border Color</td><td>color</td><td>Cor da borda inferior</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Accordion (Acordeão)</h3>
+                <p>Seções expansíveis/colapsáveis com conteúdo oculto.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Items</td><td>repeater</td><td>Title, content, open — adicionar/remover itens</td></tr>
+                    <tr><td>Tab Color</td><td>color</td><td>Cor do cabeçalho aberto</td></tr>
+                    <tr><td>Border Color</td><td>color</td><td>Cor da borda</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Navegador &amp; Atalhos</h3>
+                <p>O editor inclui funcionalidades avançadas de produtividade:</p>
+                <table class="widget-table">
+                    <tr><th>Feature</th><th>Descrição</th></tr>
+                    <tr><td><strong>Navigator</strong></td><td>Painel flutuante com árvore de elementos — drag-and-drop, renomear (duplo clique), menu de contexto</td></tr>
+                    <tr><td><strong>Right-click</strong></td><td>Menu de contexto no canvas: Editar, Duplicar, Mover cima/baixo, Copiar, Colar, Excluir</td></tr>
+                    <tr><td><strong>Drag Handle</strong></td><td>Ícone ⣿ para arrastar reordenar com linhas indicadoras de posição</td></tr>
+                    <tr><td><strong>Zoom</strong></td><td>Ctrl+Scroll ou botões +/- (25%-200%), Ctrl+0 para reset</td></tr>
+                    <tr><td><strong>Fullscreen</strong></td><td>Botão ou F11 para esconder painéis laterais</td></tr>
+                    <tr><td><strong>Atalhos</strong></td><td>Ctrl+Z desfazer, Ctrl+Shift+Z refazer, Ctrl+S salvar, Delete excluir</td></tr>
+                    <tr><td><strong>Inline Editing</strong></td><td>Duplo-clique no canvas para editar texto diretamente (Heading, Text, Button, Callout)</td></tr>
                 </table>
             </div>
         </section>
@@ -1209,6 +1315,7 @@ php artisan db:seed</code></pre>
 │  PageController      — CRUD páginas, templates, export/import   │
 │  ElementController   — CRUD elementos, controles, upload        │
 │  RevisionController  — revisões, diff, restore, auto-save       │
+│  FormController      — processamento de formulários             │
 ├─────────────────────────────────────────────────────────────────┤
 │                     SERVICES (5 classes)                         │
 │  PageBuilderService  — orquestra tudo (create, update, render)  │
@@ -1233,7 +1340,7 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Árvore de Diretórios do Page Builder</h3>
                 <table class="widget-table">
                     <tr><th>Caminho</th><th>Arquivos</th><th>Descrição</th></tr>
-                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>3</td><td>PageController, ElementController, RevisionController</td></tr>
+                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>4</td><td>PageController, ElementController, RevisionController, FormController</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>5</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>7</td><td>BaseWidget + 6 widgets concretos</td></tr>
                     <tr><td><code>app/Providers/</code></td><td>1</td><td>PageBuilderServiceProvider (registra singletons e rotas)</td></tr>
@@ -1511,7 +1618,7 @@ php artisan test --verbose</pre>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
                     <li><strong>TemplateManager</strong> — extraído do controller para classe dedicada</li>
                     <li><strong>prepareSettings()</strong> — merge automático de defaults em todos os 6 widgets</li>
-                    <li><strong>Editor JS extraído</strong> — 900+ linhas em arquivo separado para cache</li>
+                    <li><strong>Editor JS extraído</strong> — 2600+ linhas em arquivo separado para cache</li>
                     <li><strong>93 testes</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Bug fixes</strong> — status default, max order nulo, config key, AuthorizesRequests</li>
                     <li><strong>Editor WYSIWYG</strong> — widget de texto com toolbar rich-text (negrito, itálico, links, imagens, vídeos, listas)</li>

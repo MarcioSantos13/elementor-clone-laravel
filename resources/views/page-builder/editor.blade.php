@@ -132,13 +132,35 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }
 
 .pb-el {
-    position: relative; padding: .5rem; min-height: 30px; border: 2px solid transparent;
+    position: relative; padding: .5rem .5rem .5rem 1.6rem; min-height: 30px; border: 2px solid transparent;
     transition: border-color .2s, box-shadow .2s; border-radius: 4px;
 }
 .pb-el:hover { border-color: rgba(99,102,241,.25); background: rgba(99,102,241,.02); }
 .pb-el.selected { border-color: var(--pb-primary); box-shadow: 0 0 0 1px var(--pb-primary), 0 4px 12px rgba(99,102,241,.12); }
 .pb-el.drop-over { border-color: var(--pb-accent); background: var(--pb-primary-light); }
 .pb-el.drop-target { border-color: var(--pb-success) !important; background: rgba(34,197,94,.06); }
+
+.pb-el-drag {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: grab; color: var(--pb-text2); opacity: 0; transition: opacity .15s;
+    font-size: .65rem; letter-spacing: 1px; user-select: none; z-index: 5;
+}
+.pb-el:hover > .pb-el-drag, .pb-el.selected > .pb-el-drag { opacity: .6; }
+.pb-el-drag:hover { opacity: 1 !important; color: var(--pb-primary); }
+.pb-el-drag:active { cursor: grabbing; }
+
+.drop-before, .drop-after {
+    position: relative; z-index: 10;
+}
+.drop-before::before, .drop-after::after {
+    content: ''; display: block; height: 3px; background: var(--pb-primary);
+    border-radius: 2px; margin: 2px 0; box-shadow: 0 0 6px rgba(99,102,241,.4);
+    animation: dropLinePulse 1s ease-in-out infinite;
+}
+.drop-before::before { margin-bottom: 4px; }
+.drop-after::after { margin-top: 4px; }
+@keyframes dropLinePulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
 
 .pb-el-toolbar {
     display: none; position: absolute; top: -30px; left: 0; z-index: 50;
@@ -318,18 +340,18 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .pb-nav-item.drag-over { background: rgba(99,102,241,.15); border-left-color: var(--pb-accent); }
 .pb-nav-item.draggingindicator { border-top: 2px solid var(--pb-accent); }
 
-.pb-nav-context {
+.pb-nav-context, .pb-canvas-context {
     position: fixed; z-index: 99999; background: var(--pb-surface);
     border: 1px solid var(--pb-border); border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0,0,0,.3); padding: .3rem 0; min-width: 160px;
 }
-.pb-nav-context-item {
+.pb-nav-context-item, .pb-canvas-context-item {
     display: flex; align-items: center; gap: .5rem; padding: .4rem .8rem;
     font-size: .75rem; cursor: pointer; transition: background .1s;
 }
-.pb-nav-context-item:hover { background: var(--pb-surface2); }
-.pb-nav-context-item.danger { color: var(--pb-danger); }
-.pb-nav-context-sep { height: 1px; background: var(--pb-border); margin: .2rem 0; }
+.pb-nav-context-item:hover, .pb-canvas-context-item:hover { background: var(--pb-surface2); }
+.pb-nav-context-item.danger, .pb-canvas-context-item.danger { color: var(--pb-danger); }
+.pb-nav-context-sep, .pb-canvas-context-sep { height: 1px; background: var(--pb-border); margin: .2rem 0; }
 
 .pb-nav-rename-input {
     font-size: .75rem; padding: 1px 4px; background: var(--pb-surface2);
@@ -348,6 +370,11 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     <button class="active" data-mode="desktop" onclick="editor.setResponsive('desktop')" title="Desktop">&#128421;</button>
     <button data-mode="tablet" onclick="editor.setResponsive('tablet')" title="Tablet">&#128241;</button>
     <button data-mode="mobile" onclick="editor.setResponsive('mobile')" title="Mobile">&#128241;</button>
+    <span class="tb-divider"></span>
+    <button id="pb-zoom-out" onclick="editor.zoomOut()" title="Zoom Out (-)" style="padding:.4rem .5rem">&#8722;</button>
+    <span id="pb-zoom-label" style="font-size:.7rem;color:var(--pb-text2);min-width:38px;text-align:center;cursor:pointer" onclick="editor.zoomReset()" title="Reset Zoom (Ctrl+0)">100%</span>
+    <button id="pb-zoom-in" onclick="editor.zoomIn()" title="Zoom In (+)" style="padding:.4rem .5rem">+</button>
+    <button id="pb-fullscreen" onclick="editor.toggleFullscreen()" title="Tela Cheia (F11)" style="padding:.4rem .5rem">&#9974;</button>
     <span class="tb-divider"></span>
     <button onclick="editor.showPageSettings()" title="Configurações da Página" id="btn-page-settings">&#9881; <span style="font-size:.65rem;opacity:.6">Página</span></button>
     <a href="{{ route('page-builder.render', $page) }}?t={{ time() }}" target="_blank" class="tb-link">&#128065; <span style="font-size:.65rem;opacity:.6">Visualizar</span></a>

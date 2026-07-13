@@ -139,7 +139,7 @@ class SectionWidget extends BaseWidget
             $parallaxAttrs = " data-parallax-speed=\"{$settings['parallax_speed']}\"";
         }
 
-        $gap = $settings['gap'];
+        $gap = $settings['gap'] === 'default' ? '0px' : $settings['gap'];
         $flexWrap = $settings['flex_wrap'];
         $alignItems = $settings['align_items'];
         $justifyContent = $settings['justify_content'];

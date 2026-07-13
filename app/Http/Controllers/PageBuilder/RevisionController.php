@@ -103,7 +103,7 @@ class RevisionController extends Controller
         $revision->user_id = auth()->id();
         $revision->content = $validated['content'] ?? $page->content;
         $revision->settings = $validated['settings'] ?? $page->settings;
-        $revision->version = 'auto.' . time();
+        $revision->version = '1.0.' . time();
         $revision->label = 'Auto-save';
         $revision->type = 'auto_save';
         $revision->save();

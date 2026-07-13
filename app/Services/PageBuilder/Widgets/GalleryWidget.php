@@ -59,7 +59,7 @@ class GalleryWidget extends BaseWidget
         }
 
         if ($layout === 'masonry') {
-            return $this->renderMasonry($images, $gap, $showCaption, $borderRadius, $imageSize);
+            return $this->renderMasonry($images, $columns, $gap, $showCaption, $borderRadius, $imageSize);
         }
 
         $gridStyle = "display: grid; grid-template-columns: repeat({$columns}, 1fr); gap: {$gap}px;";
@@ -109,7 +109,7 @@ class GalleryWidget extends BaseWidget
         return "<div class=\"pb-gallery-editor\" style=\"{$gridStyle}\">{$items}</div>";
     }
 
-    private function renderMasonry(array $images, int $gap, bool $showCaption, int $borderRadius, string $imageSize): string
+    private function renderMasonry(array $images, int $columns, int $gap, bool $showCaption, int $borderRadius, string $imageSize): string
     {
         $items = '';
         foreach ($images as $img) {
@@ -126,6 +126,6 @@ class GalleryWidget extends BaseWidget
             $items .= $item;
         }
 
-        return "<div class=\"pb-gallery pb-gallery-masonry\" style=\"column-count: 3; column-gap: {$gap}px;\">{$items}</div>";
+        return "<div class=\"pb-gallery pb-gallery-masonry\" style=\"column-count: {$columns}; column-gap: {$gap}px;\">{$items}</div>";
     }
 }

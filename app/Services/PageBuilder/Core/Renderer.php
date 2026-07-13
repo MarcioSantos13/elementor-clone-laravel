@@ -284,7 +284,7 @@ HTML;
     {
         $classes = [];
 
-        if ($element->css_classes) {
+        if ($element->css_classes && is_array($element->css_classes)) {
             $classes = array_merge($classes, $element->css_classes);
         }
 
@@ -338,6 +338,8 @@ HTML;
             ->whereNotNull('settings->animation')->exists();
 
         $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n</style>\n";
+
+        $css .= "\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\">\n";
 
         if ($hasAnimations) {
             $css .= "\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css\">\n";

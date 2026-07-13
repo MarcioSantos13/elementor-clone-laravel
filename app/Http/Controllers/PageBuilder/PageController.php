@@ -223,7 +223,7 @@ class PageController extends Controller
 
     public function duplicate(Page $page): JsonResponse
     {
-        $this->authorize('view', $page);
+        $this->authorize('update', $page);
         $newPage = $page->replicate();
         $newPage->title = $page->title . ' (copy)';
         $newPage->slug = $page->slug . '-' . uniqid();

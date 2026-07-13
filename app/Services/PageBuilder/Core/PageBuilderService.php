@@ -280,8 +280,8 @@ class PageBuilderService
         $revision->save();
 
         // Limitar nÃºmero de revisÃµes
-        if ($this->config['revisions']['max_per_page'] ?? 50) {
-            $limit = $this->config['revisions']['max_per_page'];
+        $limit = $this->config['revisions']['max_per_page'] ?? 50;
+        if ($limit) {
             $page->revisions()
                 ->orderBy('created_at', 'desc')
                 ->skip($limit)

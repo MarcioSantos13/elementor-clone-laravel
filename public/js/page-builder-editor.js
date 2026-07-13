@@ -12,6 +12,19 @@ const editor = {
     csrf: '',
     saving: false,
     dirty: false,
+    zoomLevel: 100,
+    isFullscreen: false,
+    _timers: {},
+    _debouncedSetting(key, elementId, fn) {
+        const id = `s_${key}_${elementId}`;
+        clearTimeout(this._timers[id]);
+        this._timers[id] = setTimeout(fn, 300);
+    },
+    _debouncedStyle(key, elementId, fn) {
+        const id = `st_${key}_${elementId}`;
+        clearTimeout(this._timers[id]);
+        this._timers[id] = setTimeout(fn, 300);
+    },
 
     init(pageId, csrfToken) {
         this.pageId = pageId;
@@ -22,8 +35,54 @@ const editor = {
         this.bindKeyboard();
         this.bindCanvasDrops();
         this.bindInlineEditing();
+        this.bindZoom();
         this.autoSave();
         this.observeCanvas();
+    },
+
+    bindZoom() {
+        const wrap = document.getElementById('canvas-wrap');
+        if (!wrap) return;
+        wrap.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -5 : 5;
+                this.setZoom(this.zoomLevel + delta);
+            }
+        }, { passive: false });
+    },
+
+    setZoom(level) {
+        this.zoomLevel = Math.min(200, Math.max(25, level));
+        const canvas = document.getElementById('canvas');
+        if (canvas) {
+            canvas.style.transform = `scale(${this.zoomLevel / 100})`;
+            canvas.style.transformOrigin = 'top center';
+        }
+        const label = document.getElementById('pb-zoom-label');
+        if (label) label.textContent = this.zoomLevel + '%';
+    },
+
+    zoomIn() { this.setZoom(this.zoomLevel + 10); },
+    zoomOut() { this.setZoom(this.zoomLevel - 10); },
+    zoomReset() { this.setZoom(100); },
+
+    toggleFullscreen() {
+        this.isFullscreen = !this.isFullscreen;
+        const panels = document.querySelectorAll('.pb-panel');
+        const layout = document.querySelector('.pb-layout');
+        const btn = document.getElementById('pb-fullscreen');
+        if (this.isFullscreen) {
+            panels.forEach(p => p.style.display = 'none');
+            if (layout) layout.style.display = 'block';
+            btn.classList.add('active');
+            btn.title = 'Sair da Tela Cheia (F11)';
+        } else {
+            panels.forEach(p => p.style.display = '');
+            if (layout) layout.style.display = '';
+            btn.classList.remove('active');
+            btn.title = 'Tela Cheia (F11)';
+        }
     },
 
     observeCanvas() {
@@ -75,7 +134,7 @@ const editor = {
         if (!parentEl) {
             dz.innerHTML = '';
             if (!elements || elements.length === 0) {
-                dz.innerHTML = `<div class="pb-empty-canvas" id="empty-canvas"><div class="pb-empty-icon">&#128161;</div><p><strong>Drag widgets from the left panel</strong><br>to start building your page</p></div>`;
+                dz.innerHTML = `<div class="pb-empty-canvas" id="empty-canvas"><div class="pb-empty-icon">&#128161;</div><p><strong>Arraste widgets do painel esquerdo</strong><br>para comecar a construir sua pagina</p></div>`;
                 return;
             }
         }
@@ -87,6 +146,15 @@ const editor = {
             div.dataset.isContainer = el.is_container ? 'true' : 'false';
             div.innerHTML = this.elementHtml(el);
             div.onclick = (e) => { e.stopPropagation(); this.selectElement(el.id); };
+            const dragHandle = div.querySelector('.pb-el-drag');
+            if (dragHandle) {
+                dragHandle.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', String(el.id));
+                    e.dataTransfer.effectAllowed = 'move';
+                    div.style.opacity = '.4';
+                };
+                dragHandle.ondragend = () => { div.style.opacity = ''; };
+            }
             if (parentEl) parentEl.appendChild(div);
             else dz.appendChild(div);
             if (el.children && el.children.length > 0) {
@@ -287,7 +355,7 @@ const editor = {
                 const tc = s.tab_color || '#6366f1';
                 const bc2 = s.border_color || '#e2e8f0';
                 const ati = s.active_tab || 0;
-                if (tabs.length === 0) { preview = '<div style="text-align:center;padding:1rem;color:#999">No tabs</div>'; break; }
+                if (tabs.length === 0) { preview = '<div style="text-align:center;padding:1rem;color:#999">Nenhuma aba</div>'; break; }
                 let thead = '<div style="display:flex;border-bottom:2px solid ' + bc2 + '">';
                 let tbody = '';
                 tabs.forEach((t, i) => {
@@ -303,7 +371,7 @@ const editor = {
                 const items = Array.isArray(s.items) ? s.items : [];
                 const ac = s.tab_color || '#6366f1';
                 const ab = s.border_color || '#e2e8f0';
-                if (items.length === 0) { preview = '<div style="text-align:center;padding:1rem;color:#999">No items</div>'; break; }
+                if (items.length === 0) { preview = '<div style="text-align:center;padding:1rem;color:#999">Nenhum item</div>'; break; }
                 let ahtml = '';
                 items.forEach((item, i) => {
                     const isOpen = item.open;
@@ -317,7 +385,7 @@ const editor = {
             }
             default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
         }
-        return `<div class="pb-el-toolbar"><span class="pb-el-name">${this.escHtml(name)}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;
+        return `<div class="pb-el-drag" draggable="true" title="Arrastar para reordenar">⣿</div><div class="pb-el-toolbar"><span class="pb-el-name">${this.escHtml(name)}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;
     },
 
     escHtml(str) {
@@ -462,7 +530,7 @@ const editor = {
                 const inp = document.createElement('input');
                 inp.type = 'text'; inp.id = `ctrl-${key}`; inp.value = value || '';
                 inp.spellcheck = false;
-                inp.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
+                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
                 return inp;
             },
             number: () => {
@@ -470,14 +538,14 @@ const editor = {
                 inp.type = 'number'; inp.id = `ctrl-${key}`; inp.value = value;
                 if (ctrl.min !== undefined) inp.min = ctrl.min;
                 if (ctrl.max !== undefined) inp.max = ctrl.max;
-                inp.onchange = (e) => this.updateSetting(key, parseFloat(e.target.value) || 0, elementId);
+                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, parseFloat(e.target.value) || 0, elementId));
                 return inp;
             },
             textarea: () => {
                 const ta = document.createElement('textarea');
                 ta.id = `ctrl-${key}`; ta.value = typeof value === 'string' ? value : '';
                 ta.spellcheck = false;
-                ta.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
+                ta.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
                 return ta;
             },
             select: () => {
@@ -501,8 +569,8 @@ const editor = {
                 txt.type = 'text'; txt.value = value || '#000000';
                 txt.style.cssText = 'flex:1';
                 const update = (v) => { inp.value = v; txt.value = v; this.updateSetting(key, v, elementId); };
-                inp.oninput = (e) => update(e.target.value);
-                txt.onchange = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) update(e.target.value); };
+                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => update(e.target.value));
+                txt.oninput = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) this._debouncedSetting(key, elementId, () => update(e.target.value)); };
                 container.appendChild(inp);
                 container.appendChild(txt);
                 return container;
@@ -520,7 +588,7 @@ const editor = {
                 const inp = document.createElement('input');
                 inp.type = 'url'; inp.id = `ctrl-${key}`; inp.value = value || '';
                 inp.placeholder = 'https://...';
-                inp.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
+                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
                 return inp;
             },
             image: () => {
@@ -930,7 +998,7 @@ const editor = {
                     let timer;
                     return (html) => {
                         clearTimeout(timer);
-                        timer = setTimeout(() => this.updateSetting(key, html, elementId), 400);
+                        timer = setTimeout(() => this.updateSetting(key, html, elementId), 300);
                     };
                 })();
 
@@ -1004,7 +1072,7 @@ const editor = {
                     });
                 };
                 renderGrid('');
-                search.oninput = () => { renderGrid(search.value); preview.innerHTML = `<i class="${this.escHtml(search.value)}"></i>`; this.updateSetting(key, search.value, elementId); };
+                search.oninput = () => { renderGrid(search.value); preview.innerHTML = `<i class="${this.escHtml(search.value)}"></i>`; this._debouncedSetting(key, elementId, () => this.updateSetting(key, search.value, elementId)); };
                 container.appendChild(preview);
                 container.appendChild(search);
                     container.appendChild(grid);
@@ -1043,18 +1111,18 @@ const editor = {
                     btnRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap';
                     const addBtn = document.createElement('button');
                     addBtn.type = 'button';
-                    addBtn.textContent = '+ Add Images';
+                    addBtn.textContent = '+ Adicionar Imagens';
                     addBtn.style.cssText = 'flex:1;padding:8px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500';
                     addBtn.onclick = () => {
                         const overlay = document.createElement('div');
                         overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999';
                         const modal = document.createElement('div');
                         modal.style.cssText = 'background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:12px;padding:20px;width:500px;max-height:80vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,.3)';
-                        modal.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--pb-text)">Add Images</div>' +
-                            '<div id="gallery-dropzone" style="border:2px dashed var(--pb-border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px"><div style="font-size:1.5rem;margin-bottom:.35rem;opacity:.5">🖼️</div><div style="font-size:.72rem;color:var(--pb-text2)"><strong style="color:var(--pb-accent);cursor:pointer">Click to select</strong><br>or drag images here</div></div>' +
-                            '<div id="gallery-url-row" style="display:flex;gap:6px;margin-bottom:12px"><input id="gallery-url-input" type="url" placeholder="Or paste image URL..." style="flex:1;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:12px"><button id="gallery-url-add" type="button" style="padding:6px 12px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px">Add</button></div>' +
+                        modal.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--pb-text)">Adicionar Imagens</div>' +
+                            '<div id="gallery-dropzone" style="border:2px dashed var(--pb-border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px"><div style="font-size:1.5rem;margin-bottom:.35rem;opacity:.5">🖼️</div><div style="font-size:.72rem;color:var(--pb-text2)"><strong style="color:var(--pb-accent);cursor:pointer">Clique para selecionar</strong><br>ou arraste imagens aqui</div></div>' +
+                            '<div id="gallery-url-row" style="display:flex;gap:6px;margin-bottom:12px"><input id="gallery-url-input" type="url" placeholder="Ou cole a URL da imagem..." style="flex:1;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:12px"><button id="gallery-url-add" type="button" style="padding:6px 12px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px">Adicionar</button></div>' +
                             '<div id="gallery-selected" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px"></div>' +
-                            '<div style="display:flex;gap:8px;justify-content:flex-end"><button id="gallery-cancel" style="padding:6px 14px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);cursor:pointer;font-size:12px">Cancel</button><button id="gallery-ok" style="padding:6px 14px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500">Add to Gallery</button></div>';
+                            '<div style="display:flex;gap:8px;justify-content:flex-end"><button id="gallery-cancel" style="padding:6px 14px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);cursor:pointer;font-size:12px">Cancelar</button><button id="gallery-ok" style="padding:6px 14px;background:var(--pb-primary);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:12px;font-weight:500">Adicionar ao Galeria</button></div>';
                         overlay.appendChild(modal);
                         document.body.appendChild(overlay);
                         let selected = [];
@@ -1166,7 +1234,7 @@ const editor = {
                     renderItems();
                     const addBtn = document.createElement('button');
                     addBtn.type = 'button';
-                    addBtn.textContent = '+ Add Item';
+                    addBtn.textContent = '+ Adicionar Item';
                     addBtn.style.cssText = 'padding:6px;background:var(--pb-surface2);border:1px dashed var(--pb-border);border-radius:6px;color:var(--pb-text2);cursor:pointer;font-size:11px;text-align:center;transition:all .2s';
                     addBtn.onmouseenter = () => { addBtn.style.borderColor = 'var(--pb-accent)'; addBtn.style.color = 'var(--pb-text)'; };
                     addBtn.onmouseleave = () => { addBtn.style.borderColor = 'var(--pb-border)'; addBtn.style.color = 'var(--pb-text2)'; };
@@ -1217,7 +1285,7 @@ const editor = {
                             const inp = document.createElement('input');
                             inp.type = type; inp.value = value || '';
                             if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
-                            inp.onchange = () => this.updateStyle(fk, inp.value, elementId);
+                            inp.oninput = () => this._debouncedStyle(fk, elementId, () => this.updateStyle(fk, inp.value, elementId));
                             row.appendChild(inp);
                         }
                         c.appendChild(row);
@@ -1258,10 +1326,10 @@ const editor = {
                             const inp = document.createElement('input');
                             inp.type = type; inp.value = value || '';
                             if (fk === 'backgroundColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
-                            inp.onchange = () => {
+                            inp.oninput = () => {
                                 let v = inp.value;
                                 if (fk === 'backgroundImage' && v && !v.startsWith('url(')) v = v ? `url('${v}')` : '';
-                                this.updateStyle(fk, v, elementId);
+                                this._debouncedStyle(fk, elementId, () => this.updateStyle(fk, v, elementId));
                             };
                             row.appendChild(inp);
                         }
@@ -1298,7 +1366,7 @@ const editor = {
                             const inp = document.createElement('input');
                             inp.type = type; inp.value = value || def || '';
                             if (fk === 'borderColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
-                            inp.onchange = () => this.updateStyle(fk, inp.value, elementId);
+                            inp.oninput = () => this._debouncedStyle(fk, elementId, () => this.updateStyle(fk, inp.value, elementId));
                             row.appendChild(inp);
                         }
                         c.appendChild(row);
@@ -1333,7 +1401,7 @@ const editor = {
                         inp.type = type; inp.value = value || def || '';
                         inp.dataset.fk = fk;
                         if (fk === 'shadowColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
-                        inp.onchange = () => this.updateStyle('boxShadow', readAll(), elementId);
+                        inp.oninput = () => this._debouncedStyle('boxShadow', elementId, () => this.updateStyle('boxShadow', readAll(), elementId));
                         row.appendChild(inp);
                         c.appendChild(row);
                     });
@@ -1384,13 +1452,13 @@ const editor = {
                             inp.value = value || '';
                             inp.placeholder = '0';
                             inp.style.cssText = 'width:100%;padding:4px;text-align:center;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:12px;box-sizing:border-box';
-                            inp.onchange = () => {
-                                this.updateStyle(fk, inp.value, elementId);
+                            inp.oninput = () => {
+                                this._debouncedStyle(fk, elementId, () => this.updateStyle(fk, inp.value, elementId));
                                 if (isLinked[group.prefix]) {
                                     inputs.forEach((otherInp, oi) => {
                                         if (oi !== idx) {
                                             otherInp.value = inp.value;
-                                            this.updateStyle(group.prefix + group.keys[oi], inp.value, elementId);
+                                            this._debouncedStyle(group.prefix + group.keys[oi], elementId, () => this.updateStyle(group.prefix + group.keys[oi], inp.value, elementId));
                                         }
                                     });
                                 }
@@ -1434,7 +1502,7 @@ const editor = {
                             const inp = document.createElement('input');
                             inp.type = type; inp.value = value || '';
                             if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
-                            inp.onchange = () => this.updateStyle(fk, inp.value, elementId);
+                            inp.oninput = () => this._debouncedStyle(fk, elementId, () => this.updateStyle(fk, inp.value, elementId));
                             row.appendChild(inp);
                         }
                         c.appendChild(row);
@@ -1448,7 +1516,7 @@ const editor = {
                     ta.placeholder = 'Ex: color: red !important;\nbackground: #fff;';
                     ta.spellcheck = false;
                     ta.style.cssText = 'width:100%;padding:.45rem .6rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:.78rem;min-height:80px;font-family:"SF Mono",Menlo,Monaco,Consolas,monospace;resize:vertical;box-sizing:border-box';
-                    ta.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
+                    ta.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
                     return ta;
                 },
                 animation: () => {
@@ -1778,18 +1846,27 @@ const editor = {
         const dz = document.getElementById('canvas-dropzone');
         const emptyCanvas = document.getElementById('empty-canvas');
 
+        const clearDropIndicators = () => {
+            document.querySelectorAll('.pb-el.drop-over').forEach(el => el.classList.remove('drop-over'));
+            document.querySelectorAll('.pb-el.drop-target').forEach(el => el.classList.remove('drop-target'));
+            document.querySelectorAll('.pb-el.drop-before, .pb-el.drop-after').forEach(el => { el.classList.remove('drop-before', 'drop-after'); });
+        };
+
         dz.addEventListener('dragover', e => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'copy';
+            clearDropIndicators();
             const target = e.target.closest('.pb-el');
-            document.querySelectorAll('.pb-el.drop-over').forEach(el => el.classList.remove('drop-over'));
             if (target) {
                 if (target.dataset.isContainer === 'true') {
                     target.classList.add('drop-over');
                 } else {
-                    const parentEl = target.parentElement ? target.parentElement.closest('.pb-el') : null;
-                    if (parentEl && parentEl.dataset.isContainer === 'true') {
-                        parentEl.classList.add('drop-over');
+                    const rect = target.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    if (e.clientY < midY) {
+                        target.classList.add('drop-before');
+                    } else {
+                        target.classList.add('drop-after');
                     }
                 }
             }
@@ -1798,40 +1875,125 @@ const editor = {
 
         dz.addEventListener('dragleave', e => {
             const target = e.target.closest('.pb-el');
-            if (target) target.classList.remove('drop-over');
+            if (target) { target.classList.remove('drop-over', 'drop-before', 'drop-after'); }
             if (emptyCanvas) emptyCanvas.classList.remove('drag-over');
         });
 
         dz.addEventListener('drop', e => {
             e.preventDefault();
             e.stopPropagation();
-            document.querySelectorAll('.pb-el.drop-over').forEach(el => el.classList.remove('drop-over'));
-            document.querySelectorAll('.pb-el.drop-target').forEach(el => el.classList.remove('drop-target'));
+            clearDropIndicators();
             if (emptyCanvas) emptyCanvas.classList.remove('drag-over');
-            const type = e.dataTransfer.getData('text/plain');
-            if (!type) return;
+
+            const data = e.dataTransfer.getData('text/plain');
+            if (!data) return;
+
+            const isElementDrag = /^\d+$/.test(data);
+            if (isElementDrag) {
+                this._handleElementDrop(parseInt(data), e);
+                return;
+            }
+
             let parentId = null;
+            let insertBeforeId = null;
             const target = e.target.closest('.pb-el');
             if (target) {
                 if (target.dataset.isContainer === 'true') {
                     parentId = target.dataset.elId;
                 } else {
+                    const rect = target.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    const isAbove = e.clientY < midY;
                     const parentEl = target.parentElement ? target.parentElement.closest('.pb-el') : null;
                     if (parentEl && parentEl.dataset.isContainer === 'true') {
                         parentId = parentEl.dataset.elId;
                     }
+                    insertBeforeId = isAbove ? target.dataset.elId : null;
+                    if (!isAbove) {
+                        const nextSibling = target.nextElementSibling;
+                        if (nextSibling && nextSibling.dataset && nextSibling.dataset.elId) {
+                            insertBeforeId = null;
+                        }
+                    }
                 }
             }
-            this.showToast('Adicionando ' + type + '...', 'info');
+
+            this.showToast('Adicionando ' + data + '...', 'info');
             fetch(`/page-builder/pages/${this.pageId}/elements`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
-                body: JSON.stringify({ type, parent_id: parentId }),
+                body: JSON.stringify({ type: data, parent_id: parentId, before_id: insertBeforeId }),
             })
             .then(r => r.json())
             .then(() => this.loadElements())
             .catch(() => this.toastError('Falha ao adicionar elemento'));
         });
+
+        dz.addEventListener('contextmenu', e => {
+            const el = e.target.closest('.pb-el');
+            if (!el) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const elId = parseInt(el.dataset.elId);
+            if (!elId) return;
+            this.selectElement(elId);
+            this._showCanvasContext(e.clientX, e.clientY, elId);
+        });
+    },
+
+    _handleElementDrop(dragId, e) {
+        const target = e.target.closest('.pb-el');
+        if (!target || parseInt(target.dataset.elId) === dragId) return;
+
+        const targetId = parseInt(target.dataset.elId);
+        const rect = target.getBoundingClientRect();
+        const midY = rect.top + rect.height / 2;
+        const insertBefore = e.clientY < midY;
+
+        const els = this._lastElements || [];
+        const findAndRemove = (list) => {
+            for (let i = 0; i < list.length; i++) {
+                if (list[i].id === dragId) { return list.splice(i, 1)[0]; }
+                if (list[i].children) { const found = findAndRemove(list[i].children); if (found) return found; }
+            }
+            return null;
+        };
+        const findParent = (list, id) => {
+            for (const el of list) {
+                if (el.id === id) return list;
+                if (el.children) { const found = findParent(el.children, id); if (found) return found; }
+            }
+            return null;
+        };
+
+        const dragEl = findAndRemove(els);
+        if (!dragEl) return;
+
+        const siblings = findParent(els, targetId) || els;
+        const idx = siblings.findIndex(e => e.id === targetId);
+        if (insertBefore) siblings.splice(idx, 0, dragEl);
+        else siblings.splice(idx + 1, 0, dragEl);
+
+        this.renderCanvas(els);
+        this.renderStructure(els);
+        this.renderNavigator();
+        this.renderMath();
+        this._saveElementOrder();
+    },
+
+    _saveElementOrder() {
+        const buildOrder = (elements) => {
+            return elements.map(el => ({
+                id: el.id,
+                children: el.children ? buildOrder(el.children) : [],
+            }));
+        };
+        const order = buildOrder(this._lastElements || []);
+        fetch(`/page-builder/pages/${this.pageId}/elements/reorder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
+            body: JSON.stringify({ order }),
+        }).catch(() => this.toastError('Falha ao reordenar'));
     },
 
     bindInlineEditing() {
@@ -1893,6 +2055,11 @@ const editor = {
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) { e.preventDefault(); this.redo(); }
             if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); this.redo(); }
             if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.save(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); this.zoomReset(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === '=') { e.preventDefault(); this.zoomIn(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); this.zoomOut(); }
+            if (e.key === 'F11') { e.preventDefault(); this.toggleFullscreen(); }
+            if (e.key === 'Escape' && this.isFullscreen) { this.toggleFullscreen(); }
             if (e.key === 'Delete' && this.selectedId) { this.deleteSelected(); }
         });
     },
@@ -2217,7 +2384,7 @@ const editor = {
             { label: '↑ Move Up', action: () => this._navMoveRelative(el.id, -1) },
             { label: '↓ Move Down', action: () => this._navMoveRelative(el.id, 1) },
             { sep: true },
-            { label: '⧉ Copy', action: () => { this._clipboard = JSON.parse(JSON.stringify(el)); this.toast('Elemento copiado'); } },
+            { label: '⧉ Copy', action: () => { this._clipboard = JSON.parse(JSON.stringify(el)); this.showToast('Elemento copiado', 'success'); } },
             { label: '📋 Paste (após)', action: () => this._navPasteAfter(el.id) },
             { sep: true },
             { label: '✕ Delete', cls: 'danger', action: () => this.deleteElement(el.id) },
@@ -2247,6 +2414,56 @@ const editor = {
 
     _hideNavContext() {
         document.querySelectorAll('.pb-nav-context').forEach(c => c.remove());
+    },
+
+    _showCanvasContext(x, y, elId) {
+        this._hideCanvasContext();
+        const ctx = document.createElement('div');
+        ctx.className = 'pb-canvas-context';
+        ctx.style.left = x + 'px';
+        ctx.style.top = y + 'px';
+
+        const items = [
+            { label: '✎ Editar', action: () => this.selectElement(elId) },
+            { label: '⧉ Duplicar', action: () => this.duplicateElement(elId) },
+            { sep: true },
+            { label: '↑ Mover para cima', action: () => this._navMoveRelative(elId, -1) },
+            { label: '↓ Mover para baixo', action: () => this._navMoveRelative(elId, 1) },
+            { sep: true },
+            { label: '⧉ Copiar', action: () => { const els = this._lastElements || []; const find = (list) => { for (const e of list) { if (e.id === elId) return e; if (e.children) { const f = find(e.children); if (f) return f; } } return null; }; const found = find(els); if (found) { this._clipboard = JSON.parse(JSON.stringify(found)); this.showToast('Elemento copiado', 'success'); } } },
+            { label: '📋 Colar (após)', action: () => this._navPasteAfter(elId) },
+            { sep: true },
+            { label: '✕ Excluir', cls: 'danger', action: () => this.deleteElement(elId) },
+        ];
+
+        items.forEach(m => {
+            if (m.sep) {
+                const sep = document.createElement('div');
+                sep.className = 'pb-canvas-context-sep';
+                ctx.appendChild(sep);
+                return;
+            }
+            const btn = document.createElement('div');
+            btn.className = 'pb-canvas-context-item' + (m.cls ? ' ' + m.cls : '');
+            btn.textContent = m.label;
+            btn.onclick = (e) => { e.stopPropagation(); this._hideCanvasContext(); m.action(); };
+            ctx.appendChild(btn);
+        });
+
+        document.body.appendChild(ctx);
+
+        const rect = ctx.getBoundingClientRect();
+        if (rect.right > window.innerWidth) ctx.style.left = (x - rect.width) + 'px';
+        if (rect.bottom > window.innerHeight) ctx.style.top = (y - rect.height) + 'px';
+
+        const closeCtx = (e) => {
+            if (!ctx.contains(e.target)) { this._hideCanvasContext(); document.removeEventListener('click', closeCtx); }
+        };
+        setTimeout(() => document.addEventListener('click', closeCtx), 10);
+    },
+
+    _hideCanvasContext() {
+        document.querySelectorAll('.pb-canvas-context').forEach(c => c.remove());
     },
 
     _navMoveElement(dragId, targetId) {
@@ -2304,7 +2521,7 @@ const editor = {
         this.renderStructure(this._lastElements);
         this.renderNavigator();
         this.renderMath();
-        this._saveElementOrder(dragId, targetId);
+        this._saveElementOrder();
     },
 
     _navMoveRelative(elId, direction) {
@@ -2330,6 +2547,7 @@ const editor = {
             this.renderStructure(els);
             this.renderNavigator();
             this.renderMath();
+            this._saveElementOrder();
         }
     },
 
@@ -2356,21 +2574,8 @@ const editor = {
             this.renderStructure(els);
             this.renderNavigator();
             this.renderMath();
+            this._saveElementOrder();
         }
     },
 
-    _saveElementOrder(dragId, targetId) {
-        const buildOrder = (elements) => {
-            return elements.map(el => ({
-                id: el.id,
-                children: el.children ? buildOrder(el.children) : [],
-            }));
-        };
-        const order = buildOrder(this._lastElements || []);
-        fetch(`/page-builder/pages/${this.pageId}/elements/reorder`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': this.csrf },
-            body: JSON.stringify({ order }),
-        }).catch(() => this.toastError('Falha ao reordenar'));
-    },
 };
