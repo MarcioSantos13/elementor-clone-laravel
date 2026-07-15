@@ -424,6 +424,20 @@ php artisan db:seed</code></pre>
                     <tr><td>Border Radius</td><td>text</td><td>Raio da borda</td></tr>
                 </table>
 
+                <div class="tip">
+                    <strong>&#128161; Dica — Unidades CSS:</strong> Nos campos de texto (Min Height, Padding, Margin, etc.), você pode usar diferentes unidades CSS:
+                    <table class="widget-table" style="margin:.75rem 0">
+                        <tr><th>Unidade</th><th>Exemplo</th><th>Significado</th></tr>
+                        <tr><td><strong>vh</strong></td><td><code>90vh</code></td><td>Viewport Height — 90% da altura da tela do navegador</td></tr>
+                        <tr><td><strong>vw</strong></td><td><code>100vw</code></td><td>Viewport Width — 100% da largura da tela</td></tr>
+                        <tr><td><strong>px</strong></td><td><code>400px</code></td><td>Pixels — medida fixa</td></tr>
+                        <tr><td><strong>%</strong></td><td><code>50%</code></td><td>Percentual — relativo ao elemento pai</td></tr>
+                        <tr><td><strong>rem</strong></td><td><code>2rem</code></td><td>Relativo ao tamanho da fonte raiz (geralmente 16px)</td></tr>
+                        <tr><td><strong>em</strong></td><td><code>1.5em</code></td><td>Relativo ao tamanho da fonte do elemento pai</td></tr>
+                    </table>
+                    Para uma <strong>seção hero</strong> que ocupa quase toda a tela, use <code>90vh</code> ou <code>100vh</code> no campo <em>Min Height</em>.
+                </div>
+
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Adicionar</h3>
                 <ol>
                     <li>No <strong>painel esquerdo</strong>, encontre o widget desejado</li>

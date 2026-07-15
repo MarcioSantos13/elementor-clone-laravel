@@ -49,7 +49,6 @@ class ColumnWidget extends BaseWidget
             ],
             'text_align' => ['type' => 'select', 'label' => 'Text Align', 'options' => ['left', 'center', 'right', 'justify']],
             'background_color' => ['type' => 'color', 'label' => 'Background Color', 'tab' => 'style'],
-            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
             'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
             'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
             'padding_top' => ['type' => 'text', 'label' => 'Padding Top', 'tab' => 'advanced'],

@@ -68,14 +68,14 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 }
 .pb-panel-right { border-right: none; border-left: 1px solid var(--pb-border); }
 
-.pb-panel-tabs { display: flex; border-bottom: 1px solid var(--pb-border); background: rgba(0,0,0,.15); }
+.pb-panel-tabs { display: flex; border-bottom: 1px solid var(--pb-border); background: rgba(0,0,0,.15); gap: 2px; padding: 4px; }
 .pb-panel-tab {
-    flex: 1; padding: .65rem .5rem; text-align: center; cursor: pointer; font-size: .78rem;
-    color: var(--pb-text2); border-bottom: 2px solid transparent; background: none;
-    border-top: none; border-left: none; border-right: none; transition: all .2s; font-weight: 500;
+    flex: 1; padding: .55rem .5rem; text-align: center; cursor: pointer; font-size: .75rem;
+    color: var(--pb-text2); border: 1px solid transparent; background: transparent;
+    border-radius: 6px; transition: all .2s; font-weight: 500;
 }
-.pb-panel-tab.active { color: var(--pb-accent); border-bottom-color: var(--pb-accent); background: rgba(99,102,241,.05); }
-.pb-panel-tab:hover { color: var(--pb-text); }
+.pb-panel-tab.active { color: var(--pb-accent); background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.2); }
+.pb-panel-tab:hover { color: var(--pb-text); background: rgba(255,255,255,.05); }
 .pb-panel-body { flex: 1; overflow-y: auto; padding: .75rem; }
 .pb-panel-body::-webkit-scrollbar { width: 5px; }
 .pb-panel-body::-webkit-scrollbar-track { background: transparent; }
@@ -229,16 +229,16 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 .pb-settings-body::-webkit-scrollbar-track { background: transparent; }
 .pb-settings-body::-webkit-scrollbar-thumb { background: var(--pb-border); border-radius: 10px; }
 .pb-editor-tabs {
-    display: flex; border-bottom: 1px solid var(--pb-border); flex-shrink: 0;
+    display: flex; border-bottom: 1px solid var(--pb-border); flex-shrink: 0; gap: 2px; padding: 4px;
 }
 .pb-editor-tab {
-    flex: 1; padding: .55rem .5rem; text-align: center; font-size: .7rem; font-weight: 600;
+    flex: 1; padding: .45rem .5rem; text-align: center; font-size: .7rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: .5px; cursor: pointer;
-    background: none; border: none; color: var(--pb-text2);
-    border-bottom: 2px solid transparent; transition: all .2s;
+    background: transparent; border: 1px solid transparent; color: var(--pb-text2);
+    border-radius: 6px; transition: all .2s;
 }
-.pb-editor-tab:hover { color: var(--pb-text); background: rgba(255,255,255,.03); }
-.pb-editor-tab.active { color: var(--pb-accent); border-bottom-color: var(--pb-accent); }
+.pb-editor-tab:hover { color: var(--pb-text); background: rgba(255,255,255,.05); }
+.pb-editor-tab.active { color: var(--pb-accent); background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.2); }
 .pb-settings-section { margin-bottom: 1.25rem; }
 .pb-settings-section-title {
     font-size: .65rem; text-transform: uppercase; color: var(--pb-text2);
@@ -255,7 +255,7 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     outline: none; border-color: var(--pb-accent); box-shadow: 0 0 0 3px var(--pb-primary-light);
 }
 .pb-control select { cursor: pointer; appearance: auto; }
-.pb-control input[type="color"] { padding: 2px; height: 36px; cursor: pointer; border-radius: 6px; }
+.pb-control input[type="color"] { padding: 2px; height: 42px; cursor: pointer; border-radius: 6px; flex-shrink: 0; width: auto; }
 .pb-control input[type="number"] { width: 100%; }
 .pb-control textarea { resize: vertical; min-height: 65px; font-family: inherit; }
 

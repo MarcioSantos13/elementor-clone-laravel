@@ -52,7 +52,6 @@ class SectionWidget extends BaseWidget
             'justify_content' => ['type' => 'select', 'label' => 'Justify Content', 'options' => ['flex-start', 'center', 'flex-end', 'space-between', 'space-around', 'space-evenly']],
             'background_type' => ['type' => 'select', 'label' => 'Background Type', 'options' => ['none', 'classic', 'gradient', 'video']],
             'background_color' => ['type' => 'color', 'label' => 'Background Color', 'tab' => 'style'],
-            'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
             'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
             'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
             'padding_top' => ['type' => 'text', 'label' => 'Padding Top', 'tab' => 'advanced'],

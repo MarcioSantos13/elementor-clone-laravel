@@ -525,12 +525,15 @@ const editor = {
     },
 
     createInput(key, ctrl, value, elementId) {
+        const isStyle = ctrl.tab === 'style';
+        const save = (k, v) => isStyle ? this.updateStyle(k, v, elementId) : this.updateSetting(k, v, elementId);
+        const debouncedSave = (k, fn) => isStyle ? this._debouncedStyle(k, elementId, fn) : this._debouncedSetting(k, elementId, fn);
         const types = {
             text: () => {
                 const inp = document.createElement('input');
                 inp.type = 'text'; inp.id = `ctrl-${key}`; inp.value = value || '';
                 inp.spellcheck = false;
-                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
+                inp.oninput = (e) => debouncedSave(key, () => save(key, e.target.value));
                 return inp;
             },
             number: () => {
@@ -538,14 +541,14 @@ const editor = {
                 inp.type = 'number'; inp.id = `ctrl-${key}`; inp.value = value;
                 if (ctrl.min !== undefined) inp.min = ctrl.min;
                 if (ctrl.max !== undefined) inp.max = ctrl.max;
-                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, parseFloat(e.target.value) || 0, elementId));
+                inp.oninput = (e) => debouncedSave(key, () => save(key, parseFloat(e.target.value) || 0));
                 return inp;
             },
             textarea: () => {
                 const ta = document.createElement('textarea');
                 ta.id = `ctrl-${key}`; ta.value = typeof value === 'string' ? value : '';
                 ta.spellcheck = false;
-                ta.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
+                ta.oninput = (e) => debouncedSave(key, () => save(key, e.target.value));
                 return ta;
             },
             select: () => {
@@ -557,7 +560,7 @@ const editor = {
                     if (opt === value) o.selected = true;
                     sel.appendChild(o);
                 });
-                sel.onchange = (e) => this.updateSetting(key, e.target.value, elementId);
+                sel.onchange = (e) => save(key, e.target.value);
                 return sel;
             },
             color: () => {
@@ -567,10 +570,11 @@ const editor = {
                 inp.type = 'color'; inp.id = `ctrl-${key}`; inp.value = value || '#000000';
                 const txt = document.createElement('input');
                 txt.type = 'text'; txt.value = value || '#000000';
+                txt.placeholder = '#000000';
                 txt.style.cssText = 'flex:1';
-                const update = (v) => { inp.value = v; txt.value = v; this.updateSetting(key, v, elementId); };
-                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => update(e.target.value));
-                txt.oninput = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) this._debouncedSetting(key, elementId, () => update(e.target.value)); };
+                const update = (v) => { inp.value = v; txt.value = v; save(key, v); };
+                inp.oninput = (e) => debouncedSave(key, () => update(e.target.value));
+                txt.oninput = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) debouncedSave(key, () => update(e.target.value)); };
                 container.appendChild(inp);
                 container.appendChild(txt);
                 return container;
@@ -580,7 +584,7 @@ const editor = {
                 container.style.cssText = 'display:flex;align-items:center;gap:.5rem';
                 const cb = document.createElement('input');
                 cb.type = 'checkbox'; cb.id = `ctrl-${key}`; cb.checked = !!value;
-                cb.onchange = (e) => this.updateSetting(key, e.target.checked, elementId);
+                cb.onchange = (e) => save(key, e.target.checked);
                 container.appendChild(cb);
                 return container;
             },
@@ -588,7 +592,7 @@ const editor = {
                 const inp = document.createElement('input');
                 inp.type = 'url'; inp.id = `ctrl-${key}`; inp.value = value || '';
                 inp.placeholder = 'https://...';
-                inp.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
+                inp.oninput = (e) => debouncedSave(key, () => save(key, e.target.value));
                 return inp;
             },
             image: () => {
@@ -628,7 +632,7 @@ const editor = {
                     const alt = (value && value.alt) || '';
                     const w = (value && value.width) || 800;
                     const h = (value && value.height) || 600;
-                    this.updateSetting(key, { url, alt, width: w, height: h }, elementId);
+                    save(key, { url, alt, width: w, height: h });
                     updatePreview(url);
                 };
                 if (currentUrl) updatePreview(currentUrl);
@@ -998,7 +1002,7 @@ const editor = {
                     let timer;
                     return (html) => {
                         clearTimeout(timer);
-                        timer = setTimeout(() => this.updateSetting(key, html, elementId), 300);
+                        timer = setTimeout(() => save(key, html), 300);
                     };
                 })();
 
@@ -1067,12 +1071,12 @@ const editor = {
                         btn.style.cssText = 'width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-text);cursor:pointer;transition:all .15s';
                         btn.onmouseenter = () => { btn.style.background = 'var(--pb-border)'; btn.style.borderColor = 'var(--pb-accent)'; };
                         btn.onmouseleave = () => { btn.style.background = 'transparent'; btn.style.borderColor = 'transparent'; };
-                        btn.onclick = (e) => { e.preventDefault(); search.value = ic; preview.innerHTML = `<i class="${ic}"></i>`; this.updateSetting(key, ic, elementId); };
+                        btn.onclick = (e) => { e.preventDefault(); search.value = ic; preview.innerHTML = `<i class="${ic}"></i>`; save(key, ic); };
                         grid.appendChild(btn);
                     });
                 };
                 renderGrid('');
-                search.oninput = () => { renderGrid(search.value); preview.innerHTML = `<i class="${this.escHtml(search.value)}"></i>`; this._debouncedSetting(key, elementId, () => this.updateSetting(key, search.value, elementId)); };
+                search.oninput = () => { renderGrid(search.value); preview.innerHTML = `<i class="${this.escHtml(search.value)}"></i>`; debouncedSave(key, () => save(key, search.value)); };
                 container.appendChild(preview);
                 container.appendChild(search);
                     container.appendChild(grid);
@@ -1082,7 +1086,7 @@ const editor = {
                     const container = document.createElement('div');
                     container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
                     let images = Array.isArray(value) ? [...value] : [];
-                    const update = () => { this.updateSetting(key, images, elementId); };
+                    const update = () => { save(key, images); };
                     const renderList = () => {
                         list.innerHTML = '';
                         images.forEach((img, idx) => {
@@ -1228,7 +1232,7 @@ const editor = {
                             list.appendChild(card);
                         });
                     };
-                    const updateRepeater = () => { this.updateSetting(key, items, elementId); };
+                    const updateRepeater = () => { save(key, items); };
                     const list = document.createElement('div');
                     list.style.cssText = 'display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto';
                     renderItems();
@@ -1516,7 +1520,7 @@ const editor = {
                     ta.placeholder = 'Ex: color: red !important;\nbackground: #fff;';
                     ta.spellcheck = false;
                     ta.style.cssText = 'width:100%;padding:.45rem .6rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text);font-size:.78rem;min-height:80px;font-family:"SF Mono",Menlo,Monaco,Consolas,monospace;resize:vertical;box-sizing:border-box';
-                    ta.oninput = (e) => this._debouncedSetting(key, elementId, () => this.updateSetting(key, e.target.value, elementId));
+                    ta.oninput = (e) => debouncedSave(key, () => save(key, e.target.value));
                     return ta;
                 },
                 animation: () => {
@@ -1535,7 +1539,7 @@ const editor = {
                         if (opt === (value || 'none')) o.selected = true;
                         animSel.appendChild(o);
                     });
-                    animSel.onchange = () => this.updateSetting(key, animSel.value, elementId);
+                    animSel.onchange = () => save(key, animSel.value);
                     animRow.appendChild(animSel);
                     c.appendChild(animRow);
                     const durRow = document.createElement('div');
@@ -1553,7 +1557,7 @@ const editor = {
                         durSel.appendChild(o);
                     });
                     const durKey = key + '_duration';
-                    durSel.onchange = () => this.updateSetting(durKey, durSel.value, elementId);
+                    durSel.onchange = () => save(durKey, durSel.value);
                     durRow.appendChild(durSel);
                     c.appendChild(durRow);
                     const delayRow = document.createElement('div');
@@ -1566,11 +1570,11 @@ const editor = {
                     delayInp.type = 'number'; delayInp.min = 0; delayInp.max = 5000; delayInp.step = 100;
                     delayInp.value = 0;
                     const delayKey = key + '_delay';
-                    delayInp.onchange = () => this.updateSetting(delayKey, parseInt(delayInp.value) || 0, elementId);
+                    delayInp.onchange = () => save(delayKey, parseInt(delayInp.value) || 0);
                     delayRow.appendChild(delayInp);
                     c.appendChild(delayRow);
                     animSel.onchange = () => {
-                        this.updateSetting(key, animSel.value, elementId);
+                        save(key, animSel.value);
                         const show = animSel.value && animSel.value !== 'none';
                         durRow.style.display = show ? '' : 'none';
                         delayRow.style.display = show ? '' : 'none';
@@ -1607,7 +1611,7 @@ const editor = {
                             before.style.transform = cb.checked ? 'translateX(16px)' : '';
                         };
                         updateSlider();
-                        cb.onchange = () => { updateSlider(); this.updateSetting(fk, cb.checked, elementId); };
+                        cb.onchange = () => { updateSlider(); save(fk, cb.checked); };
                         sw.appendChild(cb);
                         sw.appendChild(slider);
                         row.appendChild(lbl);
