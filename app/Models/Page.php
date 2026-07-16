@@ -50,6 +50,11 @@ class Page extends Model
         return $this->hasMany(Revision::class)->orderBy('created_at', 'desc');
     }
 
+    public function formSubmissions(): HasMany
+    {
+        return $this->hasMany(FormSubmission::class)->orderBy('created_at', 'desc');
+    }
+
     public function latestRevision()
     {
         return $this->hasOne(Revision::class)->latestOfMany();

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\PageBuilder;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Models\FormSubmission;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class FormController extends Controller
 {
@@ -17,14 +17,11 @@ class FormController extends Controller
             'data.*' => 'nullable|string|max:5000',
         ]);
 
-        DB::table('form_submissions')->insert([
-            'page_id' => $page->id,
+        $page->formSubmissions()->create([
             'form_name' => $validated['form_name'] ?? 'Contact Form',
-            'data' => json_encode($validated['data']),
+            'data' => $validated['data'],
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         return response()->json([
@@ -37,10 +34,7 @@ class FormController extends Controller
     {
         $this->authorize('view', $page);
 
-        $submissions = DB::table('form_submissions')
-            ->where('page_id', $page->id)
-            ->orderByDesc('created_at')
-            ->paginate(20);
+        $submissions = $page->formSubmissions()->paginate(20);
 
         return response()->json($submissions);
     }

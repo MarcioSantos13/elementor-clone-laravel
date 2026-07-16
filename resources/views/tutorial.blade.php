@@ -44,7 +44,7 @@
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que você precisa ter instalado</h3>
                 <table class="widget-table">
                     <tr><th>Ferramenta</th><th>Versão Mínima</th><th>Como verificar</th></tr>
-                    <tr><td><strong>PHP</strong></td><td>8.1+</td><td><code>php -v</code></td></tr>
+                    <tr><td><strong>PHP</strong></td><td>8.2+</td><td><code>php -v</code></td></tr>
                     <tr><td><strong>Composer</strong></td><td>2.0+</td><td><code>composer -V</code></td></tr>
                     <tr><td><strong>Node.js</strong></td><td>18+</td><td><code>node -v</code></td></tr>
                     <tr><td><strong>NPM</strong></td><td>9+</td><td><code>npm -v</code></td></tr>
@@ -120,8 +120,8 @@ php artisan db:seed</code></pre>
                     <tr><td>Rotas definidas</td><td>35+ (CRUD páginas, elementos, revisões, templates)</td></tr>
                     <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>3 principais (pages, elements, revisions)</td></tr>
-                    <tr><td>Views Blade</td><td>9 (login, register, tutorial, editor, pages)</td></tr>
-                    <tr><td>Linhas de JS do editor</td><td>~2600</td></tr>
+                    <tr><td>Views Blade</td><td>16 (login, register, tutorial, editor + 7 partials, pages)</td></tr>
+                    <tr><td>Linhas de JS do editor</td><td>~2600 (6 módulos ES em resources/js/editor/)</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades</h3>
@@ -154,8 +154,9 @@ php artisan db:seed</code></pre>
                 <div style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.8rem;line-height:1.6;overflow-x:auto;font-family:monospace">
 <pre style="margin:0">┌──────────────────────────────────────────────────┐
 │                  FRONTEND                         │
-│   editor.blade.php + page-builder-editor.js       │
-│   (2600+ linhas JS vanilla, sem frameworks)         │
+│   editor.blade.php (7 partials)                   │
+│   resources/js/editor/ (6 módulos ES)              │
+│   state, utils, canvas, history, navigator, dragdrop
 ├──────────────────────────────────────────────────┤
 │                CONTROLLERS                        │
 │   PageController │ ElementController              │
@@ -812,6 +813,9 @@ php artisan db:seed</code></pre>
                 <div class="tip">
                     <strong>&#128161; Dica Rápida:</strong> Você não precisa construir tudo manualmente! Basta criar uma página e selecionar o template <strong>"Showcase Completo"</strong> na hora da criação. O passo a passo abaixo é para quem quer entender como cada seção foi construída e personalizar depois.
                 </div>
+                <div class="info" style="background:#eff6ff;border-color:#93c5fd;padding:.75rem 1rem;border-radius:8px;margin:.75rem 0">
+                    <strong>&#128204; Sobre as abas de configuração:</strong> Cada widget possui três abas no painel direito: <strong>Content</strong> (conteúdo principal), <strong>Style</strong> (aparência visual: cores, tipografia, background, border) e <strong>Advanced</strong> (espaçamento: padding, margin, z-index, CSS). As instruções abaixo indicam a aba correta entre parênteses quando a configuração não está na aba padrão (Content). Exemplo: <code>Padding superior: 120px (aba Advanced)</code>.
+                </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Visão Geral das Seções</h3>
                 <p>O template possui <strong>6 seções</strong> que, de cima para baixo, formam a landing page completa:</p>
@@ -834,9 +838,9 @@ php artisan db:seed</code></pre>
                     <li><strong>Selecione a Seção</strong> clicando nela. No painel direito, configure:
                         <ul>
                             <li><strong>Layout:</strong> <code>full_width</code> (largura total da tela)</li>
-                            <li><strong>Cor de fundo:</strong> <code>#0f172a</code></li>
-                            <li><strong>Padding superior:</strong> <code>120px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>120px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#0f172a</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>120px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>120px</code> (aba <strong>Advanced</strong>)</li>
                             <li><strong>Altura mínima:</strong> <code>90vh</code> (90% da altura da tela)</li>
                             <li><strong>Alinhar itens:</strong> <code>center</code> (centralizar verticalmente)</li>
                             <li><strong>Justificar conteúdo:</strong> <code>center</code></li>
@@ -855,19 +859,19 @@ php artisan db:seed</code></pre>
                             <li><strong>Texto:</strong> <code>"Transforme Suas Ideias em Experiências Digitais"</code></li>
                             <li><strong>Tag:</strong> <code>H1</code></li>
                             <li><strong>Tamanho:</strong> <code>xxl</code></li>
-                            <li><strong>Cor:</strong> <code>#ffffff</code> (branco)</li>
+                            <li><strong>Cor:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
                             <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Peso da fonte:</strong> <code>800</code></li>
-                            <li><strong>Margem inferior:</strong> <code>24px</code></li>
+                            <li><strong>Peso da fonte:</strong> <code>800</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Margem inferior:</strong> <code>24px</code> (aba <strong>Advanced</strong>, campo <em>Bottom Margin</em>)</li>
                         </ul>
                     </li>
                     <li><strong>Arraste um widget Texto</strong> para dentro da Coluna (abaixo do título). Configure:
                         <ul>
                             <li><strong>Conteúdo:</strong> <code>"Criamos soluções inovadoras que combinam design moderno, tecnologia de ponta e performance excepcional para impulsionar o seu negócio."</code></li>
                             <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Tamanho da fonte:</strong> <code>20px</code></li>
-                            <li><strong>Altura da linha:</strong> <code>1.8</code></li>
-                            <li><strong>Margem inferior:</strong> <code>40px</code></li>
+                            <li><strong>Tamanho da fonte:</strong> <code>20px</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Altura da linha:</strong> <code>1.8</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Margem inferior:</strong> <code>40px</code> (aba <strong>Advanced</strong>, campo <em>Bottom Margin</em>)</li>
                         </ul>
                         <div class="tip">
                             <strong>&#128161; Dica de estilo:</strong> Para o estilo exato como no template real, adicione no conteúdo HTML: <code>&lt;p style="font-size:1.25rem;color:#94a3b8;max-width:700px;margin:0 auto;"&gt;...&lt;/p&gt;</code>
@@ -877,13 +881,13 @@ php artisan db:seed</code></pre>
                         <ul>
                             <li><strong>Texto:</strong> <code>"Comece Agora"</code></li>
                             <li><strong>Link:</strong> <code>#</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#3b82f6</code> (azul)</li>
-                            <li><strong>Cor do texto:</strong> <code>#ffffff</code> (branco)</li>
+                            <li><strong>Cor de fundo:</strong> <code>#3b82f6</code> (azul) (aba <strong>Style</strong>)</li>
+                            <li><strong>Cor do texto:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
                             <li><strong>Tamanho:</strong> <code>large</code></li>
                             <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula)</li>
-                            <li><strong>Padding esquerda/direita:</strong> <code>40px</code></li>
-                            <li><strong>Peso da fonte:</strong> <code>600</code></li>
+                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula) (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding esquerda/direita:</strong> <code>40px</code> (aba <strong>Advanced</strong>, grupo <em>Padding &amp; Margin</em>)</li>
+                            <li><strong>Peso da fonte:</strong> <code>600</code> (aba <strong>Style</strong>, grupo <em>Typography</em>)</li>
                         </ul>
                     </li>
                 </ol>
@@ -896,22 +900,22 @@ php artisan db:seed</code></pre>
                     <li><strong>Arraste uma nova Seção</strong> para a página (abaixo da Hero). Configure:
                         <ul>
                             <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code></li>
-                            <li><strong>Padding superior:</strong> <code>100px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>100px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
                         <ul>
                             <li><strong>Largura:</strong> <code>col-12</code> (largura total)</li>
                             <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Padding inferior:</strong> <code>20px</code></li>
+                            <li><strong>Padding inferior:</strong> <code>20px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Dentro desta Coluna</strong>, arraste um <strong>Título</strong> e um <strong>Texto</strong>:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Nossos Serviços"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>16px</code></li>
-                            <li><strong>Texto:</strong> <code>"Oferecemos um conjunto completo de soluções para transformar sua presença digital"</code>, tamanho <code>18px</code></li>
+                            <li><strong>Título:</strong> <code>"Nossos Serviços"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>16px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Oferecemos um conjunto completo de soluções para transformar sua presença digital"</code>, tamanho <code>18px</code> (aba <strong>Style</strong>)</li>
                         </ul>
                         <div class="tip">
                             <strong>&#128161; Dica:</strong> Para o texto ficar cinza e centralizado, use no HTML: <code>&lt;p style="color:#64748b;max-width:600px;margin:0 auto;"&gt;...&lt;/p&gt;</code>
@@ -921,16 +925,16 @@ php artisan db:seed</code></pre>
                         <ul>
                             <li><strong>Largura:</strong> <code>col-4</code> (um terço da largura)</li>
                             <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#f8fafc</code></li>
-                            <li><strong>Padding superior:</strong> <code>40px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>40px</code></li>
-                            <li><strong>Border Radius:</strong> <code>12px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#f8fafc</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Border Radius:</strong> <code>12px</code> (aba <strong>Style</strong>, grupo <em>Border</em>)</li>
                         </ul>
                     </li>
                     <li><strong>Dentro desta Coluna</strong>, arraste um <strong>Título</strong> e um <strong>Texto</strong>:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Design Moderno"</code>, tag <code>H3</code>, tamanho <code>medium</code>, cor <code>#0f172a</code>, peso <code>600</code>, margem inferior <code>12px</code></li>
-                            <li><strong>Texto:</strong> <code>"Interfaces elegantes e intuitivas criadas com as melhores práticas de UX/UI."</code>, tamanho <code>15px</code>, altura da linha <code>1.7</code></li>
+                            <li><strong>Título:</strong> <code>"Design Moderno"</code>, tag <code>H3</code>, tamanho <code>medium</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>600</code> (aba <strong>Style</strong>), margem inferior <code>12px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Interfaces elegantes e intuitivas criadas com as melhores práticas de UX/UI."</code>, tamanho <code>15px</code> (aba <strong>Style</strong>), altura da linha <code>1.7</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Repita o passo 4 e 5</strong> para criar mais duas colunas idênticas ao lado:
@@ -952,9 +956,9 @@ php artisan db:seed</code></pre>
                     <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
                             <li><strong>Layout:</strong> <code>full_width</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#1e293b</code></li>
-                            <li><strong>Padding superior:</strong> <code>80px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>80px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#1e293b</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Arraste quatro Colunas</strong> para dentro da Seção (uma de cada vez). Configure cada uma:
@@ -965,26 +969,26 @@ php artisan db:seed</code></pre>
                     </li>
                     <li><strong>Na primeira Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"500+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (azul), peso <code>800</code>, margem inferior <code>8px</code></li>
-                            <li><strong>Texto:</strong> <code>"Projetos Entregues"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Título:</strong> <code>"500+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (azul, aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Projetos Entregues"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na segunda Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"98%"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code>, peso <code>800</code>, margem inferior <code>8px</code></li>
-                            <li><strong>Texto:</strong> <code>"Satisfação dos Clientes"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Título:</strong> <code>"98%"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Satisfação dos Clientes"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na terceira Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"50+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code>, peso <code>800</code>, margem inferior <code>8px</code></li>
-                            <li><strong>Texto:</strong> <code>"Profissionais"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Título:</strong> <code>"50+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Profissionais"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na quarta Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"12+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code>, peso <code>800</code>, margem inferior <code>8px</code></li>
-                            <li><strong>Texto:</strong> <code>"Anos de Experiência"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Título:</strong> <code>"12+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Anos de Experiência"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                 </ol>
@@ -997,21 +1001,21 @@ php artisan db:seed</code></pre>
                     <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
                             <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code></li>
-                            <li><strong>Padding superior:</strong> <code>100px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>100px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
                         <ul>
                             <li><strong>Largura:</strong> <code>col-12</code></li>
                             <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Padding inferior:</strong> <code>30px</code></li>
+                            <li><strong>Padding inferior:</strong> <code>30px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Dentro desta Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Nossa Equipe"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>16px</code></li>
+                            <li><strong>Título:</strong> <code>"Nossa Equipe"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>16px</code> (aba <strong>Advanced</strong>)</li>
                             <li><strong>Texto:</strong> <code>"Conheça os profissionais que tornam tudo possível"</code></li>
                         </ul>
                     </li>
@@ -1023,26 +1027,26 @@ php artisan db:seed</code></pre>
                     </li>
                     <li><strong>Na primeira Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Ana Silva"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>4px</code></li>
-                            <li><strong>Texto:</strong> <code>"CEO & Fundadora"</code>, cor <code>#64748b</code></li>
+                            <li><strong>Título:</strong> <code>"Ana Silva"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"CEO & Fundadora"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na segunda Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Carlos Oliveira"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>4px</code></li>
-                            <li><strong>Texto:</strong> <code>"CTO"</code>, cor <code>#64748b</code></li>
+                            <li><strong>Título:</strong> <code>"Carlos Oliveira"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"CTO"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na terceira Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Marina Costa"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>4px</code></li>
-                            <li><strong>Texto:</strong> <code>"Head de Design"</code>, cor <code>#64748b</code></li>
+                            <li><strong>Título:</strong> <code>"Marina Costa"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Head de Design"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na quarta Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"Rafael Santos"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>4px</code></li>
-                            <li><strong>Texto:</strong> <code>"Lead Developer"</code>, cor <code>#64748b</code></li>
+                            <li><strong>Título:</strong> <code>"Rafael Santos"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Lead Developer"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                 </ol>
@@ -1055,21 +1059,21 @@ php artisan db:seed</code></pre>
                     <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
                             <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#f8fafc</code></li>
-                            <li><strong>Padding superior:</strong> <code>100px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>100px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#f8fafc</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
                         <ul>
                             <li><strong>Largura:</strong> <code>col-12</code></li>
                             <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Padding inferior:</strong> <code>20px</code></li>
+                            <li><strong>Padding inferior:</strong> <code>20px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Dentro desta Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Título:</strong> <code>"O Que Nossos Clientes Dizem"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code>, peso <code>700</code>, margem inferior <code>16px</code></li>
+                            <li><strong>Título:</strong> <code>"O Que Nossos Clientes Dizem"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>16px</code> (aba <strong>Advanced</strong>)</li>
                             <li><strong>Texto:</strong> <code>"A satisfação dos nossos clientes é a nossa maior recompensa"</code></li>
                         </ul>
                     </li>
@@ -1077,31 +1081,31 @@ php artisan db:seed</code></pre>
                         <ul>
                             <li><strong>Largura:</strong> <code>col-4</code> (33% cada)</li>
                             <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code></li>
-                            <li><strong>Padding superior:</strong> <code>40px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>40px</code></li>
-                            <li><strong>Border Radius:</strong> <code>12px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Border Radius:</strong> <code>12px</code> (aba <strong>Style</strong>, grupo <em>Border</em>)</li>
                         </ul>
                     </li>
                     <li><strong>Na primeira Coluna</strong>, arraste (nesta ordem):
                         <ul>
-                            <li><strong>Texto:</strong> <code>"A equipe transformou completamente nossa presença online."</code>, cor <code>#475569</code>, estilo <em>itálico</em></li>
-                            <li><strong>Título:</strong> <code>"João Mendes"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code></li>
-                            <li><strong>Texto:</strong> <code>"CEO, TechStart"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Texto:</strong> <code>"A equipe transformou completamente nossa presença online."</code>, cor <code>#475569</code> (aba <strong>Style</strong>), estilo <em>itálico</em></li>
+                            <li><strong>Título:</strong> <code>"João Mendes"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"CEO, TechStart"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na segunda Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Texto:</strong> <code>"Profissionalismo e qualidade excepcionais."</code>, cor <code>#475569</code>, estilo <em>itálico</em></li>
-                            <li><strong>Título:</strong> <code>"Fernanda Lima"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code></li>
-                            <li><strong>Texto:</strong> <code>"Diretora, InnovateLab"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Texto:</strong> <code>"Profissionalismo e qualidade excepcionais."</code>, cor <code>#475569</code> (aba <strong>Style</strong>), estilo <em>itálico</em></li>
+                            <li><strong>Título:</strong> <code>"Fernanda Lima"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Diretora, InnovateLab"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Na terceira Coluna</strong>, arraste:
                         <ul>
-                            <li><strong>Texto:</strong> <code>"Resultados incríveis em tempo recorde."</code>, cor <code>#475569</code>, estilo <em>itálico</em></li>
-                            <li><strong>Título:</strong> <code>"Pedro Alves"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code>, peso <code>700</code></li>
-                            <li><strong>Texto:</strong> <code>"Fundador, WebPlus"</code>, cor <code>#94a3b8</code></li>
+                            <li><strong>Texto:</strong> <code>"Resultados incríveis em tempo recorde."</code>, cor <code>#475569</code> (aba <strong>Style</strong>), estilo <em>itálico</em></li>
+                            <li><strong>Título:</strong> <code>"Pedro Alves"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Texto:</strong> <code>"Fundador, WebPlus"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
                         </ul>
                     </li>
                 </ol>
@@ -1114,9 +1118,9 @@ php artisan db:seed</code></pre>
                     <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
                         <ul>
                             <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#3b82f6</code> (azul)</li>
-                            <li><strong>Padding superior:</strong> <code>80px</code></li>
-                            <li><strong>Padding inferior:</strong> <code>80px</code></li>
+                            <li><strong>Cor de fundo:</strong> <code>#3b82f6</code> (azul) (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding superior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Padding inferior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
                         </ul>
                     </li>
                     <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
@@ -1130,9 +1134,9 @@ php artisan db:seed</code></pre>
                             <li><strong>Texto:</strong> <code>"Pronto para Transformar seu Negócio?"</code></li>
                             <li><strong>Tag:</strong> <code>H2</code></li>
                             <li><strong>Tamanho:</strong> <code>xl</code></li>
-                            <li><strong>Cor:</strong> <code>#ffffff</code> (branco)</li>
-                            <li><strong>Peso:</strong> <code>700</code></li>
-                            <li><strong>Margem inferior:</strong> <code>16px</code></li>
+                            <li><strong>Cor:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
+                            <li><strong>Peso:</strong> <code>700</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Margem inferior:</strong> <code>16px</code> (aba <strong>Advanced</strong>, campo <em>Bottom Margin</em>)</li>
                         </ul>
                     </li>
                     <li><strong>Abaixo do título</strong>, arraste um <strong>Texto</strong>:
@@ -1147,13 +1151,13 @@ php artisan db:seed</code></pre>
                         <ul>
                             <li><strong>Texto:</strong> <code>"Fale Conosco"</code></li>
                             <li><strong>Link:</strong> <code>#</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (branco)</li>
-                            <li><strong>Cor do texto:</strong> <code>#3b82f6</code> (azul — mesma cor do fundo da seção)</li>
+                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
+                            <li><strong>Cor do texto:</strong> <code>#3b82f6</code> (azul — mesma cor do fundo da seção) (aba <strong>Style</strong>)</li>
                             <li><strong>Tamanho:</strong> <code>large</code></li>
                             <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula)</li>
-                            <li><strong>Padding esquerda/direita:</strong> <code>40px</code></li>
-                            <li><strong>Peso da fonte:</strong> <code>700</code></li>
+                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula) (aba <strong>Style</strong>)</li>
+                            <li><strong>Padding esquerda/direita:</strong> <code>40px</code> (aba <strong>Advanced</strong>, grupo <em>Padding &amp; Margin</em>)</li>
+                            <li><strong>Peso da fonte:</strong> <code>700</code> (aba <strong>Style</strong>, grupo <em>Typography</em>)</li>
                         </ul>
                     </li>
                 </ol>
@@ -1321,8 +1325,8 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Diagrama de Arquitetura</h3>
                 <div style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.78rem;line-height:1.5;overflow-x:auto;font-family:monospace">
 <pre style="margin:0">┌─────────────────────────────────────────────────────────────────┐
-│                        FRONTEND (730 linhas JS)                 │
-│  page-builder-editor.js ← editor.blade.php                     │
+│                        FRONTEND (6 módulos ES)                   │
+│  resources/js/editor/ ← editor.blade.php (partials)            │
 │  drag-drop, undo/redo, auto-save, inline editing, panels       │
 ├─────────────────────────────────────────────────────────────────┤
 │                     CONTROLLERS (3 classes)                      │
@@ -1356,13 +1360,13 @@ php artisan db:seed</code></pre>
                     <tr><th>Caminho</th><th>Arquivos</th><th>Descrição</th></tr>
                     <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>4</td><td>PageController, ElementController, RevisionController, FormController</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>5</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>7</td><td>BaseWidget + 6 widgets concretos</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>17</td><td>BaseWidget + 16 widgets concretos</td></tr>
                     <tr><td><code>app/Providers/</code></td><td>1</td><td>PageBuilderServiceProvider (registra singletons e rotas)</td></tr>
                     <tr><td><code>config/page-builder.php</code></td><td>1</td><td>Configuração: lista de widgets habilitados, config de cache</td></tr>
                     <tr><td><code>database/migrations/</code></td><td>3</td><td>pages, elements, revisions</td></tr>
                     <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>35+ rotas (resource pages + elementos + revisões)</td></tr>
-                    <tr><td><code>resources/views/</code></td><td>9</td><td>Blade views (editor, pages, auth, tutorial)</td></tr>
-                    <tr><td><code>public/js/</code></td><td>1</td><td>page-builder-editor.js (730 linhas)</td></tr>
+                    <tr><td><code>resources/views/</code></td><td>16</td><td>Blade views (editor, pages, auth, tutorial + 7 partials editor/)</td></tr>
+                    <tr><td><code>resources/js/editor/</code></td><td>6</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop</td></tr>
                     <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
                     <tr><td><code>tests/Feature/</code></td><td>4</td><td>PageControllerTest, ElementControllerTest, RevisionControllerTest, ExampleTest</td></tr>
                 </table>
@@ -1370,8 +1374,8 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Injeção de Dependências (Provider)</h3>
                 <p>O <code>PageBuilderServiceProvider</code> registra todos os serviços como <strong>singletons</strong> (uma instância compartilhada):</p>
                 <ul>
-                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 6 widgets</li>
-                    <li><code>ElementManager</code> — recebe WidgetManager via construtor</li>
+                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 17 widgets</li>
+                    <li><code>ElementManager</code> — CRUD elementos, buildTree() para construir árvore a partir do banco</li>
                     <li><code>Renderer</code> — recebe WidgetManager, renderiza árvore de elementos → HTML</li>
                     <li><code>PageBuilderService</code> — orquestra os três serviços acima</li>
                     <li><code>TemplateManager</code> — singleton independente, sem dependências</li>
@@ -1537,7 +1541,7 @@ php artisan db:seed</code></pre>
                     <tr><td>Testes unitários</td><td>45</td><td style="color:green">Widgets, Services, Templates</td></tr>
                     <tr><td>Testes de feature</td><td>48</td><td style="color:green">Controllers, Auth, Fluxos</td></tr>
                     <tr><td>Cobertura de controllers</td><td>3/3</td><td style="color:green">100% dos controllers</td></tr>
-                    <tr><td>Cobertura de widgets</td><td>7/7</td><td style="color:green">BaseWidget + todos os 6 widgets</td></tr>
+                    <tr><td>Cobertura de widgets</td><td>17/17</td><td style="color:green">BaseWidget + todos os 16 widgets</td></tr>
                     <tr><td>Sanitização de XSS</td><td>Implementada</td><td style="color:green">PageBuilderService::sanitizeContent()</td></tr>
                     <tr><td>Autorização (Policy)</td><td>Implementada</td><td style="color:green">PagePolicy em PageController</td></tr>
                     <tr><td>Tratamento de erros JS</td><td>14 fetch()</td><td style="color:green">Todos com .catch() + toast</td></tr>
@@ -1631,8 +1635,16 @@ php artisan test --verbose</pre>
                     <li><strong>Sanitização XSS</strong> — <code>sanitizeContent()</code> e <code>sanitizeSettings()</code></li>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
                     <li><strong>TemplateManager</strong> — extraído do controller para classe dedicada</li>
-                    <li><strong>prepareSettings()</strong> — merge automático de defaults em todos os 6 widgets</li>
+                    <li><strong>prepareSettings()</strong> — merge automático de defaults em todos os 17 widgets</li>
                     <li><strong>Editor JS extraído</strong> — 2600+ linhas em arquivo separado para cache</li>
+                    <li><strong>JS decomposto em módulos ES</strong> — 6 módulos: state, utils, canvas, history, navigator, dragdrop (via Vite pipeline)</li>
+                    <li><strong>Editor Blade partials</strong> — 507 linhas split em 7 partials reutilizáveis (css, toolbar, widget-panel, canvas, settings-panel, navigator, scripts)</li>
+                    <li><strong>Lógica duplicada extraída</strong> — buildTree() consolidado no ElementManager; controllers injetam ElementManager via DI</li>
+                    <li><strong>FormSubmission model</strong> — model Eloquent dedicado para envios de formulário; FormController refatorado para usar Eloquent ao invés de DB::table()</li>
+                    <li><strong>JS decomposto em módulos ES</strong> — 6 módulos: state, utils, canvas, history, navigator, dragdrop (via Vite pipeline)</li>
+                    <li><strong>Editor Blade partials</strong> — 507 linhas split em 7 partials reutilizáveis (css, toolbar, widget-panel, canvas, settings-panel, navigator, scripts)</li>
+                    <li><strong>Lógica duplicada extraída</strong> — buildTree() consolidado no ElementManager; controllers injetam ElementManager via DI</li>
+                    <li><strong>FormSubmission model</strong> — model Eloquent dedicado para envios de formulário; FormController refatorado para usar Eloquent ao invés de DB::table()</li>
                     <li><strong>93 testes</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Bug fixes</strong> — status default, max order nulo, config key, AuthorizesRequests</li>
                     <li><strong>Editor WYSIWYG</strong> — widget de texto com toolbar rich-text (negrito, itálico, links, imagens, vídeos, listas)</li>

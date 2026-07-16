@@ -153,4 +153,44 @@ class ElementManager
     {
         return $this->widgetManager->getWidget($element->type);
     }
+
+    public function buildTree($elements): array
+    {
+        $byParent = [];
+        foreach ($elements as $e) {
+            $byParent[(int) ($e->parent_id ?? 0)][] = $e;
+        }
+
+        $build = function ($parentId) use ($byParent, &$build) {
+            $result = [];
+            foreach ($byParent[$parentId] ?? [] as $element) {
+                $widget = $this->widgetManager->getWidget($element->type);
+                $node = [
+                    'id' => $element->id,
+                    'uuid' => $element->uuid,
+                    'type' => $element->type,
+                    'name' => $element->name,
+                    'order' => $element->order,
+                    'settings' => $element->settings,
+                    'content' => $element->content,
+                    'styles' => $element->styles,
+                    'responsive_settings' => $element->responsive_settings,
+                    'animation' => $element->animation,
+                    'effects' => $element->effects,
+                    'column_size' => $element->column_size,
+                    'css_classes' => $element->css_classes,
+                    'css_id' => $element->css_id,
+                    'is_container' => $widget ? $widget->isContainer() : false,
+                ];
+                $children = $build($element->id);
+                if ($children) {
+                    $node['children'] = $children;
+                }
+                $result[] = $node;
+            }
+            return $result;
+        };
+
+        return $build(0);
+    }
 }

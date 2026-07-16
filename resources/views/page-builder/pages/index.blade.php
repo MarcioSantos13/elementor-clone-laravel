@@ -366,7 +366,7 @@
             if (isError) {
                 t.style.background = '#fef2f2'; t.style.color = '#991b1b'; t.style.border = '1px solid #fecaca';
             } else {
-                t.style.background = '#dcfce7'; t.style.color = '#166534'; t.style.border = 1px solid #bbf7d0';
+                t.style.background = '#dcfce7'; t.style.color = '#166534'; t.style.border = '1px solid #bbf7d0';
             }
             t.textContent = (isError ? '\u274C ' : '\u2705 ') + msg;
             document.body.appendChild(t);

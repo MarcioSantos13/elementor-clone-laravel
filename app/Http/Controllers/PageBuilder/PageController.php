@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Element;
 use App\Services\PageBuilder\Core\PageBuilderService;
+use App\Services\PageBuilder\Core\ElementManager;
 use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\TemplateManager;
 use Illuminate\Http\JsonResponse;
@@ -17,12 +18,14 @@ use Illuminate\Support\Str;
 class PageController extends Controller
 {
     protected PageBuilderService $pageBuilder;
+    protected ElementManager $elementManager;
     protected Renderer $renderer;
     protected TemplateManager $templateManager;
 
-    public function __construct(PageBuilderService $pageBuilder, Renderer $renderer, TemplateManager $templateManager)
+    public function __construct(PageBuilderService $pageBuilder, ElementManager $elementManager, Renderer $renderer, TemplateManager $templateManager)
     {
         $this->pageBuilder = $pageBuilder;
+        $this->elementManager = $elementManager;
         $this->renderer = $renderer;
         $this->templateManager = $templateManager;
     }
@@ -283,7 +286,7 @@ class PageController extends Controller
     public function getData(Page $page): JsonResponse
     {
         $this->authorize('view', $page);
-        $tree = $this->buildElementTree($page->allElements()->get());
+        $tree = $this->elementManager->buildTree($page->allElements()->get());
 
         return response()->json([
             'page' => [
@@ -313,43 +316,5 @@ class PageController extends Controller
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
-    }
-
-    protected function buildElementTree($elements): array
-    {
-        $byParent = [];
-        foreach ($elements as $e) {
-            $byParent[(int) ($e->parent_id ?? 0)][] = $e;
-        }
-
-        $build = function ($parentId) use ($byParent, &$build) {
-            $result = [];
-            foreach ($byParent[$parentId] ?? [] as $element) {
-                $node = [
-                    'id' => $element->id,
-                    'uuid' => $element->uuid,
-                    'type' => $element->type,
-                    'name' => $element->name,
-                    'order' => $element->order,
-                    'settings' => $element->settings,
-                    'content' => $element->content,
-                    'styles' => $element->styles,
-                    'responsive_settings' => $element->responsive_settings,
-                    'animation' => $element->animation,
-                    'effects' => $element->effects,
-                    'column_size' => $element->column_size,
-                    'css_classes' => $element->css_classes,
-                    'css_id' => $element->css_id,
-                ];
-                $children = $build($element->id);
-                if ($children) {
-                    $node['children'] = $children;
-                }
-                $result[] = $node;
-            }
-            return $result;
-        };
-
-        return $build(0);
     }
 }

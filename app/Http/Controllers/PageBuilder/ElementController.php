@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Element;
 use App\Services\PageBuilder\Core\PageBuilderService;
+use App\Services\PageBuilder\Core\ElementManager;
 use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\WidgetManager;
 use Illuminate\Http\JsonResponse;
@@ -18,12 +19,14 @@ use Illuminate\Support\Str;
 class ElementController extends Controller
 {
     protected PageBuilderService $pageBuilder;
+    protected ElementManager $elementManager;
     protected Renderer $renderer;
     protected WidgetManager $widgetManager;
 
-    public function __construct(PageBuilderService $pageBuilder, Renderer $renderer, WidgetManager $widgetManager)
+    public function __construct(PageBuilderService $pageBuilder, ElementManager $elementManager, Renderer $renderer, WidgetManager $widgetManager)
     {
         $this->pageBuilder = $pageBuilder;
+        $this->elementManager = $elementManager;
         $this->renderer = $renderer;
         $this->widgetManager = $widgetManager;
     }
@@ -34,7 +37,7 @@ class ElementController extends Controller
         $elements = $page->allElements()->get();
 
         return response()->json([
-            'elements' => $this->buildTree($elements),
+            'elements' => $this->elementManager->buildTree($elements),
         ]);
     }
 
@@ -44,19 +47,20 @@ class ElementController extends Controller
         $validated = $request->validate([
             'type' => 'required|string',
             'settings' => 'nullable|array',
-            'parent_id' => 'nullable|exists:elements,id',
+            'parent_id' => 'nullable|integer|exists:elements,id',
         ]);
 
-        $element = $this->pageBuilder->addElement($page, $validated['type'], $validated['settings'] ?? []);
+        $parentId = $validated['parent_id'] ?? null;
 
-        if (!empty($validated['parent_id'])) {
-            $parent = Element::find($validated['parent_id']);
+        if ($parentId) {
+            $parent = Element::find($parentId);
             $parentWidget = $parent ? $this->widgetManager->getWidget($parent->type) : null;
-            if ($parentWidget && $parentWidget->isContainer()) {
-                $element->parent_id = $validated['parent_id'];
-                $element->save();
+            if (!$parentWidget || !$parentWidget->isContainer()) {
+                $parentId = null;
             }
         }
+
+        $element = $this->elementManager->create($page, $validated['type'], $validated['settings'] ?? [], $parentId);
 
         return response()->json([
             'message' => 'Element added successfully',
@@ -219,7 +223,7 @@ class ElementController extends Controller
             }
 
             $innerHtml = $widget->renderEditor(
-                $element->settings ?? [],
+                array_merge($element->settings ?? [], $element->styles ?? []),
                 array_merge($element->content ?? [], ['children' => $childrenHtml]),
                 $element->styles ?? []
             );
@@ -304,7 +308,7 @@ class ElementController extends Controller
 
             return response()->json([
                 'message' => 'Snapshot restored successfully',
-                'elements' => $this->buildTree($elements),
+                'elements' => $this->elementManager->buildTree($elements),
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
@@ -371,38 +375,4 @@ class ElementController extends Controller
         }
     }
 
-    protected function buildTree($elements): array
-    {
-        $byParent = [];
-        foreach ($elements as $e) {
-            $byParent[(int) ($e->parent_id ?? 0)][] = $e;
-        }
-
-        $build = function ($parentId) use ($byParent, &$build) {
-            $result = [];
-            foreach ($byParent[$parentId] ?? [] as $element) {
-                $widget = $this->widgetManager->getWidget($element->type);
-                $node = [
-                    'id' => $element->id,
-                    'uuid' => $element->uuid,
-                    'type' => $element->type,
-                    'name' => $element->name,
-                    'order' => $element->order,
-                    'settings' => $element->settings,
-                    'content' => $element->content,
-                    'styles' => $element->styles,
-                    'column_size' => $element->column_size,
-                    'is_container' => $widget ? $widget->isContainer() : false,
-                ];
-                $children = $build($element->id);
-                if ($children) {
-                    $node['children'] = $children;
-                }
-                $result[] = $node;
-            }
-            return $result;
-        };
-
-        return $build(0);
-    }
 }

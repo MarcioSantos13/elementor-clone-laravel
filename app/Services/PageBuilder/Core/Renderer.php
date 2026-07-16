@@ -97,8 +97,9 @@ HTML;
             $childrenHtml = $this->renderElements($element->children, $options);
         }
 
+        $mergedSettings = array_merge($element->settings ?? [], $element->styles ?? []);
         $innerHtml = $widget->render(
-            $element->settings ?? [],
+            $mergedSettings,
             array_merge($element->content ?? [], ['children' => $childrenHtml]),
             $element->styles ?? []
         );
@@ -174,8 +175,9 @@ HTML;
             }
         }
 
+        $mergedSettings = array_merge($element->settings ?? [], $element->styles ?? []);
         $innerHtml = $widget->renderEditor(
-            $element->settings ?? [],
+            $mergedSettings,
             array_merge($element->content ?? [], ['children' => $childrenHtml]),
             $element->styles ?? []
         );
@@ -262,7 +264,9 @@ HTML;
 
         $css = '';
         foreach ($styles as $property => $value) {
-            $cssProperty = Str::kebab($property);
+            $cssProperty = preg_replace('/([a-z0-9])([A-Z])/', '$1-$2', $property);
+            $cssProperty = str_replace('_', '-', $cssProperty);
+            $cssProperty = strtolower($cssProperty);
             $css .= "{$cssProperty}: {$value}; ";
         }
 
@@ -337,7 +341,29 @@ HTML;
         $hasAnimations = $page->elements()->where('settings->animation', '!=', 'none')
             ->whereNotNull('settings->animation')->exists();
 
-        $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n</style>\n";
+        $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n";
+
+        $css .= ".pb-section-inner > .pb-element { flex: 0 0 100%; max-width: 100%; }\n";
+        $css .= ".col-12 { flex: 0 0 100%; max-width: 100%; }\n";
+        $css .= ".col-6 { flex: 0 0 50%; max-width: 50%; }\n";
+        $css .= ".col-4 { flex: 0 0 33.333%; max-width: 33.333%; }\n";
+        $css .= ".col-8 { flex: 0 0 66.666%; max-width: 66.666%; }\n";
+        $css .= ".col-3 { flex: 0 0 25%; max-width: 25%; }\n";
+        $css .= ".col-md-6 { flex: 0 0 50%; max-width: 50%; }\n";
+        $css .= ".col-md-4 { flex: 0 0 33.333%; max-width: 33.333%; }\n";
+        $css .= ".col-md-8 { flex: 0 0 66.666%; max-width: 66.666%; }\n";
+        $css .= ".col-md-3 { flex: 0 0 25%; max-width: 25%; }\n";
+
+        $css .= ".pb-video-wrapper { position: relative; }\n";
+        $css .= ".pb-image-wrapper { line-height: 0; }\n";
+        $css .= ".pb-image-wrapper img { max-width: 100%; height: auto; display: block; }\n";
+        $css .= ".pb-divider { width: 100%; }\n";
+        $css .= ".pb-button { display: inline-block; text-decoration: none; }\n";
+        $css .= ".pb-icon-link { display: inline-block; }\n";
+        $css .= ".pb-form input, .pb-form textarea, .pb-form select { width: 100%; }\n";
+        $css .= ".pb-tabs-wrapper { width: 100%; }\n";
+        $css .= ".pb-accordion { width: 100%; }\n";
+        $css .= "</style>\n";
 
         $css .= "\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\">\n";
 
@@ -399,8 +425,9 @@ HTML;
             }
         }
 
+        $mergedSettings = array_merge($element->settings ?? [], $element->styles ?? []);
         $innerHtml = $widget->render(
-            $element->settings ?? [],
+            $mergedSettings,
             array_merge($element->content ?? [], ['children' => $childrenHtml]),
             $element->styles ?? []
         );
