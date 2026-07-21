@@ -3,6 +3,7 @@ import { escHtml, showToast, toastError, toastSuccess, structureIcon, apiFetch }
 import { renderCanvas, renderMath, elementHtml, renderStructure } from './canvas.js';
 import { pushHistory, snapshotHistory, undo, redo, updateUndoButtons, _findElement } from './history.js';
 import { bindDragDrop, bindCanvasDrops, _handleElementDrop, _saveElementOrder } from './dragdrop.js';
+import { openHtmlImportModal } from './html-import.js';
 import { toggleNavigator, renderNavigator as renderNav, _showNavContext, _hideNavContext, _showCanvasContext, _hideCanvasContext, _navMoveElement, _navMoveRelative, _navPasteAfter, _startNavRename } from './navigator.js';
 
 function renderStructureWithSelect(elements, parentUl) {
@@ -74,6 +75,7 @@ const editor = {
     hidePageSettings() { hidePageSettings(); },
     exportPage() { window.open('/page-builder/pages/' + state.pageId + '/export', '_blank'); },
     copyHtml() { copyHtml(); },
+    importHtml() { openHtmlImportModal(state.csrf); },
 };
 
 function selectElement(id) {
@@ -120,8 +122,7 @@ function loadControls(id) {
             const widget = data.widget;
             const element = data.element;
             document.getElementById('settings-empty').style.display = 'none';
-            const sf = document.getElementById('settings-form');
-            sf.style.display = '';
+            document.getElementById('settings-form').classList.add('active');
             document.getElementById('settings-title').textContent = element.name || widget.label;
             document.getElementById('settings-type').textContent = widget.type;
             state.cachedControls = widget.controls || {};
@@ -317,7 +318,7 @@ function createInput(key, ctrl, value, elementId) {
 
 function createImageInput(key, value, saveFn, elementId) {
     const container = document.createElement('div');
-    container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.35rem';
     const currentUrl = value && value.url ? value.url : '';
     const dropZone = document.createElement('div');
     dropZone.style.cssText = 'border:2px dashed var(--pb-border);border-radius:8px;padding:1rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--pb-bg);position:relative';
@@ -413,7 +414,7 @@ function createWysiwygInput(key, value, saveFn, elementId) {
 
 function createIconInput(key, value, saveFn, debouncedSave) {
     const container = document.createElement('div');
-    container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.35rem';
     const icons = ['fas fa-star','fas fa-heart','fas fa-check','fas fa-times','fas fa-plus','fas fa-minus','fas fa-arrow-right','fas fa-arrow-left','fas fa-arrow-up','fas fa-arrow-down','fas fa-chevron-right','fas fa-chevron-left','fas fa-check-circle','fas fa-times-circle','fas fa-exclamation-circle','fas fa-info-circle','fas fa-lightbulb','fas fa-bell','fas fa-envelope','fas fa-phone','fas fa-map-marker-alt','fas fa-user','fas fa-users','fas fa-home','fas fa-cog','fas fa-search','fas fa-lock','fas fa-download','fas fa-upload','fas fa-share','fas fa-link','fas fa-edit','fas fa-trash','fas fa-copy','fas fa-image','fas fa-video','fas fa-book','fas fa-calendar','fas fa-clock','fas fa-flag','fas fa-tag','fas fa-rocket','fas fa-bolt','fas fa-fire','fas fa-sun','fas fa-moon','fas fa-cloud','fas fa-globe','fas fa-code','fas fa-database','fas fa-wifi','fab fa-github','fab fa-google','fab fa-facebook','fab fa-twitter','fab fa-instagram','fab fa-youtube','fab fa-linkedin'];
     const preview = document.createElement('div');
     preview.style.cssText = 'text-align:center;padding:8px;font-size:2rem;color:var(--pb-text)';
@@ -423,7 +424,7 @@ function createIconInput(key, value, saveFn, debouncedSave) {
     search.type = 'text'; search.value = currentIcon; search.placeholder = 'fas fa-star';
     search.style.cssText = 'width:100%;padding:6px 8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:12px;font-family:monospace';
     const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:180px;overflow-y:auto;padding:4px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px';
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(8,1fr);gap:2px;max-height:140px;overflow-y:auto;padding:4px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px';
     const renderGrid = (filter) => {
         grid.innerHTML = '';
         const filtered = filter ? icons.filter(i => i.includes(filter.toLowerCase())) : icons;
@@ -447,7 +448,7 @@ function createIconInput(key, value, saveFn, debouncedSave) {
 
 function createGalleryInput(key, value, saveFn) {
     const container = document.createElement('div');
-    container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.35rem';
     let images = Array.isArray(value) ? [...value] : [];
     const update = () => saveFn(key, images);
     const list = document.createElement('div');
@@ -478,7 +479,7 @@ function createGalleryInput(key, value, saveFn) {
 
 function createRepeaterInput(key, value, ctrl, saveFn) {
     const container = document.createElement('div');
-    container.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.35rem';
     let items = Array.isArray(value) ? value.map(v => ({...v})) : [];
     const subFields = ctrl.fields || {};
     const list = document.createElement('div');
@@ -555,7 +556,7 @@ function createRepeaterInput(key, value, ctrl, saveFn) {
 
 function createTypographyInput(key, value, elementId) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const defs = [
         { fk: 'typography_font_family', label: 'Font Family', type: 'text' },
         { fk: 'typography_font_size', label: 'Font Size', type: 'text' },
@@ -595,7 +596,7 @@ function createTypographyInput(key, value, elementId) {
 
 function createBackgroundInput(key, value, elementId) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const defs = [
         { fk: 'backgroundColor', label: 'Background Color', type: 'color' },
         { fk: 'backgroundImage', label: 'Background Image', type: 'url' },
@@ -632,7 +633,7 @@ function createBackgroundInput(key, value, elementId) {
 
 function createBorderInput(key, value, elementId) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const defs = [
         { fk: 'borderWidth', label: 'Border Width', type: 'text', def: '0' },
         { fk: 'borderColor', label: 'Border Color', type: 'color', def: '#000000' },
@@ -669,7 +670,7 @@ function createBorderInput(key, value, elementId) {
 
 function createBoxShadowInput(key, value, elementId) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const defs = [
         { fk: 'shadowHorizontal', label: 'Horizontal', type: 'text', def: '0' },
         { fk: 'shadowVertical', label: 'Vertical', type: 'text', def: '0' },
@@ -704,7 +705,7 @@ function createBoxShadowInput(key, value, elementId) {
 
 function createDimensionsInput(key, value, elementId) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const isLinked = { padding: true, margin: true };
     const groups = [
         { prefix: 'padding', label: 'Padding', keys: ['Top','Right','Bottom','Left'] },
@@ -730,7 +731,7 @@ function createDimensionsInput(key, value, elementId) {
         header.appendChild(lockBtn);
         c.appendChild(header);
         const grid = document.createElement('div');
-        grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:4px';
+        grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:3px';
         const inputs = [];
         group.keys.forEach((side, idx) => {
             const fk = group.prefix + side;
@@ -765,7 +766,7 @@ function createDimensionsInput(key, value, elementId) {
 
 function createHoverInput(key, value, elementId) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const defs = [
         { fk: 'hoverBackgroundColor', label: 'Background Color', type: 'color' },
         { fk: 'hoverTextColor', label: 'Text Color', type: 'color' },
@@ -802,7 +803,7 @@ function createHoverInput(key, value, elementId) {
 
 function createAnimationInput(key, value, saveFn) {
     const c = document.createElement('div');
-    c.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
     const animRow = document.createElement('div');
     animRow.className = 'pb-control';
     const animLabel = document.createElement('label');
@@ -947,7 +948,7 @@ function deleteElement(id) {
     if (!confirm('Excluir este elemento?')) return;
     apiFetch(`/page-builder/elements/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': state.csrf } })
         .then(() => {
-            if (state.selectedId === id) { state.selectedId = null; document.getElementById('settings-empty').style.display = ''; document.getElementById('settings-form').style.display = 'none'; }
+            if (state.selectedId === id) { state.selectedId = null; document.getElementById('settings-empty').style.display = ''; document.getElementById('settings-form').classList.remove('active'); }
             loadElements();
         })
         .catch(() => toastError('Falha ao excluir elemento'));
@@ -1164,13 +1165,13 @@ function showPageSettings() {
     document.querySelectorAll('.pb-el.selected').forEach(el => el.classList.remove('selected'));
     document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
     document.getElementById('settings-empty').style.display = 'none';
-    document.getElementById('settings-form').style.display = 'none';
-    document.getElementById('page-settings-form').style.display = 'flex';
+    document.getElementById('settings-form').classList.remove('active');
+    document.getElementById('page-settings-form').classList.add('active');
     renderPageSettings();
 }
 
 function hidePageSettings() {
-    document.getElementById('page-settings-form').style.display = 'none';
+    document.getElementById('page-settings-form').classList.remove('active');
     document.getElementById('settings-empty').style.display = '';
 }
 
@@ -1277,6 +1278,6 @@ document.addEventListener('click', (e) => {
         document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
         state.selectedId = null;
         document.getElementById('settings-empty').style.display = '';
-        document.getElementById('settings-form').style.display = 'none';
+        document.getElementById('settings-form').classList.remove('active');
     }
 });

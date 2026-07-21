@@ -19,6 +19,7 @@
     <span class="tb-divider"></span>
     <button onclick="editor.exportPage()" title="Exportar como JSON">&#128229;</button>
     <button onclick="editor.copyHtml()" title="Copiar HTML da página">&#128203;</button>
+    <button onclick="editor.importHtml()" title="Importar HTML de site externo">&#128228; <span style="font-size:.65rem;opacity:.6">Importar HTML</span></button>
     <span class="tb-divider"></span>
     <button onclick="editor.save()" class="btn-save">&#128190; Salvar</button>
     <button onclick="editor.publish()" class="btn-publish">&#128752; Publicar</button>

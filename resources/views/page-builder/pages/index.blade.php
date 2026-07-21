@@ -11,9 +11,14 @@
                     <h1 class="pb-hero-title">Páginas</h1>
                     <p class="pb-hero-sub">Gerencie suas páginas e cursos no construtor visual</p>
                 </div>
-                <a href="{{ route('page-builder.pages.create') }}" class="btn btn-primary pb-hero-btn">
-                    <span>+</span> Nova Página
-                </a>
+                <div style="display:flex;gap:.75rem;align-items:center">
+                    <button onclick="openHtmlImportModal()" class="btn btn-secondary pb-hero-btn" style="background:rgba(255,255,255,.2)!important;color:#fff!important;border:2px solid rgba(255,255,255,.4)!important">
+                        <span>&#128228;</span> Importar HTML
+                    </button>
+                    <a href="{{ route('page-builder.pages.create') }}" class="btn btn-primary pb-hero-btn">
+                        <span>+</span> Nova Página
+                    </a>
+                </div>
             </div>
             <div class="pb-stats">
                 <div class="pb-stat">
@@ -159,6 +164,50 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeImportModal()">Cancelar</button>
                     <button class="btn btn-primary" onclick="importPage()" id="import-btn">Importar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="html-import-modal" style="display:none">
+        <div class="modal-overlay" onclick="closeHtmlImportModal()">
+            <div class="modal-content" onclick="event.stopPropagation()" style="max-width:700px">
+                <div class="modal-header">
+                    <h3>&#128228; Importar HTML de Site Externo</h3>
+                    <button class="modal-close" onclick="closeHtmlImportModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:#64748b;margin-bottom:1rem;font-size:.9rem">
+                        Cole o HTML de qualquer página web ou informe a URL. O conteúdo será convertido automaticamente em widgets editáveis.
+                    </p>
+
+                    <div style="margin-bottom:1rem">
+                        <label style="display:block;font-weight:600;margin-bottom:.4rem;font-size:.875rem;color:#374151">URL do Site <span style="color:#94a3b8;font-weight:400">(opcional)</span></label>
+                        <div style="display:flex;gap:.5rem">
+                            <input type="url" id="html-import-url" placeholder="https://exemplo.com/pagina" style="flex:1;padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:8px;font-size:.875rem">
+                            <button type="button" class="btn btn-secondary" onclick="fetchUrlHtml()" id="html-fetch-btn" style="white-space:nowrap;font-size:.85rem">&#128269; Buscar</button>
+                        </div>
+                        <div id="html-fetch-status" style="font-size:.8rem;margin-top:.3rem;display:none"></div>
+                    </div>
+
+                    <div style="text-align:center;margin-bottom:.75rem;font-size:.8rem;color:#94a3b8">— ou cole o HTML diretamente —</div>
+
+                    <div style="margin-bottom:1rem">
+                        <label style="display:block;font-weight:600;margin-bottom:.4rem;font-size:.875rem;color:#374151">HTML do Conteúdo</label>
+                        <textarea id="html-import-content" rows="12" placeholder="&lt;h1&gt;Titulo da Pagina&lt;/h1&gt;&#10;&lt;p&gt;Conteudo aqui...&lt;/p&gt;&#10;&lt;img src=&quot;...&quot;&gt;" style="width:100%;padding:.65rem;border:1px solid #e2e8f0;border-radius:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;resize:vertical;line-height:1.5;background:#f8fafc;color:#1e293b"></textarea>
+                    </div>
+
+                    <div style="margin-bottom:.5rem">
+                        <label style="display:block;font-weight:600;margin-bottom:.4rem;font-size:.875rem;color:#374151">Título da Página <span style="color:#94a3b8;font-weight:400">(opcional — detectado automaticamente)</span></label>
+                        <input type="text" id="html-import-title" placeholder="Ex: Página Importada" style="width:100%;padding:.5rem .75rem;border:1px solid #e2e8f0;border-radius:8px;font-size:.875rem">
+                    </div>
+
+                    <div id="html-import-error" style="color:#ef4444;margin-top:.5rem;display:none;font-size:.85rem;padding:.5rem;background:#fef2f2;border-radius:6px"></div>
+                    <div id="html-import-success" style="color:#166534;margin-top:.5rem;display:none;font-size:.85rem;padding:.5rem;background:#f0fdf4;border-radius:6px"></div>
+                </div>
+                <div class="modal-footer" style="display:flex;gap:.5rem;justify-content:flex-end">
+                    <button class="btn btn-secondary" onclick="closeHtmlImportModal()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="submitHtmlImport()" id="html-import-btn">&#128228; Importar e Editar</button>
                 </div>
             </div>
         </div>
@@ -423,6 +472,115 @@
                 });
             };
             reader.readAsText(file);
+        }
+
+        function openHtmlImportModal() {
+            document.getElementById('html-import-modal').style.display = '';
+            document.getElementById('html-import-url').value = '';
+            document.getElementById('html-import-content').value = '';
+            document.getElementById('html-import-title').value = '';
+            document.getElementById('html-import-error').style.display = 'none';
+            document.getElementById('html-import-success').style.display = 'none';
+            document.getElementById('html-fetch-status').style.display = 'none';
+            document.getElementById('html-import-btn').disabled = false;
+        }
+
+        function closeHtmlImportModal() {
+            document.getElementById('html-import-modal').style.display = 'none';
+        }
+
+        function fetchUrlHtml() {
+            const url = document.getElementById('html-import-url').value.trim();
+            if (!url) {
+                document.getElementById('html-import-error').textContent = 'Informe uma URL válida.';
+                document.getElementById('html-import-error').style.display = '';
+                return;
+            }
+            const btn = document.getElementById('html-fetch-btn');
+            const status = document.getElementById('html-fetch-status');
+            btn.disabled = true;
+            btn.textContent = 'Buscando...';
+            status.style.display = '';
+            status.style.color = '#64748b';
+            status.textContent = 'Baixando conteúdo da URL...';
+
+            fetch('/page-builder/html-import/fetch?url=' + encodeURIComponent(url), {
+                headers: { 'X-CSRF-TOKEN': csrf }
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.html) {
+                    document.getElementById('html-import-content').value = data.html;
+                    status.style.color = '#166534';
+                    status.textContent = 'HTML baixado com sucesso (' + (data.size > 1024 ? Math.round(data.size/1024) + 'KB' : data.size + 'B') + '). Revise e clique em Importar.';
+                    document.getElementById('html-import-error').style.display = 'none';
+                } else {
+                    status.style.color = '#ef4444';
+                    status.textContent = data.message || 'Erro ao buscar URL.';
+                }
+            })
+            .catch(() => {
+                status.style.color = '#ef4444';
+                status.textContent = 'Falha ao conectar com a URL.';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = '\u{1F50D} Buscar';
+            });
+        }
+
+        function submitHtmlImport() {
+            const url = document.getElementById('html-import-url').value.trim();
+            const html = document.getElementById('html-import-content').value.trim();
+            const title = document.getElementById('html-import-title').value.trim();
+            const errorEl = document.getElementById('html-import-error');
+            const successEl = document.getElementById('html-import-success');
+
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+
+            if (!url && !html) {
+                errorEl.textContent = 'Forneça uma URL ou cole o HTML.';
+                errorEl.style.display = '';
+                return;
+            }
+
+            const btn = document.getElementById('html-import-btn');
+            btn.disabled = true;
+            btn.textContent = 'Importando...';
+
+            const body = {};
+            if (url) body.url = url;
+            if (html) body.html = html;
+            if (title) body.title = title;
+
+            fetch('/page-builder/html-import', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify(body),
+            })
+            .then(r => r.text().then(text => ({ status: r.status, text })))
+            .then(({ status, text }) => {
+                let data;
+                try { data = JSON.parse(text); } catch { data = null; }
+                if (status >= 200 && status < 300 && data && data.redirect_url) {
+                    successEl.textContent = 'Importação concluída! ' + (data.widgets_count || 0) + ' widgets criados. Redirecionando...';
+                    successEl.style.display = '';
+                    setTimeout(() => { window.location.href = data.redirect_url; }, 1200);
+                } else {
+                    const msg = data && data.message ? data.message : 'Erro HTTP ' + status;
+                    errorEl.textContent = msg;
+                    errorEl.style.display = '';
+                    btn.disabled = false;
+                    btn.textContent = '\u{1F4E4} Importar e Editar';
+                }
+            })
+            .catch(err => {
+                errorEl.textContent = 'Falha na comunicação: ' + (err.message || err);
+                errorEl.style.display = '';
+                btn.disabled = false;
+                btn.textContent = '\u{1F4E4} Importar e Editar';
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {

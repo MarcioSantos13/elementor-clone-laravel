@@ -5,6 +5,7 @@ use App\Http\Controllers\PageBuilder\PageController;
 use App\Http\Controllers\PageBuilder\ElementController;
 use App\Http\Controllers\PageBuilder\RevisionController;
 use App\Http\Controllers\PageBuilder\FormController;
+use App\Http\Controllers\PageBuilder\HtmlImportController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::resource('pages', PageController::class)->except(['show', 'edit']);
@@ -16,6 +17,9 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::post('pages/{page}/duplicate', [PageController::class, 'duplicate'])->name('pages.duplicate');
     Route::get('pages/{page}/export', [PageController::class, 'export'])->name('pages.export');
     Route::post('pages/import', [PageController::class, 'import'])->name('pages.import');
+
+    Route::post('html-import', [HtmlImportController::class, 'import'])->name('html-import');
+    Route::get('html-import/fetch', [HtmlImportController::class, 'fetch'])->name('html-import.fetch');
     Route::get('templates', [PageController::class, 'listTemplates'])->name('templates.list');
     Route::post('pages/{page}/apply-template', [PageController::class, 'applyTemplate'])->name('pages.apply-template');
     Route::put('pages/{page}/layout', [PageController::class, 'updateLayout'])->name('pages.layout');

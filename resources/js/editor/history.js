@@ -58,7 +58,7 @@ export function restoreHistory(state) {
         } else {
             state.selectedId = null;
             document.getElementById('settings-empty').style.display = '';
-            document.getElementById('settings-form').style.display = 'none';
+            document.getElementById('settings-form').classList.remove('active');
         }
     }
 }

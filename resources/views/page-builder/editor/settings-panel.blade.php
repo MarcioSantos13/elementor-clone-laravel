@@ -4,7 +4,7 @@
             <div class="pse-icon">&#9881;</div>
             <p>Selecione um elemento na tela<br>para editar suas configurações</p>
         </div>
-        <div id="settings-form" style="display:none;height:100%;flex-direction:column">
+        <div id="settings-form" class="pb-settings-form">
             <div class="pb-settings-header">
                 <div>
                     <h3 id="settings-title">Element</h3>
@@ -19,7 +19,7 @@
             </div>
             <div class="pb-settings-body" id="settings-body"></div>
         </div>
-        <div id="page-settings-form" style="display:none;height:100%;flex-direction:column">
+        <div id="page-settings-form" class="pb-settings-form">
             <div class="pb-settings-header">
                 <div>
                     <h3>Layout da Página</h3>
