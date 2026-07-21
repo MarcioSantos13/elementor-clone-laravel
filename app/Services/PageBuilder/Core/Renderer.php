@@ -309,10 +309,12 @@ HTML;
                     $videoId = $m[1];
                 } elseif (preg_match('/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/', $url, $m)) {
                     $videoId = $m[1];
+                } elseif (preg_match('/youtube-nocookie\.com\/embed\/([a-zA-Z0-9_-]+)/', $url, $m)) {
+                    $videoId = $m[1];
                 }
 
                 if ($videoId) {
-                    $iframe = str_replace($url, "https://www.youtube-nocookie.com/embed/{$videoId}", $matches[0]);
+                    $iframe = str_replace($url, "https://www.youtube.com/embed/{$videoId}", $matches[0]);
                     if (!str_contains($iframe, 'allow="')) {
                         $iframe = str_replace('<iframe', '<iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen', $iframe);
                     }
@@ -328,7 +330,7 @@ HTML;
             '/<a\s[^>]*href=["\'](https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+))["\'][^>]*>.*?<\/a>/i',
             function ($matches) {
                 $videoId = $matches[2];
-                return '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/' . $videoId . '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+                return '<iframe width="560" height="315" src="https://www.youtube.com/embed/' . $videoId . '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
             },
             $processed
         );

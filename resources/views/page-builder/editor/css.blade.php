@@ -114,6 +114,7 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     width: 100%; max-width: 1200px; background: #fff; min-height: 600px;
     box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 6px 24px rgba(0,0,0,.1); border-radius: 8px;
     position: relative; transition: max-width .4s cubic-bezier(.4,0,.2,1);
+    color: #333; font-size: 15px; line-height: 1.6;
 }
 .pb-canvas.is-mobile { max-width: 375px; }
 .pb-canvas.is-tablet { max-width: 768px; }

@@ -188,7 +188,7 @@ HTML;
 
         $queryString = implode('&', $params);
 
-        return "https://www.youtube-nocookie.com/embed/{$videoId}?{$queryString}";
+        return "https://www.youtube.com/embed/{$videoId}?{$queryString}";
     }
 
     private function extractYoutubeId(string $url): ?string

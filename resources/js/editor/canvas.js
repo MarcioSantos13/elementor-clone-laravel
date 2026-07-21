@@ -80,10 +80,11 @@ export function elementHtml(el) {
             break;
         }
         case 'callout': {
-            const typeStyles = {info:{bg:'#e0f2fe',border:'#0284c7',icon:'&#8505;'},success:{bg:'#dcfce7',border:'#16a34a',icon:'&#10003;'},warning:{bg:'#fef9c3',border:'#ca8a04',icon:'&#9888;'},danger:{bg:'#fee2e2',border:'#dc2626',icon:'&#10007;'},tip:{bg:'#f0fdf4',border:'#22c55e',icon:'&#128161;'},definition:{bg:'#f3e8ff',border:'#9333ea',icon:'&#128218;'},theorem:{bg:'#fff7ed',border:'#ea580c',icon:'&#9878;'},exercise:{bg:'#ecfeff',border:'#0891b2',icon:'&#9998;'},note:{bg:'#f8fafc',border:'#64748b',icon:'&#128221;'}};
+            const typeStyles = {info:{bg:'#eff6ff',border:'#3b82f6',icon:'&#9432;',text:'#1e3a5f',title:'#1e40af'},success:{bg:'#f0fdf4',border:'#22c55e',icon:'&#10004;',text:'#14532d',title:'#166534'},warning:{bg:'#fffbeb',border:'#f59e0b',icon:'&#9888;',text:'#78350f',title:'#92400e'},danger:{bg:'#fef2f2',border:'#ef4444',icon:'&#10060;',text:'#7f1d1d',title:'#991b1b'},tip:{bg:'#f0f9ff',border:'#0ea5e9',icon:'&#128161;',text:'#0c3547',title:'#0c4a6e'},definition:{bg:'#faf5ff',border:'#a855f7',icon:'&#128214;',text:'#581c87',title:'#6b21a8'},theorem:{bg:'#fff7ed',border:'#f97316',icon:'&#9878;',text:'#7c2d12',title:'#9a3412'},exercise:{bg:'#ecfdf5',border:'#10b981',icon:'&#9998;',text:'#064e3b',title:'#065f46'},note:{bg:'#f8fafc',border:'#64748b',icon:'&#128221;',text:'#475569',title:'#334155'}};
             const st = typeStyles[s.type]||typeStyles.info;
             const borderStyle = s.border_style==='none'?'border-left:none;':s.border_style==='full'?`border:2px solid ${st.border};`:`border-left:4px solid ${st.border};`;
-            preview = `<div style="background:${st.bg};${borderStyle}padding:${s.padding||'16px'};border-radius:${s.border_radius||'8px'}"><div style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:1.2em">${escHtml(s.icon)||st.icon}</span><div style="flex:1">${s.content||'<p>Conteudo do callout</p>'}</div></div></div>`;
+            const titleHtml = s.title ? `<div style="font-weight:700;font-size:1rem;margin-bottom:6px;color:${st.title}">${escHtml(s.title)}</div>` : '';
+            preview = `<div style="background:${st.bg};${borderStyle}padding:${s.padding||'16px 20px'};border-radius:${s.border_radius||'8px'};color:${st.text}"><div style="display:flex;align-items:flex-start;gap:10px"><span style="font-size:1.2em;flex-shrink:0">${escHtml(s.icon)||st.icon}</span><div style="flex:1">${titleHtml}${s.content||'<p>Conteúdo do callout</p>'}</div></div></div>`;
             break;
         }
         case 'table': {
@@ -128,7 +129,7 @@ export function elementHtml(el) {
                     if (s.loop) params.push('playlist='+ytMatch[1]);
                     if (s.start_time>0) params.push('start='+s.start_time);
                     if (s.end_time>0) params.push('end='+s.end_time);
-                    embedUrl = 'https://www.youtube-nocookie.com/embed/'+ytMatch[1]+'?'+params.join('&');
+                    embedUrl = 'https://www.youtube.com/embed/'+ytMatch[1]+'?'+params.join('&');
                 } else {
                     const vmMatch = s.video_url.match(/vimeo\.com\/(\d+)/);
                     if (vmMatch) {

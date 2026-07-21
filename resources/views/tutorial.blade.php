@@ -13,6 +13,7 @@
             <strong>Conteúdo</strong>
             <a href="#prerequisites">Pré-requisitos &amp; Instalação</a>
             <a href="#overview">Visão Geral</a>
+            <a href="#license">Custo &amp; Licença</a>
             <a href="#auth">Criar Conta &amp; Acessar</a>
             <a href="#create-page">Criar uma Página</a>
             <a href="#editor">O Editor</a>
@@ -177,6 +178,56 @@ php artisan db:seed</code></pre>
 │   pages → elements (árvore) → revisions           │
 └──────────────────────────────────────────────────┘</pre>
                 </div>
+            </div>
+        </section>
+
+        {{-- LICENSE --}}
+        <section id="license" class="step">
+            <h2>1b. Custo &amp; Licença</h2>
+            <div class="step-body">
+                <p>O <strong>Laravel Page Builder</strong> é um projeto <strong>gratuito e open-source</strong>, licenciado sob a <strong>MIT License</strong>. Isso significa:</p>
+
+                <table class="widget-table">
+                    <tr><th>Pergunta</th><th>Resposta</th></tr>
+                    <tr><td><strong>É gratuito?</strong></td><td>Sim. Não há custos de licença, assinatura ou uso comercial.</td></tr>
+                    <tr><td><strong>Pode usar em produção?</strong></td><td>Sim. Não há restrições de uso — pessoal, educacional ou comercial.</td></tr>
+                    <tr><td><strong>Pode modificar o código?</strong></td><td>Sim. Você pode alterar, estender e personalizar livremente.</td></tr>
+                    <tr><td><strong>Pode redistribuir?</strong></td><td>Sim. A MIT License permite distribuir cópias, incluindo para uso comercial.</td></tr>
+                    <tr><td><strong>Precisa dar crédito?</strong></td><td>Recomendado (não obrigatório). Manter a licença MIT nos arquivos originais é boa prática.</td></tr>
+                    <tr><td><strong>Tem suporte oficial?</strong></td><td>Não. É um projeto independente. Use as issues do GitHub para reportar bugs ou sugestões.</td></tr>
+                    <tr><td><strong>Tem versão premium?</strong></td><td>Não. Todas as funcionalidades estão disponíveis na versão open-source.</td></tr>
+                </table>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O código-fonte está disponível no repositório do GitHub. Você pode clonar, modificar e hospedar em seu próprio servidor sem nenhuma restrição. Não há dependências de serviços pagos ou APIs externas obrigatórias.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que está incluído (gratuito)</h3>
+                <ul>
+                    <li>17 widgets (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</li>
+                    <li>Editor visual completo com drag-and-drop, undo/redo, zoom, fullscreen</li>
+                    <li>6 templates prontos (Blank, Landing, About, Contact, Moodle Course, Showcase)</li>
+                    <li>Sistema de revisões com diff e restauração</li>
+                    <li>Exportação/Importação de páginas (JSON)</li>
+                    <li>Copiar HTML para uso em outros sistemas (Moodle, WordPress, etc.)</li>
+                    <li>Suporte a LaTeX via KaTeX</li>
+                    <li>93 testes automatizados</li>
+                    <li>Integração com Moodle 4.5+</li>
+                </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Stack tecnológica (tudo open-source)</h3>
+                <table class="widget-table">
+                    <tr><th>Camada</th><th>Tecnologia</th><th>Licença</th></tr>
+                    <tr><td>Backend</td><td>Laravel 12</td><td>MIT</td></tr>
+                    <tr><td>Frontend</td><td>JavaScript vanilla</td><td>—</td></tr>
+                    <tr><td>Banco de Dados</td><td>SQLite</td><td>Public Domain</td></tr>
+                    <tr><td>Build</td><td>Vite</td><td>MIT</td></tr>
+                    <tr><td>CSS</td><td>Tailwind CSS</td><td>MIT</td></tr>
+                    <tr><td>Ícones</td><td>Font Awesome</td><td>MIT (icons) + SIL OFL (fonts)</td></tr>
+                    <tr><td>Fórmulas</td><td>KaTeX</td><td>MIT</td></tr>
+                    <tr><td>Fontes</td><td>Google Fonts (Inter)</td><td>SIL OFL</td></tr>
+                </table>
+                <p style="margin-top:.75rem;font-size:.88rem;color:#666">Toda a stack é composta por tecnologias open-source gratuitas. Não há custos ocultos.</p>
             </div>
         </section>
 
@@ -1673,34 +1724,34 @@ php artisan test --verbose</pre>
         </section>
 
         {{-- MOODLE --}}
+        {{-- MOODLE --}}
         <section id="moodle" class="step">
             <h2>20. Uso com Moodle 4.5+</h2>
             <div class="step-body">
-                <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções de uso.</p>
+                <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções detalhadas.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.1 Copiar HTML para o Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.1 Copiar HTML para o Moodle (recomendado)</h3>
                 <ol>
-                    <li>Crie sua página no Page Builder normalmente (use templates prontos ou comece do zero).</li>
-                    <li>Na lista de páginas, clique em <strong>"Copy HTML"</strong> (ou no editor, clique no botão <strong>"Copy HTML"</strong> da barra de ferramentas).</li>
-                    <li>O HTML renderizado da página será copiado para a área de transferência.</li>
-                    <li>No Moodle, edite um recurso do tipo <strong>Página (Page)</strong> ou <strong>Livro (Book)</strong>, ou um bloco HTML.</li>
-                    <li>No editor do Moodle, mude para o modo <strong>HTML</strong> (código fonte) e cole o conteúdo (<kbd>Ctrl+V</kbd>).</li>
-                    <li>Salve as alterações. O conteúdo será exibido com os estilos inline preservados.</li>
+                    <li>Crie sua página no Page Builder normalmente (use um modelo pronto ou comece do zero). Os modelos são fixos e nunca são alterados ao criar uma nova página — o sistema faz uma cópia dos dados para a página nova.</li>
+                    <li>No editor visual, clique no botão <strong>"Copy HTML"</strong> (ícone de clipboard) na barra de ferramentas. Uma notificação "HTML copiado!" será exibida.</li>
+                    <li>O HTML renderizado da página (com CSS inline) está na sua área de transferência.</li>
+                    <li>No Moodle, edite um recurso do tipo <strong>Página (Page)</strong> ou <strong>Livro (Book)</strong>.</li>
+                    <li>No editor do Moodle, clique no botão <strong>&lt;&gt;</strong> (Mostrar código fonte / HTML) e cole o conteúdo com <kbd>Ctrl+V</kbd>.</li>
+                    <li>Salve a página. O conteúdo será exibido com todos os estilos preservados.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.2 Exportar e Importar entre Moodle e Page Builder</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.2 Exportar como JSON (backup ou transferência entre instalações)</h3>
                 <ol>
-                    <li><strong>Exportar:</strong> Na lista de páginas, clique em <strong>"Export"</strong> para baixar um arquivo <code>.json</code> com toda a estrutura da página.</li>
-                    <li><strong>Importar:</strong> Em qualquer instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, selecione o arquivo <code>.json</code> exportado e a página será recriada.</li>
-                    <li>Isso permite transferir páginas entre diferentes instalações ou fazer backup antes de modificar.</li>
+                    <li>Na lista de páginas do Page Builder, clique em <strong>"Export"</strong> na página desejada. Um arquivo <code>.json</code> será baixado com toda a estrutura da página.</li>
+                    <li>Para importar em outra instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, faça upload do arquivo <code>.json</code> e a página será recriada.</li>
+                    <li>Após importar, abra a página no editor e use o <strong>"Copy HTML"</strong> (passo 20.1) para colar o conteúdo no Moodle.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.3 Renderização como Página Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.3 Renderização como Página Moodle (iframe)</h3>
                 <ol>
-                    <li>O Page Builder pode ser incorporado ao Moodle como um <strong>recurso externo</strong> ou via <strong>iframe</strong>.</li>
-                    <li>Use o parâmetro <code>?format=inner</code> na URL de renderização (<code>/page-builder/pages/{id}/render?format=inner</code>) para obter apenas o HTML do conteúdo, sem a estrutura completa da página (ideal para incorporação).</li>
+                    <li>O Page Builder pode ser incorporado ao Moodle como um <strong>recurso externo</strong> ou via <strong>iframe</strong>, apontando para a URL pública da página renderizada.</li>
+                    <li>Use o parâmetro <code>?format=inner</code> na URL de renderização (<code>/page-builder/pages/{id}/render?format=inner</code>) para obter apenas o HTML do conteúdo, sem a estrutura completa da página.</li>
                     <li>Você também pode usar <code>?format=inner&theme=none</code> para um HTML ainda mais limpo, apenas com os elementos e estilos inline.</li>
-                    <li>No Moodle, crie um recurso <strong>"Página"</strong> e cole o HTML gerado no modo código fonte, ou use um <strong>bloco HTML</strong> para exibir conteúdo em áreas laterais.</li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.4 Widgets Educacionais no Moodle</h3>
@@ -1716,14 +1767,13 @@ php artisan test --verbose</pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.5 Dicas para Moodle</h3>
                 <ul>
-                    <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), o que garante compatibilidade máxima com o editor do Moodle.</li>
-                    <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens locais do Page Builder não serão acessíveis pelo Moodle.</li>
+                    <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), garantindo compatibilidade máxima com o editor do Moodle — nenhum plugin adicional é necessário.</li>
+                    <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens enviadas para <code>storage/app/public/</code> no Page Builder não serão acessíveis pelo Moodle.</li>
                     <li><strong>Imagens no texto:</strong> O editor de texto (WYSIWYG) permite inserir imagens diretamente no conteúdo. Faça upload pela toolbar ou cole (Ctrl+V). As imagens ficam com CSS inline, compatíveis com o Moodle.</li>
                     <li><strong>Vídeos YouTube:</strong> Na toolbar do editor de texto, clique no botão <strong>&#9654;</strong> (vermelho) e cole a URL do vídeo. O embed é inserido como <code>&lt;iframe&gt;</code> com privacidade ativada (<code>youtube-nocookie.com</code>), recomendado pelo Moodle.</li>
                     <li><strong>Fórmulas matemáticas:</strong> O Page Builder usa KaTeX para renderizar LaTeX no editor. Ao copiar o HTML, as fórmulas são salvas como HTML estático — o Moodle não precisa de KaTeX instalado. Para fórmulas inline no parágrafo, use o botão &#945; no editor WYSIWYG.</li>
                     <li><strong>Responsividade:</strong> O HTML gerado mantém a responsividade. Teste em diferentes dispositivos após colar no Moodle.</li>
                     <li><strong>Limitação de largura:</strong> O Moodle pode aplicar estilos próprios de container. Use o parâmetro <code>?format=inner</code> para obter apenas o conteúdo bruto e ajuste margens no Moodle se necessário.</li>
-                    <li><strong>Copiar HTML direto do editor:</strong> No editor visual, o botão "Copy HTML" na barra de ferramentas copia o HTML da página atual (salva) para a área de transferência — você nem precisa sair do editor.</li>
                 </ul>
 
                 <div class="tip">

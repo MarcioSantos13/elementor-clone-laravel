@@ -54,6 +54,8 @@
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21c0-4.418-3.582-8-8-8s-8 3.582-8 8"/></svg>
                                     @elseif($key === 'contact')
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                                    @elseif($key === 'moodle-course')
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                                     @else
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
                                     @endif
@@ -65,6 +67,7 @@
                                         @elseif($key === 'about')Company presentation
                                         @elseif($key === 'contact')Contact form layout
                                         @elseif($key === 'showcase')Hero, features, stats, gallery, team, CTA, footer
+                                        @elseif($key === 'moodle-course')Curso educacional completo para Moodle
                                         @else&#8205;@endif
                                     </span>
                                 </div>
@@ -99,6 +102,7 @@
         .template-card-preview.about { background: linear-gradient(135deg,#f0f9ff,#e0f2fe); color: #0369a1; }
         .template-card-preview.contact { background: linear-gradient(135deg,#f8fafc,#f1f5f9); color: #475569; }
         .template-card-preview.showcase { background: linear-gradient(135deg,#0f172a,#1e293b); color: #94a3b8; }
+        .template-card-preview.moodle-course { background: linear-gradient(135deg,#1d3b5c,#2a5a84); color: #f39c12; }
         .template-card-info { padding: .65rem .75rem; }
         .template-card-info strong { display: block; font-size: .85rem; margin-bottom: .15rem; color: #0f172a; }
         .template-card-info span { font-size: .75rem; color: #64748b; }
