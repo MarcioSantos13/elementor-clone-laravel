@@ -1,9 +1,24 @@
 import { structureIcon, apiFetch } from './utils.js';
 
 export function toggleNavigator(state) {
-    const nav = document.getElementById('navigator');
-    nav.classList.toggle('open');
-    if (nav.classList.contains('open')) renderNavigator(state);
+    const navPanel = document.getElementById('panel-navigator');
+    const isVisible = navPanel.style.display !== 'none';
+    if (isVisible) {
+        document.getElementById('panel-widgets').style.display = '';
+        document.getElementById('panel-navigator').style.display = 'none';
+        document.getElementById('panel-structure').style.display = 'none';
+        document.getElementById('panel-layouts').style.display = 'none';
+        document.querySelectorAll('.pb-panel-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('.pb-panel-tab[data-tab="widgets"]').classList.add('active');
+    } else {
+        document.getElementById('panel-widgets').style.display = 'none';
+        document.getElementById('panel-navigator').style.display = '';
+        document.getElementById('panel-structure').style.display = 'none';
+        document.getElementById('panel-layouts').style.display = 'none';
+        document.querySelectorAll('.pb-panel-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('.pb-panel-tab[data-tab="navigator"]').classList.add('active');
+        renderNavigator(state);
+    }
 }
 
 export function renderNavigator(state) {

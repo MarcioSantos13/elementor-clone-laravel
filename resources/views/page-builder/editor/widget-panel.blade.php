@@ -1,6 +1,7 @@
 <div class="pb-panel">
     <div class="pb-panel-tabs">
         <button class="pb-panel-tab active" data-tab="widgets" onclick="editor.switchTab('widgets')">&#128161; Widgets</button>
+        <button class="pb-panel-tab" data-tab="navigator" onclick="editor.switchTab('navigator')">&#9776; Navigator</button>
         <button class="pb-panel-tab" data-tab="structure" onclick="editor.switchTab('structure')">&#9776; Estrutura</button>
         <button class="pb-panel-tab" data-tab="layouts" onclick="editor.switchTab('layouts')">&#128196; Layouts</button>
     </div>
@@ -37,6 +38,9 @@
                 <div class="pb-widget-item" draggable="true" data-type="math"><span class="pb-widget-icon">&Sigma;</span><span class="pb-widget-label">Matemática</span></div>
             </div>
         </div>
+    </div>
+    <div class="pb-panel-body" id="panel-navigator" style="display:none">
+        <div class="pb-navigator-body" id="navigator-body"></div>
     </div>
     <div class="pb-panel-body" id="panel-structure" style="display:none">
         <ul class="pb-structure-tree" id="structure-tree"></ul>

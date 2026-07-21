@@ -1004,9 +1004,11 @@ function switchTab(tab) {
     document.querySelectorAll('.pb-panel-tab').forEach(t => t.classList.remove('active'));
     document.querySelector(`.pb-panel-tab[data-tab="${tab}"]`).classList.add('active');
     document.getElementById('panel-widgets').style.display = tab === 'widgets' ? '' : 'none';
+    document.getElementById('panel-navigator').style.display = tab === 'navigator' ? '' : 'none';
     document.getElementById('panel-structure').style.display = tab === 'structure' ? '' : 'none';
     document.getElementById('panel-layouts').style.display = tab === 'layouts' ? '' : 'none';
     if (tab === 'layouts') loadTemplates();
+    if (tab === 'navigator') renderNavigator(state);
 }
 
 function setZoom(level) {
