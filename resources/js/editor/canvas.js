@@ -255,6 +255,46 @@ export function elementHtml(el) {
             preview = ahtml;
             break;
         }
+        case 'section': {
+            const bgColor = s.background_color || 'transparent';
+            const pt = s.padding_top || '40px';
+            const pr = s.padding_right || '0px';
+            const pb = s.padding_bottom || '40px';
+            const pl = s.padding_left || '0px';
+            const mt = s.margin_top || '0px';
+            const mb = s.margin_bottom || '0px';
+            const br = s.border_radius || '0px';
+            const cw = s.content_width || '1140px';
+            const layout = s.layout || 'boxed';
+            const bgImage = s.background_image && s.background_image.url ? s.background_image.url : '';
+            let secStyle = `padding:${pt} ${pr} ${pb} ${pl};margin:${mt} 0 ${mb} 0;border-radius:${br};position:relative;`;
+            if (bgColor && bgColor !== 'transparent') secStyle += `background-color:${bgColor};`;
+            if (bgImage) secStyle += `background-image:url('${escHtml(bgImage)}');background-position:center center;background-size:cover;background-repeat:no-repeat;`;
+            const minH = s.min_height && s.min_height !== 'auto' ? `min-height:${s.min_height};` : '';
+            if (minH) secStyle += minH;
+            const innerStyle = layout === 'boxed' ? `max-width:${cw};margin:0 auto;` : '';
+            preview = `<div class="pb-section-editor" style="${secStyle}"><div class="pb-section-header">Section</div><div class="pb-section-content" style="${innerStyle}"></div></div>`;
+            break;
+        }
+        case 'column': {
+            const colWidth = s.column_width || 'col-4';
+            const vAlign = s.vertical_alignment || 'stretch';
+            const cPos = s.content_position || 'top';
+            const tAlign = s.text_align || '';
+            const cBg = s.background_color || 'transparent';
+            const cpt = s.padding_top || '10px';
+            const cpr = s.padding_right || '10px';
+            const cpb = s.padding_bottom || '10px';
+            const cpl = s.padding_left || '10px';
+            const cm = s.margin || '0px';
+            const cbr = s.border_radius || '0px';
+            let colStyle = `padding:${cpt} ${cpr} ${cpb} ${cpl};border-radius:${cbr};display:flex;flex-direction:column;align-self:${vAlign};justify-content:${cPos};`;
+            if (tAlign) colStyle += `text-align:${tAlign};`;
+            if (cm) colStyle += `margin:${cm};`;
+            if (cBg && cBg !== 'transparent') colStyle += `background-color:${cBg};`;
+            preview = `<div class="pb-column-editor ${colWidth}" style="${colStyle}"><div class="pb-column-header">Column</div><div class="pb-column-content"></div></div>`;
+            break;
+        }
         default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
     }
     return `<div class="pb-el-drag" draggable="true" title="Arrastar para reordenar">&#10023;</div><div class="pb-el-toolbar"><span class="pb-el-name">${escHtml(name)}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;

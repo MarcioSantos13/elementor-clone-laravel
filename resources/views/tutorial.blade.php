@@ -16,6 +16,7 @@
             <a href="#license">Custo &amp; Licença</a>
             <a href="#auth">Criar Conta &amp; Acessar</a>
             <a href="#create-page">Criar uma Página</a>
+            <a href="#build-from-zero">Construir do Zero (Passo a Passo)</a>
             <a href="#editor">O Editor</a>
             <a href="#drag-widgets">Adicionar Widgets</a>
             <a href="#educational-widgets">Widgets Educacionais</a>
@@ -289,6 +290,328 @@ php artisan db:seed</code></pre>
                     <li>Opcionalmente, escolha um <strong>Template</strong> (veja <a href="#templates">passo 10</a>)</li>
                     <li>Clique em <strong>"Criar &amp; Abrir Editor"</strong> para ir direto ao editor visual</li>
                 </ol>
+            </div>
+        </section>
+
+        {{-- BUILD FROM ZERO --}}
+        <section id="build-from-zero" class="step">
+            <h2>3b. Construindo uma Página do Zero (Template em Branco)</h2>
+            <div class="step-body">
+                <p>Este guia passo a passo mostra como construir uma página completa a partir do zero, usando o template <strong>"Página em Branco"</strong>. Vamos criar uma página simples com um cabeçalho hero, uma seção de conteúdo com duas colunas e um rodapé.</p>
+
+                <div class="tip">
+                    <strong>&#128161; Antes de começar:</strong> Entenda a hierarquia fundamental do page builder:
+                    <br><br>
+                    <strong>Página</strong> → <strong>Seção</strong> (container de linha) → <strong>Coluna</strong> (container de coluna) → <strong>Widget</strong> (conteúdo: título, texto, imagem, botão, etc.)
+                    <br><br>
+                    Você <em>sempre</em> começa arrastando uma <strong>Seção</strong> para a página. Dentro da Seção, colocamos <strong>Colunas</strong>. Dentro das Colunas, colocamos <strong>Widgets</strong>.
+                </div>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 1 — Criar a Página em Branco</h3>
+                <ol>
+                    <li>Na barra de navegação superior, clique em <strong>"+ Nova Página"</strong>.</li>
+                    <li>No formulário de criação, preencha:
+                        <ul>
+                            <li><strong>Título:</strong> <code>Minha Primeira Página</code></li>
+                            <li><strong>Status:</strong> <code>Rascunho</code> (recomendado enquanto estiver editando)</li>
+                            <li><strong>Template:</strong> selecione <code>Página em Branco (começa do Zero)</code></li>
+                        </ul>
+                    </li>
+                    <li>Clique em <strong>"Criar &amp; Abrir Editor"</strong>.</li>
+                    <li>O editor abrirá com um canvas vazio — nenhuma seção ou widget ainda.</li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 2 — Adicionar a Primeira Seção (Cabeçalho Hero)</h3>
+                <p>A seção é o container principal. Tudo começa com ela.</p>
+                <ol>
+                    <li>No painel esquerdo (Widgets), localize o widget <strong>"Seção" &#128194;</strong>.</li>
+                    <li><strong>Arraste</strong> o widget "Seção" e <strong>solte</strong> na área cinza do canvas (onde diz "Arraste widgets aqui" ou similar).</li>
+                    <li>Uma seção aparecerá no canvas como uma caixa vazia (a seção não cria colunas automaticamente).</li>
+                    <li><strong>Clique na seção</strong> (na borda azul) para selecioná-la. O painel direito mostrará as configurações.</li>
+                    <li>No painel direito, configure a seção:
+                        <ul>
+                            <li><strong>Layout:</strong> <code>full_width</code> (ocupa toda a largura da tela)</li>
+                            <li><strong>Cor de fundo (aba Style):</strong> <code>#1e293b</code> (azul escuro)</li>
+                            <li><strong>Padding superior (aba Advanced):</strong> <code>80px</code></li>
+                            <li><strong>Padding inferior (aba Advanced):</strong> <code>80px</code></li>
+                            <li><strong>Alinhar itens:</strong> <code>center</code></li>
+                            <li><strong>Justificar conteúdo:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Para alterar um valor de padding, clique na aba <strong>"Advanced"</strong> no painel direito. Lá você encontra os campos de Padding e Margin para cada lado (topo, direita, baixo, esquerda).
+                </div>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 3 — Adicionar e Configurar a Coluna</h3>
+                <p>A seção criada está vazia. Agora precisamos adicionar uma coluna dentro dela.</p>
+                <ol>
+                    <li>No painel esquerdo (Widgets), localize o widget <strong>"Coluna" &#128194;</strong>.</li>
+                    <li><strong>Arraste</strong> o widget "Coluna" e <strong>solte</strong> dentro da seção que criamos no Passo 2.</li>
+                    <li>Uma coluna aparecerá dentro da seção.</li>
+                    <li><strong>Clique na coluna</strong> para selecioná-la. No painel direito, configure:
+                        <ul>
+                            <li><strong>Largura:</strong> <code>col-12</code> (largura total)</li>
+                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Importante:</strong> A seção <strong>não cria colunas automaticamente</strong>. Você sempre precisa arrastar o widget "Coluna" para dentro da seção manualmente. Widgets de conteúdo (Título, Texto, Botão, etc.) só podem ser colocados dentro de colunas.
+                </div>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 4 — Adicionar um Título (Heading)</h3>
+                <p>Agora vamos colocar conteúdo dentro da coluna.</p>
+                <ol>
+                    <li>No painel esquerdo, localize o widget <strong>"Título" &#128221;</strong>.</li>
+                    <li><strong>Arraste</strong> o widget "Título" e <strong>solte</strong> dentro da coluna (área azulclara dentro da seção).</li>
+                    <li>Um título com texto padrão aparecerá. <strong>Clique nele</strong> para selecionar.</li>
+                    <li>No painel direito, configure:
+                        <ul>
+                            <li><strong>Title (texto):</strong> <code>Bem-vindo à Minha Página</code></li>
+                            <li><strong>HTML Tag:</strong> <code>H1</code></li>
+                            <li><strong>Size:</strong> <code>xxl</code></li>
+                            <li><strong>Alignment:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                    <li>Vá na aba <strong>"Style"</strong> do painel direito e configure:
+                        <ul>
+                            <li><strong>Color:</strong> <code>#ffffff</code> (branco, para contrastar com o fundo escuro)</li>
+                            <li><strong>Font Weight:</strong> <code>800</code> (negrito forte)</li>
+                        </ul>
+                    </li>
+                    <li>Vá na aba <strong>"Advanced"</strong> e configure:
+                        <ul>
+                            <li><strong>Bottom Margin:</strong> <code>16px</code> (espaço abaixo do título)</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 5 — Adicionar um Texto Descritivo</h3>
+                <ol>
+                    <li>No painel esquerdo, localize o widget <strong>"Texto" &#128196;</strong>.</li>
+                    <li><strong>Arraste</strong> o widget "Texto" e <strong>solte</strong> dentro da mesma coluna, <em>abaixo</em> do título.</li>
+                    <li><strong>Clique no texto</strong> para selecionar.</li>
+                    <li>No painel direito, você verá um editor rich-text (WYSIWYG). Digite:
+                        <ul>
+                            <li><code>Esta é minha primeira página criada com o Page Builder. Arraste e solte widgets para construir o layout desejado.</code></li>
+                        </ul>
+                    </li>
+                    <li>Configure os campos abaixo do editor:
+                        <ul>
+                            <li><strong>Alignment:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                    <li>Vá na aba <strong>"Style"</strong> e configure:
+                        <ul>
+                            <li><strong>Font Size:</strong> <code>18</code></li>
+                            <li><strong>Line Height:</strong> <code>1.8</code></li>
+                        </ul>
+                    </li>
+                    <li>Vá na aba <strong>"Advanced"</strong> e configure:
+                        <ul>
+                            <li><strong>Bottom Margin:</strong> <code>32px</code></li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 6 — Adicionar um Botão</h3>
+                <ol>
+                    <li>No painel esquerdo, localize o widget <strong>"Botão" &#128073;</strong>.</li>
+                    <li><strong>Arraste</strong> o widget "Botão" e <strong>solte</strong> dentro da mesma coluna, <em>abaixo</em> do texto.</li>
+                    <li><strong>Clique no botão</strong> para selecionar.</li>
+                    <li>No painel direito, configure:
+                        <ul>
+                            <li><strong>Text:</strong> <code>Saiba Mais</code></li>
+                            <li><strong>Link:</strong> <code>#</code> (ou uma URL real)</li>
+                            <li><strong>Size:</strong> <code>large</code></li>
+                            <li><strong>Alignment:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                    <li>Vá na aba <strong>"Style"</strong> e configure:
+                        <ul>
+                            <li><strong>Background Color:</strong> <code>#3b82f6</code> (azul)</li>
+                            <li><strong>Text Color:</strong> <code>#ffffff</code> (branco)</li>
+                            <li><strong>Border Radius:</strong> <code>8px</code></li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Resultado até aqui:</strong> Você tem uma seção escura com um título branco grande, um texto descritivo e um botão azul centralizados. É o "hero" da página.
+                </div>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 7 — Adicionar uma Segunda Seção (Conteúdo com Duas Colunas)</h3>
+                <p>Agora vamos criar uma seção com duas colunas lado a lado.</p>
+                <ol>
+                    <li><strong>Arraste outro widget "Seção"</strong> do painel esquerdo e <strong>solte</strong> na página, <em>abaixo</em> da seção hero.</li>
+                    <li>Selecione a nova seção e configure:
+                        <ul>
+                            <li><strong>Layout:</strong> <code>boxed</code> (largura contida, centralizada)</li>
+                            <li><strong>Cor de fundo (aba Style):</strong> <code>#ffffff</code> (branco)</li>
+                            <li><strong>Padding superior (aba Advanced):</strong> <code>80px</code></li>
+                            <li><strong>Padding inferior (aba Advanced):</strong> <code>80px</code></li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 8 — Criar a Primeira Coluna (Lado Esquerdo)</h3>
+                <ol>
+                    <li>No painel esquerdo, arraste o widget <strong>"Coluna"</strong> e <strong>solte</strong> dentro da seção que criou no Passo 7.</li>
+                    <li><strong>Selecione essa coluna</strong>. No painel direito, configure:
+                        <ul>
+                            <li><strong>Largura:</strong> <code>col-6</code> (50% da largura)</li>
+                        </ul>
+                    </li>
+                    <li>Dentro dessa coluna, arraste um widget <strong>"Título"</strong> e configure:
+                        <ul>
+                            <li><strong>Title:</strong> <code>Sobre Nós</code></li>
+                            <li><strong>HTML Tag:</strong> <code>H2</code></li>
+                            <li><strong>Size:</strong> <code>xl</code></li>
+                            <li><strong>Alignment:</strong> <code>left</code></li>
+                        </ul>
+                    </li>
+                    <li>Vá na aba <strong>"Style"</strong> do título e configure:
+                        <ul>
+                            <li><strong>Color:</strong> <code>#1e293b</code></li>
+                            <li><strong>Font Weight:</strong> <code>700</code></li>
+                        </ul>
+                    </li>
+                    <li>Abaixo do título, arraste um widget <strong>"Texto"</strong> e configure:
+                        <ul>
+                            <li><strong>Conteúdo:</strong> <code>Somos uma equipe apaixonada por criar soluções digitais inovadoras. Nosso objetivo é transformar ideias em experiências excepcionais para nossos clientes.</code></li>
+                            <li><strong>Font Size (aba Style):</strong> <code>16</code></li>
+                            <li><strong>Line Height (aba Style):</strong> <code>1.8</code></li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 9 — Criar a Segunda Coluna (Lado Direito)</h3>
+                <ol>
+                    <li><strong>Arraste outro widget "Coluna"</strong> do painel esquerdo e <strong>solte</strong> dentro da mesma seção (abaixo ou ao lado da primeira coluna).</li>
+                    <li>Selecione essa nova coluna e configure:
+                        <ul>
+                            <li><strong>Largura:</strong> <code>col-6</code> (50% da largura)</li>
+                        </ul>
+                    </li>
+                    <li>O page builder automaticamente colocará as duas colunas <strong>lado a lado</strong> (50% cada).</li>
+                    <li>Dentro dessa segunda coluna, arraste um widget <strong>"Imagem"</strong> e configure:
+                        <ul>
+                            <li><strong>Image URL:</strong> cole a URL de uma imagem (ou use o botão de upload)</li>
+                            <li><strong>Alt Text:</strong> <code>Imagem ilustrativa</code></li>
+                            <li><strong>Width:</strong> <code>100%</code></li>
+                        </ul>
+                    </li>
+                    <li>Opcionalmente, adicione um widget <strong>"Texto"</strong> abaixo da imagem com uma descrição.</li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Se as colunas não estiverem lado a lado, verifique se ambas pertencem à <em>mesma seção</em>. Colunas dentro da mesma seção são automaticamente posicionadas horizontalmente.
+                </div>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 10 — Adicionar uma Terceira Seção (Rodapé / CTA)</h3>
+                <ol>
+                    <li><strong>Arraste mais uma "Seção"</strong> e solte abaixo da seção anterior.</li>
+                    <li>Configure:
+                        <ul>
+                            <li><strong>Layout:</strong> <code>full_width</code></li>
+                            <li><strong>Cor de fundo (aba Style):</strong> <code>#3b82f6</code> (azul)</li>
+                            <li><strong>Padding superior (aba Advanced):</strong> <code>60px</code></li>
+                            <li><strong>Padding inferior (aba Advanced):</strong> <code>60px</code></li>
+                            <li><strong>Alinhar itens:</strong> <code>center</code></li>
+                            <li><strong>Justificar conteúdo:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                    <li>Arraste o widget <strong>"Coluna"</strong> e <strong>solte</strong> dentro dessa seção. Selecione a coluna e configure:
+                        <ul>
+                            <li><strong>Largura:</strong> <code>col-12</code></li>
+                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
+                        </ul>
+                    </li>
+                    <li>Dentro da coluna, arraste um <strong>"Título"</strong>:
+                        <ul>
+                            <li><strong>Title:</strong> <code>Pronto para Começar?</code></li>
+                            <li><strong>HTML Tag:</strong> <code>H2</code></li>
+                            <li><strong>Size:</strong> <code>xl</code></li>
+                            <li><strong>Alignment:</strong> <code>center</code></li>
+                            <li><strong>Color (aba Style):</strong> <code>#ffffff</code></li>
+                        </ul>
+                    </li>
+                    <li>Abaixo do título, arraste um <strong>"Botão"</strong>:
+                        <ul>
+                            <li><strong>Text:</strong> <code>Fale Conosco</code></li>
+                            <li><strong>Link:</strong> <code>#</code></li>
+                            <li><strong>Size:</strong> <code>large</code></li>
+                            <li><strong>Alignment:</strong> <code>center</code></li>
+                            <li><strong>Background Color (aba Style):</strong> <code>#ffffff</code></li>
+                            <li><strong>Text Color (aba Style):</strong> <code>#3b82f6</code></li>
+                            <li><strong>Border Radius (aba Style):</strong> <code>50px</code> (formato pílula)</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 11 — Salvar e Publicar</h3>
+                <ol>
+                    <li>Revise a página no canvas — você deve ver 3 seções empilhadas: hero escura, conteúdo branco com 2 colunas, e rodapé azul.</li>
+                    <li>Clique no botão <strong>&#128190; Salvar</strong> na barra superior para salvar como rascunho.</li>
+                    <li>Quando estiver satisfeito, clique em <strong>&#128640; Publicar</strong> para tornar a página visível publicamente.</li>
+                    <li>Para ver o resultado final, clique em <strong>&#128065; Visualizar</strong> (ícone de olho) ou acesse a URL pública da página.</li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Estrutura Final da Página</h3>
+                <p>Após concluir todos os passos, sua árvore de elementos ficará assim:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.85rem;overflow-x:auto"><code>Página: "Minha Primeira Página"
+│
+├── Seção 1 (full_width, fundo #1e293b)
+│   └── Coluna (col-12, center)
+│       ├── Título H1: "Bem-vindo à Minha Página" (branco, xxl)
+│       ├── Texto: "Esta é minha primeira página..." (18px)
+│       └── Botão: "Saiba Mais" (azul, large)
+│
+├── Seção 2 (boxed, fundo #ffffff)
+│   ├── Coluna (col-6)
+│   │   ├── Título H2: "Sobre Nós" (#1e293b, xl)
+│   │   └── Texto: "Somos uma equipe..." (16px)
+│   └── Coluna (col-6)
+│       └── Imagem (100% width)
+│
+└── Seção 3 (full_width, fundo #3b82f6)
+    └── Coluna (col-12, center)
+        ├── Título H2: "Pronto para Começar?" (branco, xl)
+        └── Botão: "Fale Conosco" (branco, pílula)</code></pre>
+
+                <div class="tip">
+                    <strong>&#128161; Dicas para personalizar:</strong>
+                    <ul style="margin-top:.5rem">
+                        <li><strong>Para reordenar elementos:</strong> arraste um widget para cima ou para baixo dentro da coluna.</li>
+                        <li><strong>Para duplicar:</strong> clique com o botão direito em um elemento e selecione "Duplicar".</li>
+                        <li><strong>Para remover:</strong> passe o mouse sobre o elemento e clique no ícone ✕.</li>
+                        <li><strong>Para desfazer:</strong> pressione <kbd>Ctrl</kbd>+<kbd>Z</kbd> (até 50 etapas).</li>
+                        <li><strong>Para editar texto rapidamente:</strong> duplo-clique no título ou texto no canvas para editar inline.</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
