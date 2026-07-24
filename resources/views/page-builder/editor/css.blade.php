@@ -326,4 +326,76 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     border: 1px solid var(--pb-accent); border-radius: 3px; color: var(--pb-text);
     width: 120px; outline: none;
 }
+
+.pb-el-children {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: 20px;
+}
+
+[data-el-type="section"] > .pb-el-children,
+[data-el-type="column"] > .pb-el-children {
+    padding: .25rem;
+}
+
+.pb-section-editor {
+    border: 2px dashed rgba(99,102,241,.3);
+    border-radius: 6px;
+    min-height: 60px;
+    position: relative;
+}
+
+.pb-section-header {
+    font-size: .6rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: rgba(255,255,255,.6);
+    background: rgba(99,102,241,.5);
+    padding: 2px 8px;
+    border-radius: 4px 4px 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.pb-section-content {
+    padding: .5rem;
+    min-height: 40px;
+}
+
+.pb-column-editor {
+    border: 1px dashed rgba(99,102,241,.25);
+    border-radius: 4px;
+    min-height: 40px;
+    position: relative;
+}
+
+.pb-column-header {
+    font-size: .55rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: rgba(99,102,241,.6);
+    background: rgba(99,102,241,.08);
+    padding: 1px 6px;
+    border-radius: 3px 3px 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+.pb-column-content {
+    padding: .25rem;
+    min-height: 30px;
+}
+
+[data-el-type="section"] {
+    border-color: rgba(99,102,241,.15);
+}
+
+[data-el-type="column"] {
+    border-color: rgba(99,102,241,.1);
+}
 </style>

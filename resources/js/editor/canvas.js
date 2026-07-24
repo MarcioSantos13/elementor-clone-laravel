@@ -57,7 +57,7 @@ export function renderMath() {
 
 export function elementHtml(el) {
     let name = el.name || el.type;
-    const s = el.settings || {};
+    const s = { ...(el.settings || {}), ...(el.styles || {}) };
     let preview = '';
     switch (el.type) {
         case 'heading': {

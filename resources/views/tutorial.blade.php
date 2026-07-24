@@ -307,6 +307,10 @@ php artisan db:seed</code></pre>
                     Você <em>sempre</em> começa arrastando uma <strong>Seção</strong> para a página. Dentro da Seção, colocamos <strong>Colunas</strong>. Dentro das Colunas, colocamos <strong>Widgets</strong>.
                 </div>
 
+                <div class="tip" style="background:#fff3cd;border-color:#ffc107">
+                    <strong>&#9888; Atenção ao copiar texto:</strong> Para os exemplos de texto abaixo, <strong>digite manualmente</strong> no editor em vez de copiar e colar do tutorial. Copiar do navegador inclui formatação HTML indesejada (spans com estilos inline) nos campos de entrada.
+                </div>
+
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 1 — Criar a Página em Branco</h3>
@@ -376,7 +380,7 @@ php artisan db:seed</code></pre>
                     <li>Um título com texto padrão aparecerá. <strong>Clique nele</strong> para selecionar.</li>
                     <li>No painel direito, configure:
                         <ul>
-                            <li><strong>Title (texto):</strong> <code>Bem-vindo à Minha Página</code></li>
+                            <li><strong>Title (texto):</strong> digite: <em>Bem-vindo à Minha Página</em></li>
                             <li><strong>HTML Tag:</strong> <code>H1</code></li>
                             <li><strong>Size:</strong> <code>xxl</code></li>
                             <li><strong>Alignment:</strong> <code>center</code></li>
@@ -404,7 +408,7 @@ php artisan db:seed</code></pre>
                     <li><strong>Clique no texto</strong> para selecionar.</li>
                     <li>No painel direito, você verá um editor rich-text (WYSIWYG). Digite:
                         <ul>
-                            <li><code>Esta é minha primeira página criada com o Page Builder. Arraste e solte widgets para construir o layout desejado.</code></li>
+                            <li><em>Esta é minha primeira página criada com o Page Builder. Arraste e solte widgets para construir o layout desejado.</em></li>
                         </ul>
                     </li>
                     <li>Configure os campos abaixo do editor:
@@ -480,7 +484,7 @@ php artisan db:seed</code></pre>
                     </li>
                     <li>Dentro dessa coluna, arraste um widget <strong>"Título"</strong> e configure:
                         <ul>
-                            <li><strong>Title:</strong> <code>Sobre Nós</code></li>
+                            <li><strong>Title:</strong> digite: <em>Sobre Nós</em></li>
                             <li><strong>HTML Tag:</strong> <code>H2</code></li>
                             <li><strong>Size:</strong> <code>xl</code></li>
                             <li><strong>Alignment:</strong> <code>left</code></li>
@@ -494,7 +498,7 @@ php artisan db:seed</code></pre>
                     </li>
                     <li>Abaixo do título, arraste um widget <strong>"Texto"</strong> e configure:
                         <ul>
-                            <li><strong>Conteúdo:</strong> <code>Somos uma equipe apaixonada por criar soluções digitais inovadoras. Nosso objetivo é transformar ideias em experiências excepcionais para nossos clientes.</code></li>
+                            <li><strong>Conteúdo:</strong> digite: <em>Somos uma equipe apaixonada por criar soluções digitais inovadoras. Nosso objetivo é transformar ideias em experiências excepcionais para nossos clientes.</em></li>
                             <li><strong>Font Size (aba Style):</strong> <code>16</code></li>
                             <li><strong>Line Height (aba Style):</strong> <code>1.8</code></li>
                         </ul>
@@ -548,7 +552,7 @@ php artisan db:seed</code></pre>
                     </li>
                     <li>Dentro da coluna, arraste um <strong>"Título"</strong>:
                         <ul>
-                            <li><strong>Title:</strong> <code>Pronto para Começar?</code></li>
+                            <li><strong>Title:</strong> digite: <em>Pronto para Começar?</em></li>
                             <li><strong>HTML Tag:</strong> <code>H2</code></li>
                             <li><strong>Size:</strong> <code>xl</code></li>
                             <li><strong>Alignment:</strong> <code>center</code></li>
@@ -557,7 +561,7 @@ php artisan db:seed</code></pre>
                     </li>
                     <li>Abaixo do título, arraste um <strong>"Botão"</strong>:
                         <ul>
-                            <li><strong>Text:</strong> <code>Fale Conosco</code></li>
+                            <li><strong>Text:</strong> digite: <em>Fale Conosco</em></li>
                             <li><strong>Link:</strong> <code>#</code></li>
                             <li><strong>Size:</strong> <code>large</code></li>
                             <li><strong>Alignment:</strong> <code>center</code></li>
