@@ -67,6 +67,14 @@ export function bindCanvasDrops(state) {
                 const midY = rect.top + rect.height / 2;
                 target.classList.add(e.clientY < midY ? 'drop-before' : 'drop-after');
             }
+        } else {
+            const childContainer = e.target.closest('.pb-el-children');
+            if (childContainer) {
+                const parentContainer = childContainer.closest('.pb-el');
+                if (parentContainer && parentContainer.dataset.isContainer === 'true') {
+                    parentContainer.classList.add('drop-over');
+                }
+            }
         }
         if (emptyCanvas) emptyCanvas.classList.add('drag-over');
     });
@@ -138,13 +146,13 @@ export function bindCanvasDrops(state) {
 }
 
 export function _handleElementDrop(state, dragId, e) {
-    const target = e.target.closest('.pb-el');
+    let target = e.target.closest('.pb-el');
     if (!target || parseInt(target.dataset.elId) === dragId) return;
 
     const targetId = parseInt(target.dataset.elId);
+    const isContainer = target.dataset.isContainer === 'true';
     const rect = target.getBoundingClientRect();
     const midY = rect.top + rect.height / 2;
-    const insertBefore = e.clientY < midY;
 
     const els = state._lastElements || [];
     const dragEl = findInTree(els, dragId);
@@ -156,10 +164,18 @@ export function _handleElementDrop(state, dragId, e) {
         parentList.splice(idx, 1);
     }
 
-    const siblings = findParentList(els, targetId) || els;
-    const idx = siblings.findIndex(e => e.id === targetId);
-    if (insertBefore) siblings.splice(idx, 0, dragEl);
-    else siblings.splice(idx + 1, 0, dragEl);
+    const targetEl = findInTree(els, targetId);
+    if (!targetEl) return;
+
+    if (isContainer && targetEl.children) {
+        if (!targetEl.children) targetEl.children = [];
+        targetEl.children.push(dragEl);
+    } else {
+        const siblings = findParentList(els, targetId) || els;
+        const idx = siblings.findIndex(e => e.id === targetId);
+        if (e.clientY < midY) siblings.splice(idx, 0, dragEl);
+        else siblings.splice(idx + 1, 0, dragEl);
+    }
 
     state.renderCanvas(state, els);
     state.renderStructure(els);

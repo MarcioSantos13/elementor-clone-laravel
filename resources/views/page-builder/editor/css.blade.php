@@ -398,4 +398,41 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
 [data-el-type="column"] {
     border-color: rgba(99,102,241,.1);
 }
+
+.pb-empty-drop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    border: 2px dashed var(--pb-border);
+    border-radius: 6px;
+    color: var(--pb-text2);
+    font-size: 1.5rem;
+    transition: all 0.2s;
+}
+
+.drop-over .pb-empty-drop {
+    border-color: var(--pb-accent);
+    background: var(--pb-primary-light);
+}
+
+.drop-over {
+    position: relative;
+}
+
+.drop-over::after {
+    content: 'Solte aqui';
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--pb-primary);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+}
 </style>

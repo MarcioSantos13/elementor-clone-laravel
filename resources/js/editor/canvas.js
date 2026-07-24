@@ -28,11 +28,18 @@ export function renderCanvas(state, elements, parentEl) {
         }
         if (parentEl) parentEl.appendChild(div);
         else dz.appendChild(div);
-        if (el.children && el.children.length > 0) {
+        if (el.is_container) {
             const childContainer = document.createElement('div');
             childContainer.className = 'pb-el-children';
             div.appendChild(childContainer);
-            renderCanvas(state, el.children, childContainer);
+            if (el.children && el.children.length > 0) {
+                renderCanvas(state, el.children, childContainer);
+            } else {
+                const emptyDrop = document.createElement('div');
+                emptyDrop.className = 'pb-empty-drop';
+                emptyDrop.innerHTML = '<span>+</span>';
+                childContainer.appendChild(emptyDrop);
+            }
         }
     });
     if (!parentEl) state.renderMath();
