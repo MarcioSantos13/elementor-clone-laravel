@@ -435,4 +435,116 @@ body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: v
     z-index: 10;
     pointer-events: none;
 }
+
+/* ========== SortableJS Styles - Elementor Style ========== */
+
+.pb-sortable-ghost {
+    opacity: .4;
+    border: 2px dashed var(--pb-accent) !important;
+    background: var(--pb-primary-light) !important;
+    border-radius: 4px;
+}
+
+.pb-sortable-chosen {
+    cursor: grabbing !important;
+}
+
+.pb-sortable-drag {
+    opacity: .9 !important;
+    box-shadow: 0 8px 32px rgba(99,102,241,.3) !important;
+    border: 2px solid var(--pb-primary) !important;
+    border-radius: 4px;
+    z-index: 10000 !important;
+}
+
+/* Widget panel ghost when dragging */
+.pb-widget-ghost {
+    opacity: .3;
+    border: 2px dashed var(--pb-accent) !important;
+    background: var(--pb-primary-light) !important;
+}
+
+.pb-widget-chosen {
+    border-color: var(--pb-accent) !important;
+    background: var(--pb-primary-light) !important;
+    transform: scale(1.02);
+}
+
+.pb-widget-dragging {
+    opacity: .8 !important;
+    transform: rotate(2deg) scale(1.05) !important;
+    box-shadow: 0 12px 40px rgba(99,102,241,.4) !important;
+    z-index: 100000 !important;
+    border-color: var(--pb-primary) !important;
+}
+
+/* Body state when dragging */
+body.pb-is-dragging {
+    cursor: grabbing !important;
+}
+body.pb-is-dragging * {
+    cursor: grabbing !important;
+}
+
+/* Empty canvas drop zone when dragging */
+body.pb-is-dragging .pb-empty-canvas {
+    border-color: var(--pb-accent);
+    background: rgba(99,102,241,.06);
+    animation: emptyCanvasPulse 1.5s ease-in-out infinite;
+}
+body.pb-is-dragging .pb-empty-canvas .pb-empty-icon {
+    animation: emptyIconBounce .8s ease-in-out infinite;
+}
+
+@keyframes emptyCanvasPulse {
+    0%, 100% { border-color: var(--pb-accent); }
+    50% { border-color: var(--pb-primary); background: rgba(99,102,241,.1); }
+}
+
+@keyframes emptyIconBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Container highlight when dragging over */
+body.pb-is-dragging .pb-el[data-is-container="true"] {
+    transition: all .2s;
+}
+body.pb-is-dragging .pb-el[data-is-container="true"].pb-sortable-ghost {
+    border: 2px dashed var(--pb-accent) !important;
+    background: rgba(99,102,241,.08) !important;
+    min-height: 80px;
+}
+
+/* Navigator sortable styles */
+.pb-nav-ghost {
+    opacity: .4;
+    background: rgba(99,102,241,.15) !important;
+    border-left: 3px solid var(--pb-accent) !important;
+}
+
+.pb-nav-chosen {
+    background: rgba(99,102,241,.1) !important;
+    border-left-color: var(--pb-accent) !important;
+    color: var(--pb-accent) !important;
+    font-weight: 600;
+}
+
+/* Drop indicator line (Elementor style) */
+.sortable-drag .pb-el {
+    box-shadow: 0 4px 16px rgba(99,102,241,.2) !important;
+}
+
+/* Smooth animations for all sortable containers */
+.pb-el-children,
+#canvas-dropzone,
+.pb-nav-children {
+    transition: min-height .2s ease;
+}
+
+/* Widget panel hover effect improvement */
+body.pb-is-dragging .pb-panel:not(.pb-panel-right) {
+    background: rgba(99,102,241,.05);
+    border-right-color: var(--pb-accent);
+}
 </style>

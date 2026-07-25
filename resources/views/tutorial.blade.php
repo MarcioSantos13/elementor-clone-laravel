@@ -105,7 +105,7 @@ php artisan db:seed</code></pre>
             <h2>1. Visão Geral</h2>
 
             <div class="step-body">
-                <p>O <strong>Laravel Page Builder</strong> é um construtor de páginas visual drag-and-drop inspirado no Elementor. Permite criar páginas web completas arrastando widgets para uma tela, editando conteúdo e estilo em tempo real, sem escrever código.</p>
+                <p>O <strong>Laravel Page Builder</strong> é um construtor de páginas visual drag-and-drop inspirado no Elementor, usando <strong>SortableJS</strong> para um D&D fluido e preciso. Permite criar páginas web completas arrastando widgets para uma tela, editando conteúdo e estilo em tempo real, sem escrever código.</p>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Stack Tecnológica</h3>
                 <table class="widget-table">
@@ -114,7 +114,7 @@ php artisan db:seed</code></pre>
                     <tr><td>Frontend</td><td>JavaScript vanilla (sem frameworks)</td><td>ES2022+</td></tr>
                     <tr><td>Banco de Dados</td><td>SQLite (padrão) / MySQL / MariaDB</td><td>&#8212;</td></tr>
                     <tr><td>PHP</td><td>LTS</td><td>8.2+</td></tr>
-                    <tr><td>Build</td><td>Vite + Tailwind CSS</td><td>7.x / 4.x</td></tr>
+                    <tr><td>Build</td><td>Vite + Tailwind CSS + SortableJS</td><td>7.x / 4.x / 1.x</td></tr>
                     <tr><td>Testes</td><td>PHPUnit</td><td>11.x</td></tr>
                 </table>
 
@@ -149,9 +149,9 @@ php artisan db:seed</code></pre>
                     <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
                     <li>Duplicar, exportar (JSON), importar, copiar HTML, excluir páginas</li>
                     <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou colar HTML diretamente</li>
-                    <li><strong>Navegador (Navigator)</strong> — painel flutuante com árvore de elementos, drag-and-drop, renomear, menu de contexto</li>
+                    <li><strong>Navegador (Navigator)</strong> — painel flutuante com árvore de elementos, drag-and-drop SortableJS para reordenar, renomear, menu de contexto</li>
                     <li><strong>Right-click context menu</strong> no canvas e no Navigator (Editar, Duplicar, Copiar, Colar, Mover, Excluir)</li>
-                    <li><strong>Drag handle</strong> com indicadores visuais de posição (drop-before/drop-after)</li>
+                    <li><strong>Drag handle</strong> com SortableJS — indicadores visuais de posição (drop-before/drop-after), aninhamento em containers</li>
                     <li><strong>Zoom do canvas</strong> com Ctrl+Scroll, botões +/-, reset com Ctrl+0 (25%-200%)</li>
                     <li><strong>Tela cheia (Fullscreen)</strong> — esconder painéis laterais com botão ou F11</li>
                     <li><strong>Preview em tempo real</strong> — debounce 300ms em todos os controles (text, color, number, etc.)</li>
@@ -167,7 +167,7 @@ php artisan db:seed</code></pre>
 │                  FRONTEND                         │
 │   editor.blade.php (7 partials)                   │
 │   resources/js/editor/ (6 módulos ES)              │
-│   state, utils, canvas, history, navigator, dragdrop
+│   state, utils, canvas, history, navigator, dragdrop (SortableJS)
 ├──────────────────────────────────────────────────┤
 │                CONTROLLERS                        │
 │   PageController │ ElementController              │
@@ -215,7 +215,7 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que está incluído (gratuito)</h3>
                 <ul>
                     <li>17 widgets (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</li>
-                    <li>Editor visual completo com drag-and-drop, undo/redo, zoom, fullscreen</li>
+                    <li>Editor visual completo com drag-and-drop (SortableJS), undo/redo, zoom, fullscreen</li>
                     <li>6 templates prontos (Blank, Landing, About, Contact, Moodle Course, Showcase)</li>
                     <li>Sistema de revisões com diff e restauração</li>
                     <li>Exportação/Importação de páginas (JSON)</li>
@@ -644,7 +644,7 @@ php artisan db:seed</code></pre>
                     <li>Lista os 17 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion</li>
                     <li>Cada widget mostra um ícone (emoji) e nome</li>
                     <li>O painel começa colapsado — clique no ícone de widgets (☰) na barra superior para expandir</li>
-                    <li>Clique em um widget para adicioná-lo à página (ou arraste para o canvas)</li>
+                    <li><strong>Arraste</strong> um widget do painel para o canvas para adicioná-lo (suporte a Drop Indicator com SortableJS)</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Centro — Canvas</h3>
@@ -690,6 +690,7 @@ php artisan db:seed</code></pre>
         <section id="drag-widgets" class="step">
             <h2>5. Adicionar Widgets (Arrastar &amp; Soltar)</h2>
             <div class="step-body">
+                <p>O editor usa <strong>SortableJS</strong> (mesma biblioteca do Elementor real) para um drag-and-drop fluido e preciso. Arraste qualquer widget do painel esquerdo e solte exatamente onde deseja no canvas. Indicadores visuais mostram onde o elemento será inserido.</p>
                 <p>Cada widget adiciona um tipo diferente de conteúdo. Veja o que cada um faz e suas configurações disponíveis:</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Visão Geral dos Widgets</h3>
@@ -996,7 +997,7 @@ php artisan db:seed</code></pre>
                 <p>O editor inclui funcionalidades avançadas de produtividade:</p>
                 <table class="widget-table">
                     <tr><th>Feature</th><th>Descrição</th></tr>
-                    <tr><td><strong>Navigator</strong></td><td>Painel flutuante com árvore de elementos — drag-and-drop, renomear (duplo clique), menu de contexto</td></tr>
+                    <tr><td><strong>Navigator</strong></td><td>Painel flutuante com árvore de elementos — drag-and-drop SortableJS para reordenar e aninhar, renomear (duplo clique), menu de contexto</td></tr>
                     <tr><td><strong>Right-click</strong></td><td>Menu de contexto no canvas: Editar, Duplicar, Mover cima/baixo, Copiar, Colar, Excluir</td></tr>
                     <tr><td><strong>Drag Handle</strong></td><td>Ícone ⣿ para arrastar reordenar com linhas indicadoras de posição</td></tr>
                     <tr><td><strong>Zoom</strong></td><td>Ctrl+Scroll ou botões +/- (25%-200%), Ctrl+0 para reset</td></tr>
@@ -1741,8 +1742,8 @@ php artisan db:seed</code></pre>
                 <ol>
                     <li><strong>Abrir Navigator:</strong> clique no botão flutuante ☰ → painel aparece com a árvore</li>
                     <li><strong>Navegar:</strong> clique em qualquer item para selecioná-lo no canvas</li>
-                    <li><strong>Reordenar:</strong> arraste um item para cima/baixo na árvore → a ordem muda no canvas</li>
-                    <li><strong>Mover entre colunas:</strong> arraste um widget de uma coluna para outra</li>
+                    <li><strong>Reordenar (SortableJS):</strong> arraste um item para cima/baixo na árvore → a ordem muda no canvas</li>
+                    <li><strong>Mover entre colunas (SortableJS):</strong> arraste um widget de uma coluna para outra</li>
                     <li><strong>Renomear:</strong> duplo clique no nome → digite novo nome → Enter para salvar</li>
                     <li><strong>Context menu:</strong> clique direito → Duplicate, Delete, Copy, Paste, Move Up/Down</li>
                 </ol>
@@ -1815,7 +1816,7 @@ php artisan db:seed</code></pre>
 <pre style="margin:0">┌─────────────────────────────────────────────────────────────────┐
 │                        FRONTEND (6 módulos ES)                   │
 │  resources/js/editor/ ← editor.blade.php (partials)            │
-│  drag-drop, undo/redo, auto-save, inline editing, panels       │
+│  drag-drop (SortableJS), undo/redo, auto-save, inline editing, panels       │
 ├─────────────────────────────────────────────────────────────────┤
 │                     CONTROLLERS (7 classes)                       │
 │  PageController       — CRUD páginas, templates, export/import  │
@@ -1867,7 +1868,7 @@ php artisan db:seed</code></pre>
                     <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>50+ rotas (pages, elements, revisions, collab, html-import)</td></tr>
                     <tr><td><code>routes/api.php</code></td><td>1</td><td>API REST com Sanctum (tokens, pages, elements)</td></tr>
                     <tr><td><code>resources/views/</code></td><td>16</td><td>Blade views (editor, pages, auth, tutorial + 7 partials editor/)</td></tr>
-                    <tr><td><code>resources/js/editor/</code></td><td>6</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop</td></tr>
+                    <tr><td><code>resources/js/editor/</code></td><td>6</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop (SortableJS)</td></tr>
                     <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
                     <tr><td><code>tests/Feature/</code></td><td>4</td><td>PageControllerTest, ElementControllerTest, RevisionControllerTest, ExampleTest</td></tr>
                 </table>

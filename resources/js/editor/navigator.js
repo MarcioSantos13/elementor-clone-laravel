@@ -1,4 +1,7 @@
+import Sortable from 'sortablejs';
 import { structureIcon, apiFetch } from './utils.js';
+
+let _navSortables = new Map();
 
 export function toggleNavigator(state) {
     const navPanel = document.getElementById('panel-navigator');
@@ -24,8 +27,10 @@ export function toggleNavigator(state) {
 export function renderNavigator(state) {
     const body = document.getElementById('navigator-body');
     body.innerHTML = '';
+    destroyNavSortables();
     const els = state._lastElements || [];
     _renderNavItems(state, els, body, 0);
+    _initNavSortable(body, state, null);
 }
 
 export function _renderNavItems(state, elements, container, depth) {
@@ -88,21 +93,6 @@ export function _renderNavItems(state, elements, container, depth) {
             _showNavContext(state, e.clientX, e.clientY, el);
         };
 
-        item.ondragover = (e) => { e.preventDefault(); item.classList.add('drag-over'); };
-        item.ondragleave = () => item.classList.remove('drag-over');
-        item.ondrop = (e) => {
-            e.preventDefault();
-            item.classList.remove('drag-over');
-            const dragId = parseInt(e.dataTransfer.getData('text/plain'));
-            if (dragId && dragId !== el.id) _navMoveElement(state, dragId, el.id);
-        };
-
-        item.draggable = true;
-        item.ondragstart = (e) => {
-            e.dataTransfer.setData('text/plain', el.id);
-            e.dataTransfer.effectAllowed = 'move';
-        };
-
         container.appendChild(item);
 
         if (hasChildren) {
@@ -110,8 +100,57 @@ export function _renderNavItems(state, elements, container, depth) {
             childDiv.className = 'pb-nav-children';
             container.appendChild(childDiv);
             _renderNavItems(state, el.children, childDiv, depth + 1);
+            _initNavSortable(childDiv, state, el.id);
         }
     });
+}
+
+function _initNavSortable(container, state, parentId) {
+    if (_navSortables.has(container)) {
+        _navSortables.get(container).destroy();
+    }
+
+    const sortable = Sortable.create(container, {
+        group: {
+            name: 'navigator',
+            pull: true,
+            put: true,
+        },
+        animation: 150,
+        ghostClass: 'pb-nav-ghost',
+        chosenClass: 'pb-nav-chosen',
+        draggable: '.pb-nav-item',
+        handle: '.pb-nav-item',
+        onAdd(evt) {
+            const dragId = parseInt(evt.item.dataset.elId);
+            const newParentEl = evt.to.closest('.pb-nav-item');
+            const newParentId = newParentEl ? parseInt(newParentEl.dataset.elId) : null;
+
+            if (dragId) {
+                _navMoveElement(state, dragId, newParentId);
+            }
+        },
+        onUpdate(evt) {
+            const dragId = parseInt(evt.item.dataset.elId);
+            const siblingItems = Array.from(evt.to.children).filter(
+                c => c.classList.contains('pb-nav-item') && c.dataset.elId
+            );
+            const newSiblingId = siblingItems[evt.newIndex + 1]
+                ? parseInt(siblingItems[evt.newIndex + 1].dataset.elId)
+                : null;
+
+            if (dragId) {
+                _navReorderElement(state, dragId, newParentId, newSiblingId);
+            }
+        },
+    });
+
+    _navSortables.set(container, sortable);
+}
+
+function destroyNavSortables() {
+    _navSortables.forEach(s => s.destroy());
+    _navSortables.clear();
 }
 
 export function _startNavRename(state, nameEl, el) {
@@ -256,23 +295,57 @@ function findParentList(list, id) {
     return null;
 }
 
-export function _navMoveElement(state, dragId, targetId) {
+export function _navMoveElement(state, dragId, newParentId) {
     const els = state._lastElements || [];
     const dragEl = findInTree(els, dragId);
-    const targetEl = findInTree(els, targetId);
-    if (!dragEl || !targetEl) return;
+    if (!dragEl) return;
 
     const dragParent = findParentList(els, dragId);
-    const targetParent = findParentList(els, targetId);
-
     if (dragParent) {
         const idx = dragParent.findIndex(e => e.id === dragId);
         dragParent.splice(idx, 1);
     }
 
-    if (targetParent) {
-        const idx = targetParent.findIndex(e => e.id === targetId);
-        targetParent.splice(idx + 1, 0, dragEl);
+    if (newParentId) {
+        const targetEl = findInTree(els, newParentId);
+        if (targetEl && targetEl.children) {
+            targetEl.children.push(dragEl);
+        }
+    } else {
+        els.push(dragEl);
+    }
+
+    state.renderCanvas(state, els);
+    state.renderStructure(els);
+    renderNavigator(state);
+    state.renderMath();
+    state._saveElementOrder();
+}
+
+function _navReorderElement(state, dragId, targetParentId, beforeId) {
+    const els = state._lastElements || [];
+    const dragEl = findInTree(els, dragId);
+    if (!dragEl) return;
+
+    const dragParent = findParentList(els, dragId);
+    if (dragParent) {
+        const idx = dragParent.findIndex(e => e.id === dragId);
+        dragParent.splice(idx, 1);
+    }
+
+    if (beforeId) {
+        const insertParent = findParentList(els, beforeId);
+        if (insertParent) {
+            const idx = insertParent.findIndex(e => e.id === beforeId);
+            insertParent.splice(idx, 0, dragEl);
+        }
+    } else if (targetParentId) {
+        const targetEl = findInTree(els, targetParentId);
+        if (targetEl && targetEl.children) {
+            targetEl.children.push(dragEl);
+        }
+    } else {
+        els.push(dragEl);
     }
 
     state.renderCanvas(state, els);

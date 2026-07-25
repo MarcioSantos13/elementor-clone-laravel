@@ -2,7 +2,7 @@ import state from './state.js';
 import { escHtml, showToast, toastError, toastSuccess, structureIcon, apiFetch } from './utils.js';
 import { renderCanvas, renderMath, elementHtml, renderStructure } from './canvas.js';
 import { pushHistory, snapshotHistory, undo, redo, updateUndoButtons, _findElement } from './history.js';
-import { bindDragDrop, bindCanvasDrops, _handleElementDrop, _saveElementOrder } from './dragdrop.js';
+import { bindDragDrop, refreshSortables, initContainerSortables, _saveElementOrder } from './dragdrop.js';
 import { openHtmlImportModal } from './html-import.js';
 import { toggleNavigator, renderNavigator as renderNav, _showNavContext, _hideNavContext, _showCanvasContext, _hideCanvasContext, _navMoveElement, _navMoveRelative, _navPasteAfter, _startNavRename } from './navigator.js';
 
@@ -30,7 +30,7 @@ const editor = {
         state.pageId = pageId;
         state.csrf = csrfToken;
 
-        state.renderCanvas = (els) => renderCanvas(state, els);
+        state.renderCanvas = (els) => { renderCanvas(state, els); refreshSortables(state); };
         state.renderMath = () => renderMath();
         state.renderStructure = (els) => renderStructureWithSelect(els);
         state.renderNavigator = (s) => renderNav(s || state);
@@ -47,7 +47,6 @@ const editor = {
         loadElements();
         loadPageData();
         bindDragDrop(state);
-        bindCanvasDrops(state);
         bindKeyboard();
         bindInlineEditing();
         bindZoom();
@@ -100,6 +99,7 @@ function loadElements() {
             const prevSelected = state.selectedId;
             state._lastElements = data.elements || [];
             renderCanvas(state, state._lastElements);
+            refreshSortables(state);
             renderMath();
             renderStructureWithSelect(state._lastElements);
             pushHistory(state, state._lastElements);

@@ -1,187 +1,177 @@
+import Sortable from 'sortablejs';
 import { toastError, apiFetch } from './utils.js';
 
-function clearDropIndicators() {
-    document.querySelectorAll('.drop-over, .drop-before, .drop-after, .drag-over').forEach(el => {
-        el.classList.remove('drop-over', 'drop-before', 'drop-after', 'drag-over');
-    });
-}
-
-function findInTree(list, id) {
-    for (const el of list) {
-        if (el.id === id) return el;
-        if (el.children) {
-            const found = findInTree(el.children, id);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
-function findParentList(list, id) {
-    for (const el of list) {
-        if (el.id === id) return list;
-        if (el.children) {
-            const found = findParentList(el.children, id);
-            if (found) return found;
-        }
-    }
-    return null;
-}
+let _widgetPanelSortable = null;
+let _canvasSortable = null;
+const _containerSortables = new Map();
 
 export function bindDragDrop(state) {
-    document.querySelectorAll('.pb-widget-item[draggable]').forEach(w => {
-        w.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('text/plain', w.dataset.type);
-            e.dataTransfer.effectAllowed = 'copy';
-            w.classList.add('dragging');
-            const ghost = document.createElement('div');
-            ghost.className = 'pb-drag-ghost';
-            ghost.textContent = w.dataset.type;
-            ghost.id = 'drag-ghost';
-            document.body.appendChild(ghost);
-            e.dataTransfer.setDragImage(ghost, 0, 0);
-        });
-        w.addEventListener('dragend', () => {
-            w.classList.remove('dragging');
-            const ghost = document.getElementById('drag-ghost');
-            if (ghost) ghost.remove();
-            clearDropIndicators();
+    _bindWidgetPanel(state);
+    _bindCanvasDropzone(state);
+}
+
+function _bindWidgetPanel(state) {
+    const panelBody = document.getElementById('panel-widgets');
+    if (!panelBody) return;
+
+    const widgetItems = panelBody.querySelectorAll('.pb-widget-grid');
+    widgetItems.forEach(grid => {
+        Sortable.create(grid, {
+            group: {
+                name: 'widgets',
+                pull: 'clone',
+                put: false,
+            },
+            sort: false,
+            draggable: '.pb-widget-item',
+            ghostClass: 'pb-widget-ghost',
+            chosenClass: 'pb-widget-chosen',
+            dragClass: 'pb-widget-dragging',
+            animation: 150,
+            filter: '.pb-widget-group-title',
+            onStart(evt) {
+                document.body.classList.add('pb-is-dragging');
+                const item = evt.item;
+                item.dataset._origParent = '';
+            },
+            onEnd(evt) {
+                document.body.classList.remove('pb-is-dragging');
+            },
         });
     });
 }
 
-export function bindCanvasDrops(state) {
+function _bindCanvasDropzone(state) {
     const dz = document.getElementById('canvas-dropzone');
-    const emptyCanvas = document.getElementById('empty-canvas');
+    if (!dz) return;
 
-    dz.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-        clearDropIndicators();
-        const target = e.target.closest('.pb-el');
-        if (target) {
-            if (target.dataset.isContainer === 'true') {
-                target.classList.add('drop-over');
-            } else {
-                const rect = target.getBoundingClientRect();
-                const midY = rect.top + rect.height / 2;
-                target.classList.add(e.clientY < midY ? 'drop-before' : 'drop-after');
-            }
-        } else {
-            const childContainer = e.target.closest('.pb-el-children');
-            if (childContainer) {
-                const parentContainer = childContainer.closest('.pb-el');
-                if (parentContainer && parentContainer.dataset.isContainer === 'true') {
-                    parentContainer.classList.add('drop-over');
-                }
-            }
-        }
-        if (emptyCanvas) emptyCanvas.classList.add('drag-over');
-    });
+    if (_canvasSortable) _canvasSortable.destroy();
 
-    dz.addEventListener('dragleave', e => {
-        const target = e.target.closest('.pb-el');
-        if (target) target.classList.remove('drop-over', 'drop-before', 'drop-after');
-        if (emptyCanvas) emptyCanvas.classList.remove('drag-over');
-    });
-
-    dz.addEventListener('drop', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        clearDropIndicators();
-        if (emptyCanvas) emptyCanvas.classList.remove('drag-over');
-
-        const data = e.dataTransfer.getData('text/plain');
-        if (!data) return;
-
-        if (/^\d+$/.test(data)) {
-            _handleElementDrop(state, parseInt(data), e);
-            return;
-        }
-
-        let parentId = null;
-        let insertBeforeId = null;
-        const target = e.target.closest('.pb-el');
-        if (target) {
-            if (target.dataset.isContainer === 'true') {
-                parentId = target.dataset.elId;
-            } else {
-                const rect = target.getBoundingClientRect();
-                const midY = rect.top + rect.height / 2;
-                const isAbove = e.clientY < midY;
-                const parentEl = target.parentElement ? target.parentElement.closest('.pb-el') : null;
-                if (parentEl && parentEl.dataset.isContainer === 'true') {
-                    parentId = parentEl.dataset.elId;
-                }
-                insertBeforeId = isAbove ? target.dataset.elId : null;
-                if (!isAbove) {
-                    const nextSibling = target.nextElementSibling;
-                    if (nextSibling && nextSibling.dataset && nextSibling.dataset.elId) {
-                        insertBeforeId = null;
-                    }
-                }
-            }
-        }
-
-        state.showToast('Adicionando ' + data + '...', 'info');
-        apiFetch(`/page-builder/pages/${state.pageId}/elements`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
-            body: JSON.stringify({ type: data, parent_id: parentId ? parseInt(parentId) : null }),
-        })
-        .then(() => state.loadElements())
-        .catch(err => toastError('Falha ao adicionar elemento: ' + (err.message || err)));
-    });
-
-    dz.addEventListener('contextmenu', e => {
-        const el = e.target.closest('.pb-el');
-        if (!el) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const elId = parseInt(el.dataset.elId);
-        if (!elId) return;
-        state.onSelectElement(elId);
-        state.showCanvasContext(e.clientX, e.clientY, elId);
+    _canvasSortable = Sortable.create(dz, {
+        group: {
+            name: 'canvas',
+            pull: false,
+            put: ['widgets'],
+        },
+        animation: 200,
+        ghostClass: 'pb-sortable-ghost',
+        chosenClass: 'pb-sortable-chosen',
+        dragClass: 'pb-sortable-drag',
+        handle: '.pb-el-drag',
+        draggable: '.pb-el',
+        emptyInsertThreshold: 60,
+        onAdd(evt) {
+            _handleNewWidgetDrop(state, evt);
+        },
+        onUpdate(evt) {
+            _handleCanvasReorder(state, evt);
+        },
     });
 }
 
-export function _handleElementDrop(state, dragId, e) {
-    let target = e.target.closest('.pb-el');
-    if (!target || parseInt(target.dataset.elId) === dragId) return;
+function _handleNewWidgetDrop(state, evt) {
+    const item = evt.item;
+    const type = item.dataset.type;
 
-    const targetId = parseInt(target.dataset.elId);
-    const isContainer = target.dataset.isContainer === 'true';
-    const rect = target.getBoundingClientRect();
-    const midY = rect.top + rect.height / 2;
-
-    const els = state._lastElements || [];
-    const dragEl = findInTree(els, dragId);
-    if (!dragEl) return;
-
-    const parentList = findParentList(els, dragId);
-    if (parentList) {
-        const idx = parentList.findIndex(e => e.id === dragId);
-        parentList.splice(idx, 1);
+    if (item.parentNode) {
+        item.parentNode.removeChild(item);
     }
 
-    const targetEl = findInTree(els, targetId);
-    if (!targetEl) return;
+    if (!type) return;
 
-    if (isContainer && targetEl.children) {
-        if (!targetEl.children) targetEl.children = [];
-        targetEl.children.push(dragEl);
-    } else {
-        const siblings = findParentList(els, targetId) || els;
-        const idx = siblings.findIndex(e => e.id === targetId);
-        if (e.clientY < midY) siblings.splice(idx, 0, dragEl);
-        else siblings.splice(idx + 1, 0, dragEl);
+    let parentId = null;
+    let insertBeforeId = null;
+
+    const targetContainer = evt.to;
+    const parentEl = targetContainer.closest('.pb-el[data-is-container="true"]');
+    if (parentEl) {
+        parentId = parseInt(parentEl.dataset.elId);
     }
 
-    state.renderCanvas(state, els);
-    state.renderStructure(els);
-    state.renderNavigator(state);
-    state.renderMath();
-    _saveElementOrder(state);
+    const siblings = Array.from(targetContainer.children).filter(
+        el => el.classList.contains('pb-el') && el.dataset.elId
+    );
+    const newIndex = evt.newIndex;
+    if (newIndex < siblings.length) {
+        insertBeforeId = parseInt(siblings[newIndex].dataset.elId);
+    }
+
+    state.showToast('Adicionando ' + type + '...', 'info');
+
+    apiFetch(`/page-builder/pages/${state.pageId}/elements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+        body: JSON.stringify({
+            type: type,
+            parent_id: parentId,
+            insert_before_id: insertBeforeId,
+        }),
+    })
+    .then(() => state.loadElements())
+    .catch(err => toastError('Falha ao adicionar elemento: ' + (err.message || err)));
+}
+
+function _handleCanvasReorder(state, evt) {
+    const el = evt.item;
+    const elId = parseInt(el.dataset.elId);
+    if (!elId) return;
+
+    state.loadElements();
+}
+
+export function initContainerSortables(state) {
+    destroyAllContainerSortables();
+
+    const dz = document.getElementById('canvas-dropzone');
+    if (dz) {
+        _initSortableForContainer(dz, state, null);
+    }
+
+    document.querySelectorAll('.pb-el[data-is-container="true"] .pb-el-children').forEach(childContainer => {
+        const parentEl = childContainer.closest('.pb-el[data-is-container="true"]');
+        if (parentEl) {
+            const parentId = parseInt(parentEl.dataset.elId);
+            _initSortableForContainer(childContainer, state, parentId);
+        }
+    });
+}
+
+function _initSortableForContainer(container, state, parentId) {
+    if (_containerSortables.has(container)) {
+        _containerSortables.get(container).destroy();
+    }
+
+    const sortable = Sortable.create(container, {
+        group: {
+            name: 'canvas',
+            pull: false,
+            put: ['widgets', 'canvas'],
+        },
+        animation: 200,
+        ghostClass: 'pb-sortable-ghost',
+        chosenClass: 'pb-sortable-chosen',
+        dragClass: 'pb-sortable-drag',
+        handle: '.pb-el-drag',
+        draggable: '.pb-el',
+        emptyInsertThreshold: 40,
+        onAdd(evt) {
+            _handleNewWidgetDrop(state, evt);
+        },
+        onUpdate(evt) {
+            _handleCanvasReorder(state, evt);
+        },
+    });
+
+    _containerSortables.set(container, sortable);
+}
+
+export function destroyAllContainerSortables() {
+    _containerSortables.forEach(s => s.destroy());
+    _containerSortables.clear();
+}
+
+export function refreshSortables(state) {
+    initContainerSortables(state);
 }
 
 export function _saveElementOrder(state) {
