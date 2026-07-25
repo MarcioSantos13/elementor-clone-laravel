@@ -2232,6 +2232,56 @@ php artisan test --testsuite=Unit
 # Rodar com verbose
 php artisan test --verbose</pre>
                 </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Cache de Renderização</h3>
+                <p>O projeto tem um sistema opcional de cache para páginas renderizadas, configurado em <code>config/page-builder.php</code> via variáveis de ambiente:</p>
+
+                <table class="widget-table">
+                    <tr><th>Variável</th><th>Default</th><th>Descrição</th></tr>
+                    <tr><td><code>PAGE_BUILDER_CACHE</code></td><td><code>false</code></td><td>Habilita/desabilita cache de renderização</td></tr>
+                    <tr><td><code>PAGE_BUILDER_CACHE_TTL</code></td><td><code>3600</code></td><td>Tempo de vida do cache em segundos (1 hora)</td></tr>
+                </table>
+
+                <div class="tip">
+                    <strong>&#128161; Importante:</strong> Por padrão, o cache está <strong>desligado</strong>. Cada visualização re-renderiza a página do banco de dados. Se você não adicionou <code>PAGE_BUILDER_CACHE=true</code> no <code>.env</code>, não existe cache para limpar.
+                </div>
+
+                <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Quando o cache é limpo automaticamente</h4>
+                <p>O <code>ClearPageCacheJob</code> é disparado automaticamente ao:</p>
+                <ul>
+                    <li>Salvar/atualizar uma página (<code>PageBuilderService::updatePage()</code>)</li>
+                    <li>Adicionar, atualizar, remover ou duplicar um widget</li>
+                    <li>Restaurar uma revisão</li>
+                </ul>
+
+                <div class="warning">
+                    <strong>&#9888;&#65039; Atenção:</strong> O botão <strong>"Publicar"</strong> <strong>NÃO</strong> limpa o cache. Se a cache estiver ativa, publique <strong>depois</strong> de salvar para garantir que a visualização mostre o conteúdo atualizado.
+                </div>
+
+                <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Como limpar o cache manualmente</h4>
+                <div style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0">
+<pre style="margin:0"># Limpar TODO o cache do Laravel (inclui páginas)
+php artisan cache:clear
+
+# Limpar só o cache de uma página específica (via Tinker)
+php artisan tinker
+# Digite:
+Cache::forget("page.1.render." . md5(json_encode(['with_container' => true])));
+Cache::forget("page.1.render." . md5(json_encode(['with_container' => false])));
+Cache::forget("page.1.render." . md5(json_encode([])));
+Cache::forget("page.1.json");</pre>
+                </div>
+
+                <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Resumo do fluxo de cache</h4>
+                <table class="widget-table">
+                    <tr><th>Ação</th><th>Cache limpo?</th><th>Re-renderiza?</th></tr>
+                    <tr><td>Salvar (botão Salvar)</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
+                    <tr><td>Publicar</td><td style="color:red">❌ Não</td><td>Usa cache antigo se existir</td></tr>
+                    <tr><td>Editar widget</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
+                    <tr><td>Remover widget</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
+                    <tr><td>Restaurar revisão</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
+                    <tr><td><code>php artisan cache:clear</code></td><td style="color:green">✅ Tudo</td><td>Próxima visualização</td></tr>
+                </table>
             </div>
         </section>
 
