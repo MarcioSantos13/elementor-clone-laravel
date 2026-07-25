@@ -9,36 +9,56 @@ class PagePolicy
 {
     public function viewAny(?User $user): bool
     {
-        return true;
+        return $user !== null;
     }
 
     public function view(?User $user, Page $page): bool
     {
-        return true;
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return $page->user_id === $user->id || $page->status === 'published';
     }
 
     public function create(User $user): bool
     {
-        return true;
+        return $user->isAdmin() || $user->isEditor();
     }
 
     public function update(User $user, Page $page): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($user->isViewer()) {
+            return false;
+        }
+
         return $page->user_id === $user->id;
     }
 
     public function delete(User $user, Page $page): bool
     {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
         return $page->user_id === $user->id;
     }
 
     public function restore(User $user, Page $page): bool
     {
-        return $page->user_id === $user->id;
+        return $this->delete($user, $page);
     }
 
     public function forceDelete(User $user, Page $page): bool
     {
-        return $page->user_id === $user->id;
+        return $user->isAdmin();
     }
 }

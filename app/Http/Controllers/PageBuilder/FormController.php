@@ -11,6 +11,8 @@ class FormController extends Controller
 {
     public function submit(Request $request, Page $page)
     {
+        $this->authorize('view', $page);
+
         $validated = $request->validate([
             'form_name' => 'nullable|string|max:255',
             'data' => 'required|array',

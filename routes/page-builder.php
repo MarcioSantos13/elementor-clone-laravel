@@ -6,6 +6,7 @@ use App\Http\Controllers\PageBuilder\ElementController;
 use App\Http\Controllers\PageBuilder\RevisionController;
 use App\Http\Controllers\PageBuilder\FormController;
 use App\Http\Controllers\PageBuilder\HtmlImportController;
+use App\Http\Controllers\PageBuilder\CollaborationController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::resource('pages', PageController::class)->except(['show', 'edit']);
@@ -18,8 +19,8 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::get('pages/{page}/export', [PageController::class, 'export'])->name('pages.export');
     Route::post('pages/import', [PageController::class, 'import'])->name('pages.import');
 
-    Route::post('html-import', [HtmlImportController::class, 'import'])->name('html-import');
-    Route::get('html-import/fetch', [HtmlImportController::class, 'fetch'])->name('html-import.fetch');
+    Route::post('html-import', [HtmlImportController::class, 'import'])->name('html-import')->middleware('throttle:html-import');
+    Route::get('html-import/fetch', [HtmlImportController::class, 'fetch'])->name('html-import.fetch')->middleware('throttle:html-import');
     Route::get('templates', [PageController::class, 'listTemplates'])->name('templates.list');
     Route::post('pages/{page}/apply-template', [PageController::class, 'applyTemplate'])->name('pages.apply-template');
     Route::put('pages/{page}/layout', [PageController::class, 'updateLayout'])->name('pages.layout');
@@ -38,7 +39,8 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::get('elements/{element}/render', [ElementController::class, 'renderElement'])->name('elements.render');
     Route::get('elements/{element}/controls', [ElementController::class, 'controls'])->name('elements.controls');
     Route::get('widgets/{type}/controls', [ElementController::class, 'widgetControls'])->name('widgets.controls');
-    Route::post('upload', [ElementController::class, 'uploadImage'])->name('upload');
+    Route::post('upload', [ElementController::class, 'uploadImage'])->name('upload')->middleware('throttle:upload');
+    Route::post('upload-video', [ElementController::class, 'uploadVideo'])->name('upload-video')->middleware('throttle:upload');
 
     Route::get('pages/{page}/revisions', [RevisionController::class, 'index'])->name('revisions.index');
     Route::get('revisions/{revision}', [RevisionController::class, 'show'])->name('revisions.show');
@@ -48,6 +50,13 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::post('pages/{page}/revisions/prune', [RevisionController::class, 'prune'])->name('revisions.prune');
     Route::post('pages/{page}/revisions/auto-save', [RevisionController::class, 'autoSave'])->name('revisions.auto-save');
 
-    Route::post('pages/{page}/form/submit', [FormController::class, 'submit'])->name('form.submit');
+    Route::post('pages/{page}/form/submit', [FormController::class, 'submit'])->name('form.submit')->middleware('throttle:form-submit');
     Route::get('pages/{page}/form/submissions', [FormController::class, 'submissions'])->name('form.submissions');
+
+    Route::post('pages/{page}/collab/join', [CollaborationController::class, 'join'])->name('collab.join');
+    Route::post('pages/{page}/collab/leave', [CollaborationController::class, 'leave'])->name('collab.leave');
+    Route::post('pages/{page}/collab/heartbeat', [CollaborationController::class, 'heartbeat'])->name('collab.heartbeat');
+    Route::get('pages/{page}/collab/users', [CollaborationController::class, 'activeUsers'])->name('collab.users');
+    Route::post('pages/{page}/elements/{elementId}/lock', [CollaborationController::class, 'lockElement'])->name('collab.lock');
+    Route::post('pages/{page}/elements/{elementId}/unlock', [CollaborationController::class, 'unlockElement'])->name('collab.unlock');
 });

@@ -15,6 +15,7 @@ class VideoWidget extends BaseWidget
         $this->defaultSettings = [
             'video_type' => 'youtube',
             'video_url' => '',
+            'video_file' => '',
             'autoplay' => false,
             'loop' => false,
             'controls' => true,
@@ -28,8 +29,9 @@ class VideoWidget extends BaseWidget
         ];
 
         $this->controls = [
-            'video_type' => ['type' => 'select', 'label' => 'Video Type', 'options' => ['youtube', 'vimeo', 'custom']],
+            'video_type' => ['type' => 'select', 'label' => 'Video Type', 'options' => ['youtube', 'vimeo', 'custom', 'upload']],
             'video_url' => ['type' => 'url', 'label' => 'Video URL', 'required' => true],
+            'video_file' => ['type' => 'video', 'label' => 'Upload Video'],
             'aspect_ratio' => ['type' => 'select', 'label' => 'Aspect Ratio', 'options' => ['16:9', '4:3', '1:1', '21:9']],
             'autoplay' => ['type' => 'boolean', 'label' => 'Autoplay'],
             'loop' => ['type' => 'boolean', 'label' => 'Loop'],
@@ -58,6 +60,7 @@ class VideoWidget extends BaseWidget
         $settings = $this->prepareSettings($settings);
         $videoUrl = $settings['video_url'];
         $videoType = $settings['video_type'];
+        $videoFile = $settings['video_file'] ?? '';
         $autoplay = $settings['autoplay'];
         $loop = $settings['loop'];
         $controls = $settings['controls'];
@@ -68,6 +71,10 @@ class VideoWidget extends BaseWidget
         $alignment = $settings['alignment'];
         $width = $settings['width'];
         $maxWidth = $settings['max_width'];
+
+        if ($videoType === 'upload' && !empty($videoFile)) {
+            return $this->renderLocalVideo($videoFile, $autoplay, $loop, $controls, $mute, $aspectRatio, $alignment, $width, $maxWidth);
+        }
 
         if (empty($videoUrl)) {
             return '<div class="pb-video-placeholder" style="text-align:center;padding:2rem;color:#999;background:#f5f5f5;border-radius:8px;">No video selected</div>';
@@ -104,15 +111,52 @@ class VideoWidget extends BaseWidget
 HTML;
     }
 
+    private function renderLocalVideo(string $fileUrl, bool $autoplay, bool $loop, bool $controls, bool $mute, string $aspectRatio, string $alignment, string $width, string $maxWidth): string
+    {
+        $ratioMap = [
+            '16:9' => '56.25%',
+            '4:3' => '75%',
+            '1:1' => '100%',
+            '21:9' => '42.86%',
+        ];
+        $paddingBottom = $ratioMap[$aspectRatio] ?? '56.25%';
+
+        $wrapperStyle = "width: {$width}; max-width: {$maxWidth}; margin: 0;";
+        if ($alignment === 'center') {
+            $wrapperStyle .= ' margin-left: auto; margin-right: auto;';
+        } elseif ($alignment === 'right') {
+            $wrapperStyle .= ' margin-left: auto;';
+        }
+
+        $sanitizedUrl = htmlspecialchars($fileUrl, ENT_QUOTES, 'UTF-8');
+        $autoplayAttr = $autoplay ? ' autoplay' : '';
+        $loopAttr = $loop ? ' loop' : '';
+        $controlsAttr = $controls ? ' controls' : '';
+        $muteAttr = $mute ? ' muted' : '';
+
+        return <<<HTML
+<div class="pb-video-wrapper" style="{$wrapperStyle}">
+    <div class="pb-video-container" style="position: relative; padding-bottom: {$paddingBottom}; height: 0; overflow: hidden; border-radius: 8px;">
+        <video src="{$sanitizedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border: 0;"{$autoplayAttr}{$loopAttr}{$controlsAttr}{$muteAttr} playsinline></video>
+    </div>
+</div>
+HTML;
+    }
+
     public function renderEditor(array $settings, array $content = [], array $styles = []): string
     {
         $settings = $this->prepareSettings($settings);
         $videoUrl = $settings['video_url'];
         $videoType = $settings['video_type'];
+        $videoFile = $settings['video_file'] ?? '';
         $aspectRatio = $settings['aspect_ratio'];
         $alignment = $settings['alignment'];
         $width = $settings['width'];
         $maxWidth = $settings['max_width'];
+
+        if ($videoType === 'upload' && !empty($videoFile)) {
+            return $this->renderLocalVideo($videoFile, false, false, true, false, $aspectRatio, $alignment, $width, $maxWidth);
+        }
 
         if (empty($videoUrl)) {
             return '<div class="pb-video-placeholder" style="text-align:center;padding:2rem;color:#999;background:#f5f5f5;border-radius:8px;cursor:pointer;">🎬 Click to add video</div>';
@@ -155,6 +199,7 @@ HTML;
         return match ($type) {
             'youtube' => $this->getYoutubeEmbedUrl($url, $autoplay, $loop, $controls, $mute, $startTime, $endTime),
             'vimeo' => $this->getVimeoEmbedUrl($url, $autoplay, $loop, $mute),
+            'upload' => $url,
             default => $url,
         };
     }

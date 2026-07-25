@@ -98,19 +98,15 @@ class RevisionController extends Controller
             'settings' => 'sometimes|array',
         ]);
 
-        $revision = new Revision();
-        $revision->page_id = $page->id;
-        $revision->user_id = auth()->id();
-        $revision->content = $validated['content'] ?? $page->content;
-        $revision->settings = $validated['settings'] ?? $page->settings;
-        $revision->version = '1.0.' . time();
-        $revision->label = 'Auto-save';
-        $revision->type = 'auto_save';
-        $revision->save();
+        \App\Jobs\AutoSaveRevisionJob::dispatch(
+            $page,
+            auth()->id(),
+            $validated['content'] ?? null,
+            $validated['settings'] ?? null,
+        );
 
         return response()->json([
-            'message' => 'Auto-saved successfully',
-            'revision' => $revision,
+            'message' => 'Auto-save queued successfully',
         ]);
     }
 }

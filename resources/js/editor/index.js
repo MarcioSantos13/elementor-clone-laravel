@@ -53,6 +53,9 @@ const editor = {
         bindZoom();
         autoSave();
         observeCanvas();
+        collabJoin();
+        collabHeartbeat();
+        bindCollabPresence();
     },
 
     undo() { undo(state); },
@@ -290,6 +293,7 @@ function createInput(key, ctrl, value, elementId) {
             return inp;
         },
         image: () => createImageInput(key, value, saveFn, elementId),
+        video: () => createVideoInput(key, value, saveFn, elementId),
         wysiwyg: () => createWysiwygInput(key, value, saveFn, elementId),
         icon: () => createIconInput(key, value, saveFn, debouncedSave),
         gallery: () => createGalleryInput(key, value, saveFn),
@@ -367,6 +371,44 @@ function createImageInput(key, value, saveFn, elementId) {
     container.appendChild(dropZone);
     container.appendChild(preview);
     container.appendChild(urlRow);
+    return container;
+}
+
+function createVideoInput(key, value, saveFn, elementId) {
+    const container = document.createElement('div');
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.35rem';
+    const currentUrl = value || '';
+    const dropZone = document.createElement('div');
+    dropZone.style.cssText = 'border:2px dashed var(--pb-border);border-radius:8px;padding:1rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--pb-bg);position:relative';
+    dropZone.innerHTML = `<div style="font-size:1.5rem;margin-bottom:.35rem;opacity:.5">&#127909;</div><div style="font-size:.72rem;color:var(--pb-text2)"><strong style="color:var(--pb-accent);cursor:pointer">Clique para selecionar</strong><br>ou arraste um video aqui</div><div style="font-size:.65rem;color:var(--pb-text2);margin-top:.3rem">MP4, WebM, OGG (max 50MB)</div>`;
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'video/mp4,video/webm,video/ogg';
+    fileInput.style.display = 'none';
+    const preview = document.createElement('div');
+    preview.style.cssText = 'border-radius:6px;overflow:hidden;background:var(--pb-bg);min-height:50px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--pb-text2);border:1px solid var(--pb-border)';
+    const updatePreview = (url) => {
+        if (url) preview.innerHTML = `<video src="${escHtml(url)}" style="width:100%;max-height:120px;object-fit:contain;border-radius:4px" controls></video>`;
+        else preview.textContent = 'Nenhum video selecionado';
+    };
+    if (currentUrl) updatePreview(currentUrl);
+    dropZone.appendChild(fileInput);
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        uploadVideoFile(file, (url) => { saveFn(key, url); updatePreview(url); });
+    };
+    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--pb-accent)'; dropZone.style.background = 'var(--pb-primary-light)'; };
+    dropZone.ondragleave = () => { dropZone.style.borderColor = 'var(--pb-border)'; dropZone.style.background = 'var(--pb-bg)'; };
+    dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--pb-border)'; dropZone.style.background = 'var(--pb-bg)';
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('video/')) uploadVideoFile(file, (url) => { saveFn(key, url); updatePreview(url); });
+    };
+    container.appendChild(dropZone);
+    container.appendChild(preview);
     return container;
 }
 
@@ -1210,6 +1252,22 @@ function uploadImageFile(file, callback) {
     .catch(() => toastError('Falha ao enviar imagem'));
 }
 
+function uploadVideoFile(file, callback) {
+    const formData = new FormData();
+    formData.append('video', file);
+    showToast('Enviando video...', 'info');
+    apiFetch('/page-builder/upload-video', {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': state.csrf },
+        body: formData,
+    })
+    .then(data => {
+        if (data.url) { toastSuccess('Video enviado!'); callback(data.url); }
+        else toastError('Falha ao enviar video');
+    })
+    .catch(() => toastError('Falha ao enviar video'));
+}
+
 function renderPageSettings() {
     const body = document.getElementById('page-settings-body');
     body.innerHTML = '';
@@ -1262,6 +1320,72 @@ function updatePageSetting(key, value) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
         body: JSON.stringify({ settings }),
     }).catch(() => toastError('Falha ao atualizar configuracao da pagina'));
+}
+
+function collabJoin() {
+    apiFetch(`/page-builder/pages/${state.pageId}/collab/join`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': state.csrf },
+    }).catch(() => {});
+}
+
+function collabLeave() {
+    if (!state.pageId) return;
+    apiFetch(`/page-builder/pages/${state.pageId}/collab/leave`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': state.csrf },
+    }).catch(() => {});
+}
+
+function collabHeartbeat() {
+    setInterval(() => {
+        if (!state.pageId) return;
+        apiFetch(`/page-builder/pages/${state.pageId}/collab/heartbeat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+            body: JSON.stringify({ cursor_position: state.selectedId ? { element_id: state.selectedId } : null }),
+        }).then(data => {
+            if (data && data.active_users) renderCollabUsers(data.active_users);
+        }).catch(() => {});
+    }, 15000);
+}
+
+function renderCollabUsers(users) {
+    let bar = document.getElementById('collab-users-bar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'collab-users-bar';
+        bar.style.cssText = 'display:flex;gap:4px;align-items:center;margin-left:auto;padding:0 8px';
+        const toolbar = document.querySelector('.pb-toolbar-right');
+        if (toolbar) toolbar.appendChild(bar);
+    }
+    const myId = window._pageData?.user_id;
+    bar.innerHTML = users.filter(u => u.user_id !== myId).map(u =>
+        `<div title="${escHtml(u.name)}" style="width:28px;height:28px;border-radius:50%;background:${u.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;border:2px solid #fff;margin-left:-6px;cursor:default">${escHtml(u.name.charAt(0).toUpperCase())}</div>`
+    ).join('');
+}
+
+function bindCollabPresence() {
+    window.addEventListener('beforeunload', () => collabLeave());
+}
+
+function lockElement(elementId) {
+    return apiFetch(`/page-builder/pages/${state.pageId}/elements/${elementId}/lock`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': state.csrf },
+    }).catch(err => {
+        if (err.message && err.message.includes('being edited')) {
+            showToast(err.message, 'error');
+        }
+        throw err;
+    });
+}
+
+function unlockElement(elementId) {
+    return apiFetch(`/page-builder/pages/${state.pageId}/elements/${elementId}/unlock`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': state.csrf },
+    }).catch(() => {});
 }
 
 window.editor = editor;

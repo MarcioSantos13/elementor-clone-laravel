@@ -8,6 +8,7 @@ use App\Services\PageBuilder\Core\ElementManager;
 use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\PageBuilderService;
 use App\Services\PageBuilder\Core\TemplateManager;
+use App\Services\PageBuilder\Core\CollaborationService;
 use Illuminate\Support\ServiceProvider;
 
 class PageBuilderServiceProvider extends ServiceProvider
@@ -46,6 +47,10 @@ class PageBuilderServiceProvider extends ServiceProvider
 
         $this->app->singleton(TemplateManager::class, function ($app) {
             return new TemplateManager();
+        });
+
+        $this->app->singleton(CollaborationService::class, function ($app) {
+            return new CollaborationService();
         });
 
         $this->app->alias(PageBuilderService::class, 'page-builder');

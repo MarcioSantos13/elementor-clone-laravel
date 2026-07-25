@@ -285,6 +285,28 @@ class ElementController extends Controller
         ]);
     }
 
+    public function uploadVideo(Request $request): JsonResponse
+    {
+        $request->validate([
+            'video' => 'required|file|mimes:mp4,webm,ogg|max:51200',
+        ]);
+
+        $file = $request->file('video');
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('page-builder/videos', $filename, 'public');
+
+        if (!$path) {
+            return response()->json(['error' => 'Falha ao fazer upload do vídeo'], 500);
+        }
+
+        $url = parse_url(Storage::disk('public')->url($path), PHP_URL_PATH);
+
+        return response()->json([
+            'url' => $url,
+            'filename' => $filename,
+        ]);
+    }
+
     public function restoreSnapshot(Request $request, Page $page): JsonResponse
     {
         $this->authorize('update', $page);

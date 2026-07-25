@@ -40,17 +40,17 @@ class HtmlImportController extends Controller
                 $converted['title'] = ($converted['title'] ?? $title) . ' ' . date('H:i');
             }
 
-            $page = $this->pageBuilder->importPage($converted);
-
-            $widgetCount = $this->countWidgets($converted['elements'] ?? []);
+            $job = new \App\Jobs\ImportHtmlJob(
+                $html,
+                auth()->id(),
+                $converted['title'] ?? $title,
+            );
+            $job->dispatch();
 
             return response()->json([
-                'message'      => 'Página importada com sucesso',
-                'page_id'      => $page->id,
-                'redirect_url' => route('page-builder.editor', $page),
-                'title'        => $page->title,
-                'widgets_count'=> $widgetCount,
-            ], 201);
+                'message'      => 'Importação iniciada em segundo plano',
+                'queued'       => true,
+            ], 202);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         } catch (\RuntimeException $e) {

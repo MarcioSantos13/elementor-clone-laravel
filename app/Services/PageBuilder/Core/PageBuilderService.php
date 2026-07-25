@@ -434,10 +434,7 @@ class PageBuilderService
      */
     protected function clearPageCache(Page $page): void
     {
-        Cache::forget("page.{$page->id}.render." . md5(json_encode(['with_container' => true])));
-        Cache::forget("page.{$page->id}.render." . md5(json_encode(['with_container' => false])));
-        Cache::forget("page.{$page->id}.render." . md5(json_encode([])));
-        Cache::forget("page.{$page->id}.json");
+        \App\Jobs\ClearPageCacheJob::dispatch($page);
     }
 
     /**

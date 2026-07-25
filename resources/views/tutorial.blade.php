@@ -28,10 +28,14 @@
             <a href="#save-publish">Salvar &amp; Publicar</a>
             <a href="#preview">Visualizar Página</a>
             <a href="#duplicate-delete">Duplicar &amp; Excluir</a>
+            <a href="#collaboration">Colaboração em Tempo Real</a>
+            <a href="#html-import">Importação de HTML</a>
             <a href="#showcase">Template Showcase Completo</a>
             <a href="#architecture">Arquitetura do Projeto</a>
             <a href="#database">Banco de Dados</a>
             <a href="#routes">Rotas</a>
+            <a href="#api">API REST (Sanctum)</a>
+            <a href="#jobs">Jobs &amp; Filas</a>
             <a href="#quality">Qualidade &amp; Testes</a>
             <a href="#improvements">Melhorias Propostas</a>
             <a href="#moodle">Uso com Moodle 4.5+</a>
@@ -119,11 +123,13 @@ php artisan db:seed</code></pre>
                     <tr><th>Métrica</th><th>Valor</th></tr>
                     <tr><td>Widgets disponíveis</td><td>17 (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</td></tr>
                     <tr><td>Templates prontos</td><td>5 (Blank, Landing, About, Contact, Showcase Completo)</td></tr>
-                    <tr><td>Rotas definidas</td><td>35+ (CRUD páginas, elementos, revisões, templates)</td></tr>
+                    <tr><td>Rotas definidas</td><td>50+ (CRUD páginas, elementos, revisões, templates, colaboração, HTML import, API REST)</td></tr>
                     <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
-                    <tr><td>Tabelas no banco</td><td>3 principais (pages, elements, revisions)</td></tr>
+                    <tr><td>Tabelas no banco</td><td>4 principais (pages, elements, revisions, form_submissions) + personal_access_tokens</td></tr>
                     <tr><td>Views Blade</td><td>16 (login, register, tutorial, editor + 7 partials, pages)</td></tr>
                     <tr><td>Linhas de JS do editor</td><td>~2600 (6 módulos ES em resources/js/editor/)</td></tr>
+                    <tr><td>API REST</td><td>Sanctum (token-based) com CRUD páginas e elementos</td></tr>
+                    <tr><td>Jobs (filas)</td><td>3 (ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob)</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades</h3>
@@ -142,6 +148,7 @@ php artisan db:seed</code></pre>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
                     <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
                     <li>Duplicar, exportar (JSON), importar, copiar HTML, excluir páginas</li>
+                    <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou colar HTML diretamente</li>
                     <li><strong>Navegador (Navigator)</strong> — painel flutuante com árvore de elementos, drag-and-drop, renomear, menu de contexto</li>
                     <li><strong>Right-click context menu</strong> no canvas e no Navigator (Editar, Duplicar, Copiar, Colar, Mover, Excluir)</li>
                     <li><strong>Drag handle</strong> com indicadores visuais de posição (drop-before/drop-after)</li>
@@ -149,6 +156,8 @@ php artisan db:seed</code></pre>
                     <li><strong>Tela cheia (Fullscreen)</strong> — esconder painéis laterais com botão ou F11</li>
                     <li><strong>Preview em tempo real</strong> — debounce 300ms em todos os controles (text, color, number, etc.)</li>
                     <li><strong>Estilo por widget</strong> — 3 abas (Content, Style, Advanced): tipografia, fundo, borda, sombra, hover, dimensões, animação, CSS customizado, visibilidade responsiva</li>
+                    <li><strong>Colaboração em tempo real</strong> — presença de usuários, bloqueio de elementos, cursores</li>
+                    <li><strong>API REST</strong> — autenticação via Sanctum tokens, CRUD completo de páginas e elementos</li>
                     <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
                 </ul>
 
@@ -1180,9 +1189,110 @@ php artisan db:seed</code></pre>
             </div>
         </section>
 
+        {{-- COLLABORATION --}}
+        <section id="collaboration" class="step">
+            <h2>14. Colaboração em Tempo Real</h2>
+            <div class="step-body">
+                <p>O Page Builder suporta <strong>colaboração simultânea</strong> — múltiplos usuários podem editar a mesma página ao mesmo tempo. O sistema usa cache (Redis/Cache) para rastrear presença e bloqueio de elementos.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades de Colaboração</h3>
+                <table class="widget-table">
+                    <tr><th>Feature</th><th>Descrição</th></tr>
+                    <tr><td><strong>Presença de Usuários</strong></td><td>Mostra quem está editando a página em tempo real. Cada usuário tem uma cor atribuída automaticamente.</td></tr>
+                    <tr><td><strong>Bloqueio de Elementos</strong></td><td>Quando um usuário seleciona um elemento, ele fica bloqueado para outros usuários. Retorna HTTP 409 se outro usuário tentar editar.</td></tr>
+                    <tr><td><strong>Heartbeat</strong></td><td>A cada 15 segundos, o editor envia um heartbeat para manter a presença ativa. Usuários inativos por mais de 30 segundos são removidos da lista.</td></tr>
+                    <tr><td><strong>Cursores</strong></td><td>A posição do cursor é compartilhada entre os usuários (via heartbeat).</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Colaboração</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/collab/join</code></td><td>Entrar na sessão de colaboração</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/collab/leave</code></td><td>Sair da sessão</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/collab/heartbeat</code></td><td>Enviar heartbeat com posição do cursor</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/collab/users</code></td><td>Listar usuários ativos na página</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/elements/{elementId}/lock</code></td><td>Bloquear elemento para edição</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/elements/{elementId}/unlock</code></td><td>Desbloquear elemento</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Usar</h3>
+                <ol>
+                    <li>Abram a <strong>mesma página</strong> no editor (ambos logados)</li>
+                    <li>O painel de colaboração mostra os <strong>usuários ativos</strong> com suas cores</li>
+                    <li>Ao <strong>selecionar um elemento</strong>, ele fica bloqueado para outros</li>
+                    <li>Se outro usuário tentar editar o mesmo elemento, receberá uma mensagem: <em>"Element is being edited by another user"</em></li>
+                    <li>Ao <strong>deselecionar</strong> o elemento, ele é desbloqueado automaticamente</li>
+                </ol>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> A colaboração usa o cache do Laravel (configurado como <code>cache_store</code> no <code>.env</code>). Para produção, configure Redis para melhor performance. O TTL de presença é de 30 segundos — usuários inativos são removidos automaticamente.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Cores de Usuário</h3>
+                <p>Cada usuário recebe uma cor automaticamente baseada no seu <code>user_id</code>. As cores disponíveis são: vermelho, laranja, amarelo, verde, ciano, azul, roxo, rosa, e mais. A cor é exibida ao lado do nome do usuário no painel de colaboração.</p>
+            </div>
+        </section>
+
+        {{-- HTML IMPORT --}}
+        <section id="html-import" class="step">
+            <h2>15. Importação de HTML</h2>
+            <div class="step-body">
+                <p>O Page Builder permite <strong>importar páginas externas</strong> a partir de HTML puro ou URLs. O sistema converte automaticamente o HTML em elementos do page builder (seções, colunas e widgets).</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Importar</h3>
+                <ol>
+                    <li>Na lista de páginas, clique em <strong>"Import"</strong></li>
+                    <li>Escolha uma das opções:
+                        <ul>
+                            <li><strong>Cole HTML:</strong> paste o código HTML diretamente no textarea</li>
+                            <li><strong>URL:</strong> cole a URL de uma página web para buscar automaticamente</li>
+                        </ul>
+                    </li>
+                    <li>Opcionalmente, defina um <strong>título</strong> para a página importada</li>
+                    <li>Clique em <strong>"Importar"</strong> — a importação é processada em segundo plano via Job</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que é Convertido</h3>
+                <table class="widget-table">
+                    <tr><th>HTML Original</th><th>Widget do Page Builder</th></tr>
+                    <tr><td><code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code></td><td>Widget <strong>Heading</strong> com tag e cor preservadas</td></tr>
+                    <tr><td><code>&lt;p&gt;</code>, <code>&lt;div&gt;</code>, <code>&lt;span&gt;</code></td><td>Widget <strong>Text</strong> com formatação inline</td></tr>
+                    <tr><td><code>&lt;img&gt;</code>, <code>&lt;figure&gt;</code></td><td>Widget <strong>Image</strong> com src, alt e caption</td></tr>
+                    <tr><td><code>&lt;a&gt;</code> com classes de botão</td><td>Widget <strong>Button</strong> com texto, link e cores</td></tr>
+                    <tr><td><code>&lt;table&gt;</code></td><td>Widget <strong>Text</strong> com HTML da tabela preservado</td></tr>
+                    <tr><td><code>&lt;ul&gt;</code>, <code>&lt;ol&gt;</code></td><td>Widget <strong>Text</strong> com lista preservada</td></tr>
+                    <tr><td><code>&lt;blockquote&gt;</code></td><td>Widget <strong>Callout</strong> (tipo note)</td></tr>
+                    <tr><td><code>&lt;pre&gt;</code></td><td>Widget <strong>Text</strong> com bloco de código</td></tr>
+                    <tr><td><code>&lt;hr&gt;</code></td><td>Widget <strong>Divider</strong></td></tr>
+                    <tr><td>Links YouTube</td><td>Widget <strong>Video</strong> com embed automático</td></tr>
+                    <tr><td><code>&lt;div&gt;</code> com background</td><td><strong>Seção</strong> com cor de fundo e padding</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Importação</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/page-builder/html-import</code></td><td>Importar HTML (via textarea ou URL) — processa em background via Job</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/html-import/fetch</code></td><td>Buscar HTML de uma URL (retorna o HTML bruto)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Limitações</h3>
+                <ul>
+                    <li><strong>Tamanho máximo:</strong> 500KB de HTML</li>
+                    <li><strong>URLs permitidas:</strong> apenas HTTP/HTTPS</li>
+                    <li><strong>Timeout:</strong> 15 segundos para buscar URLs</li>
+                    <li><strong>Scripts:</strong> tags <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code> e <code>&lt;noscript&gt;</code> são removidos</li>
+                    <li><strong>Processamento:</strong> a importação roda via Queue Job (<code>ImportHtmlJob</code>) — necessário configurar <code>QUEUE_CONNECTION</code> no <code>.env</code></li>
+                </ul>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Para importar páginas do Moodle ou WordPress, copie o HTML da página e cole no textarea. O sistema converte automaticamente headings, parágrafos, imagens, tabelas e listas em widgets do page builder. Após importar, abra a página no editor para ajustar o layout.
+                </div>
+            </div>
+        </section>
+
         {{-- SHOWCASE COMPLETO TEMPLATE --}}
         <section id="showcase" class="step">
-            <h2>14. Template Showcase Completo</h2>
+            <h2>16. Template Showcase Completo</h2>
             <div class="step-body">
                 <p>O template <strong>Showcase Completo</strong> é uma landing page de marketing completa construída inteiramente com o page builder. Ele demonstra técnicas avançadas de layout usando <strong>Seções com layout full_width e boxed</strong>, <strong>Colunas com larguras variadas</strong> e widgets estilizados.</p>
 
@@ -1696,7 +1806,7 @@ php artisan db:seed</code></pre>
 
         {{-- PROJECT STRUCTURE --}}
         <section id="architecture" class="step">
-            <h2>15. Arquitetura do Projeto</h2>
+            <h2>17. Arquitetura do Projeto</h2>
             <div class="step-body">
                 <p>O projeto segue o padrão MVC do Laravel com uma camada adicional de <strong>Serviços</strong> e <strong>Widgets</strong> para isolar a lógica do page builder.</p>
 
@@ -1707,42 +1817,55 @@ php artisan db:seed</code></pre>
 │  resources/js/editor/ ← editor.blade.php (partials)            │
 │  drag-drop, undo/redo, auto-save, inline editing, panels       │
 ├─────────────────────────────────────────────────────────────────┤
-│                     CONTROLLERS (3 classes)                      │
-│  PageController      — CRUD páginas, templates, export/import   │
-│  ElementController   — CRUD elementos, controles, upload        │
-│  RevisionController  — revisões, diff, restore, auto-save       │
-│  FormController      — processamento de formulários             │
+│                     CONTROLLERS (7 classes)                       │
+│  PageController       — CRUD páginas, templates, export/import  │
+│  ElementController    — CRUD elementos, controles, upload       │
+│  RevisionController   — revisões, diff, restore, auto-save      │
+│  FormController       — processamento de formulários            │
+│  CollaborationController — presença, bloqueio, cursores         │
+│  HtmlImportController — importação de HTML via URL ou textarea  │
+│  PageApiController    — API REST (Sanctum) para páginas         │
+│  ElementApiController — API REST (Sanctum) para elementos       │
 ├─────────────────────────────────────────────────────────────────┤
-│                     SERVICES (5 classes)                         │
-│  PageBuilderService  — orquestra tudo (create, update, render)  │
-│  ElementManager      — CRUD elementos, árvore, reordenação      │
-│  WidgetManager       — registra e gerencia widgets dinamicamente│
-│  Renderer            — renderiza árvore de elementos → HTML     │
-│  TemplateManager     — 5 templates predefinidos                 │
+│                     SERVICES (7 classes)                         │
+│  PageBuilderService   — orquestra tudo (create, update, render) │
+│  ElementManager       — CRUD elementos, árvore, reordenação     │
+│  WidgetManager        — registra e gerencia widgets dinamicamente│
+│  Renderer             — renderiza árvore de elementos → HTML    │
+│  TemplateManager      — 5 templates predefinidos                │
+│  CollaborationService — presença, bloqueio, cursores (Cache)    │
+│  HtmlImportService    — converte HTML externo em widgets        │
 ├─────────────────────────────────────────────────────────────────┤
-│                     WIDGETS (7 classes)                          │
-│  BaseWidget (abstract) → HeadingWidget                          │
-│                        → TextWidget                             │
-│                        → ImageWidget                            │
-│                        → ButtonWidget                           │
-│                        → SectionWidget                          │
-│                        → ColumnWidget                           │
+│                     JOBS (3 classes)                              │
+│  ImportHtmlJob        — importa HTML em background via Queue    │
+│  ClearPageCacheJob    — limpa cache renderizado da página       │
+│  AutoSaveRevisionJob  — cria revisão automática a cada 60s     │
 ├─────────────────────────────────────────────────────────────────┤
-│                     DATABASE (SQLite)                            │
+│                     WIDGETS (17 classes)                          │
+│  BaseWidget (abstract) → Heading, Text, Image, Button           │
+│                        → Section, Column, Callout, Table         │
+│                        → Math, Video, Divider, Spacer            │
+│                        → Icon, Gallery, Form, Tabs, Accordion    │
+├─────────────────────────────────────────────────────────────────┤
+│                     DATABASE (SQLite)                             │
 │  pages → elements (árvore via parent_id) → revisions            │
+│  form_submissions → personal_access_tokens (Sanctum)            │
 └─────────────────────────────────────────────────────────────────┘</pre>
                 </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Árvore de Diretórios do Page Builder</h3>
                 <table class="widget-table">
                     <tr><th>Caminho</th><th>Arquivos</th><th>Descrição</th></tr>
-                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>4</td><td>PageController, ElementController, RevisionController, FormController</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>5</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>17</td><td>BaseWidget + 16 widgets concretos</td></tr>
+                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>6</td><td>PageController, ElementController, RevisionController, FormController, CollaborationController, HtmlImportController</td></tr>
+                    <tr><td><code>app/Http/Controllers/Api/</code></td><td>2</td><td>PageApiController, ElementApiController (REST API)</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>7</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager, CollaborationService, HtmlImportService</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>18</td><td>BaseWidget + 17 widgets concretos</td></tr>
+                    <tr><td><code>app/Jobs/</code></td><td>3</td><td>ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob</td></tr>
                     <tr><td><code>app/Providers/</code></td><td>1</td><td>PageBuilderServiceProvider (registra singletons e rotas)</td></tr>
                     <tr><td><code>config/page-builder.php</code></td><td>1</td><td>Configuração: lista de widgets habilitados, config de cache</td></tr>
-                    <tr><td><code>database/migrations/</code></td><td>3</td><td>pages, elements, revisions</td></tr>
-                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>35+ rotas (resource pages + elementos + revisões)</td></tr>
+                    <tr><td><code>database/migrations/</code></td><td>5</td><td>pages, elements, revisions, form_submissions, add_role_to_users</td></tr>
+                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>50+ rotas (pages, elements, revisions, collab, html-import)</td></tr>
+                    <tr><td><code>routes/api.php</code></td><td>1</td><td>API REST com Sanctum (tokens, pages, elements)</td></tr>
                     <tr><td><code>resources/views/</code></td><td>16</td><td>Blade views (editor, pages, auth, tutorial + 7 partials editor/)</td></tr>
                     <tr><td><code>resources/js/editor/</code></td><td>6</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop</td></tr>
                     <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
@@ -1757,6 +1880,7 @@ php artisan db:seed</code></pre>
                     <li><code>Renderer</code> — recebe WidgetManager, renderiza árvore de elementos → HTML</li>
                     <li><code>PageBuilderService</code> — orquestra os três serviços acima</li>
                     <li><code>TemplateManager</code> — singleton independente, sem dependências</li>
+                    <li><code>CollaborationService</code> — usa Cache para presença e bloqueio de elementos</li>
                 </ul>
                 <p>O provider também carrega rotas, views e config publicável.</p>
 
@@ -1768,6 +1892,8 @@ php artisan db:seed</code></pre>
                     <li><strong>Editar configuração</strong> → JS envia <code>PUT /elements/{id}/settings</code> → atualiza JSON <code>settings</code></li>
                     <li><strong>Salvar</strong> → <code>PUT /pages/{id}</code> → <code>PageBuilderService::updatePage()</code> → cria <code>Revision</code></li>
                     <li><strong>Renderizar</strong> → <code>Renderer::render()</code> → percorre árvore recursivamente → gera HTML com estilos inline</li>
+                    <li><strong>Importar HTML</strong> → <code>HtmlImportController::import()</code> → <code>ImportHtmlJob</code> (Queue) → converte HTML em widgets</li>
+                    <li><strong>Colaboração</strong> → <code>CollaborationController::join()</code> → <code>CollaborationService</code> → Cache para presença</li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Sistema de Widgets</h3>
@@ -1784,9 +1910,9 @@ php artisan db:seed</code></pre>
 
         {{-- DATABASE --}}
         <section id="database" class="step">
-            <h2>16. Banco de Dados</h2>
+            <h2>18. Banco de Dados</h2>
             <div class="step-body">
-                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 3 tabelas principais além das padrão do Laravel (users, cache, jobs):</p>
+                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 4 tabelas principais além das padrão do Laravel (users, cache, jobs, personal_access_tokens):</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Tabela <code>pages</code></h3>
                 <table class="widget-table">
@@ -1836,19 +1962,50 @@ php artisan db:seed</code></pre>
                     <tr><td><code>page_id</code></td><td>foreignId</td><td>Página revisada (cascade delete)</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Usuário que fez a revisão</td></tr>
                     <tr><td><code>version</code></td><td>string(20)</td><td>Versão da revisão (ex: "1.0", "2.3")</td></tr>
-                    <tr><td><code>label</code></td><td>string (nullable)</td><td>Label descritivo (ex: "Versão inicial")</td></tr>
-                    <tr><td><code>type</code></td><td>string</td><td>"manual" ou "auto" (padrão: manual)</td></tr>
+                    <tr><td><code>label</code></td><td>string (nullable)</td><td>Label descritivo (ex: "Versão inicial", "Auto-save")</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>"manual" ou "auto_save" (padrão: manual)</td></tr>
                     <tr><td><code>content</code></td><td>longText (nullable)</td><td>Snapshot do conteúdo HTML da página</td></tr>
                     <tr><td><code>settings</code></td><td>json (nullable)</td><td>Snapshot das configurações da página</td></tr>
                     <tr><td><code>meta_data</code></td><td>json (nullable)</td><td>Snapshot dos metadados</td></tr>
                     <tr><td><code>diff</code></td><td>json (nullable)</td><td>Diff em relação à revisão anterior</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>form_submissions</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>page_id</code></td><td>foreignId</td><td>Página do formulário (cascade delete)</td></tr>
+                    <tr><td><code>form_name</code></td><td>string</td><td>Nome do formulário (padrão: "Contact Form")</td></tr>
+                    <tr><td><code>data</code></td><td>json</td><td>Dados enviados pelo formulário</td></tr>
+                    <tr><td><code>ip_address</code></td><td>string(45) (nullable)</td><td>IP do remetente</td></tr>
+                    <tr><td><code>user_agent</code></td><td>string (nullable)</td><td>User agent do navegador</td></tr>
+                    <tr><td><code>created_at / updated_at</code></td><td>timestamps</td><td>Datas de criação e atualização</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>users</code> (coluna adicional)</h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>role</code></td><td>string</td><td>Função do usuário (padrão: "editor"). Adicionada via migration <code>add_role_to_users</code></td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>personal_access_tokens</code> (Sanctum)</h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>tokenable_type</code></td><td>string</td><td>Tipo do modelo (User)</td></tr>
+                    <tr><td><code>tokenable_id</code></td><td>bigint</td><td>ID do modelo</td></tr>
+                    <tr><td><code>name</code></td><td>string</td><td>Nome do token</td></tr>
+                    <tr><td><code>token</code></td><td>string</td><td>Hash do token (SHA-256)</td></tr>
+                    <tr><td><code>abilities</code></td><td>json</td><td>Permissões do token</td></tr>
+                    <tr><td><code>last_used_at</code></td><td>timestamp (nullable)</td><td>Último uso</td></tr>
+                    <tr><td><code>expires_at</code></td><td>timestamp (nullable)</td><td>Data de expiração</td></tr>
                 </table>
             </div>
         </section>
 
         {{-- ROUTES --}}
         <section id="routes" class="step">
-            <h2>17. Rotas</h2>
+            <h2>19. Rotas</h2>
             <div class="step-body">
                 <p>Todas as rotas do page builder ficam em <code>routes/page-builder.php</code>, protegidas pelo middleware <code>web</code> + <code>auth</code>, com prefixo <code>/page-builder</code>.</p>
 
@@ -1890,6 +2047,7 @@ php artisan db:seed</code></pre>
                     <tr><td>GET</td><td><code>/page-builder/elements/{id}/controls</code></td><td>ElementController@controls</td><td>Controles do elemento</td></tr>
                     <tr><td>GET</td><td><code>/page-builder/widgets/{type}/controls</code></td><td>ElementController@widgetControls</td><td>Controles por tipo de widget</td></tr>
                     <tr><td>POST</td><td><code>/page-builder/upload</code></td><td>ElementController@uploadImage</td><td>Upload de imagem</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/upload-video</code></td><td>ElementController@uploadVideo</td><td>Upload de vídeo</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Revisões</h3>
@@ -1903,12 +2061,134 @@ php artisan db:seed</code></pre>
                     <tr><td>POST</td><td><code>/page-builder/pages/{id}/revisions/prune</code></td><td>RevisionController@prune</td><td>Limpar revisões antigas</td></tr>
                     <tr><td>POST</td><td><code>/page-builder/pages/{id}/revisions/auto-save</code></td><td>RevisionController@autoSave</td><td>Auto-save (a cada 60s)</td></tr>
                 </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Colaboração</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/collab/join</code></td><td>CollaborationController@join</td><td>Entrar na sessão</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/collab/leave</code></td><td>CollaborationController@leave</td><td>Sair da sessão</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/collab/heartbeat</code></td><td>CollaborationController@heartbeat</td><td>Heartbeat com cursor</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/collab/users</code></td><td>CollaborationController@activeUsers</td><td>Usuários ativos</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/elements/{elementId}/lock</code></td><td>CollaborationController@lockElement</td><td>Bloquear elemento</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/elements/{elementId}/unlock</code></td><td>CollaborationController@unlockElement</td><td>Desbloquear elemento</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Importação HTML</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/page-builder/html-import</code></td><td>HtmlImportController@import</td><td>Importar HTML (textarea ou URL)</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/html-import/fetch</code></td><td>HtmlImportController@fetch</td><td>Buscar HTML de uma URL</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Formulários</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/page-builder/pages/{id}/form/submit</code></td><td>FormController@submit</td><td>Enviar formulário</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/pages/{id}/form/submissions</code></td><td>FormController@submissions</td><td>Listar envios</td></tr>
+                </table>
+            </div>
+        </section>
+
+        {{-- API REST --}}
+        <section id="api" class="step">
+            <h2>20. API REST (Sanctum)</h2>
+            <div class="step-body">
+                <p>O Page Builder expõe uma <strong>API REST</strong> completa com autenticação via <strong>Laravel Sanctum</strong>. Isso permite integração com aplicativos móveis, SPAs externas e automações.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Autenticação</h3>
+                <p>A API usa tokens de acesso pessoal (Personal Access Tokens) do Sanctum. Para obter um token:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0"><code>POST /api/tokens
+{
+    "email": "test@example.com",
+    "password": "password",
+    "device_name": "Minha App"
+}
+
+// Resposta:
+{
+    "token": "1|abc123...",
+    "user": { "id": 1, "name": "...", "email": "..." }
+}</code></pre>
+
+                <p>Use o token no header <code>Authorization: Bearer {token}</code> em todas as requisições.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Endpoints da API</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/api/tokens</code></td><td>Criar token de acesso</td></tr>
+                    <tr><td>DELETE</td><td><code>/api/tokens</code></td><td>Revogar token atual</td></tr>
+                    <tr><td>GET</td><td><code>/api/user</code></td><td>Obter dados do usuário autenticado</td></tr>
+                    <tr><td>GET</td><td><code>/api/pages</code></td><td>Listar páginas do usuário (paginado)</td></tr>
+                    <tr><td>POST</td><td><code>/api/pages</code></td><td>Criar nova página</td></tr>
+                    <tr><td>GET</td><td><code>/api/pages/{id}</code></td><td>Obter página com árvore de elementos</td></tr>
+                    <tr><td>PUT</td><td><code>/api/pages/{id}</code></td><td>Atualizar página</td></tr>
+                    <tr><td>DELETE</td><td><code>/api/pages/{id}</code></td><td>Excluir página</td></tr>
+                    <tr><td>GET</td><td><code>/api/pages/{id}/elements</code></td><td>Listar elementos da página</td></tr>
+                    <tr><td>POST</td><td><code>/api/pages/{id}/elements</code></td><td>Criar elemento na página</td></tr>
+                    <tr><td>GET</td><td><code>/api/elements/{id}</code></td><td>Obter elemento</td></tr>
+                    <tr><td>PUT</td><td><code>/api/elements/{id}</code></td><td>Atualizar elemento</td></tr>
+                    <tr><td>DELETE</td><td><code>/api/elements/{id}</code></td><td>Excluir elemento</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Exemplo com cURL</h3>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0"><code># Listar páginas
+curl -H "Authorization: Bearer 1|abc123..." \
+     http://localhost:8000/api/pages
+
+# Criar página
+curl -X POST -H "Authorization: Bearer 1|abc123..." \
+     -H "Content-Type: application/json" \
+     -d '{"title":"Minha Página","status":"draft"}' \
+     http://localhost:8000/api/pages
+
+# Criar elemento
+curl -X POST -H "Authorization: Bearer 1|abc123..." \
+     -H "Content-Type: application/json" \
+     -d '{"type":"heading","settings":{"title":"Olá Mundo","tag":"h1"}}' \
+     http://localhost:8000/api/pages/1/elements</code></pre>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> A API filtra páginas pelo <code>user_id</code> do token — cada usuário só vê suas próprias páginas. Use <code>?per_page=50</code> para ajustar a paginação.
+                </div>
+            </div>
+        </section>
+
+        {{-- JOBS --}}
+        <section id="jobs" class="step">
+            <h2>21. Jobs &amp; Filas</h2>
+            <div class="step-body">
+                <p>O projeto usa o sistema de <strong>Jobs do Laravel</strong> para processar tarefas pesadas em segundo plano via Queue.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Jobs Disponíveis</h3>
+                <table class="widget-table">
+                    <tr><th>Job</th><th>Descrição</th><th>Timeout</th><th>Tentativas</th></tr>
+                    <tr><td><code>ImportHtmlJob</code></td><td>Converte HTML externo em elementos do page builder e cria a página. Processado via <code>HtmlImportController::import()</code>.</td><td>60s</td><td>3</td></tr>
+                    <tr><td><code>ClearPageCacheJob</code></td><td>Limpa o cache renderizado de uma página (key <code>page.{id}.render.{hash}</code>). Chamado após atualizar elementos.</td><td>10s</td><td>3</td></tr>
+                    <tr><td><code>AutoSaveRevisionJob</code></td><td>Cria uma revisão automática (<code>type: auto_save</code>) com snapshot do conteúdo e configurações da página.</td><td>30s</td><td>3</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Configuração da Queue</h3>
+                <p>No arquivo <code>.env</code>, configure:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0"><code># Opções: sync (síncrono), database, redis, sqs, etc.
+QUEUE_CONNECTION=sync
+
+# Para produção com Redis:
+QUEUE_CONNECTION=redis</code></pre>
+
+                <p>Para processar as filas em background:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0"><code>php artisan queue:work
+php artisan queue:work --tries=3
+php artisan queue:listen --timeout=60</code></pre>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Em desenvolvimento, use <code>QUEUE_CONNECTION=sync</code> para processar jobs imediatamente. Em produção, use <code>redis</code> ou <code>database</code> para processamento assíncrono. O comando <code>php artisan queue:work</code> deve rodar como um daemon (via Supervisor, systemd, etc.).
+                </div>
             </div>
         </section>
 
         {{-- QUALITY --}}
         <section id="quality" class="step">
-            <h2>18. Qualidade &amp; Testes</h2>
+            <h2>22. Qualidade &amp; Testes</h2>
             <div class="step-body">
                 <p>O projeto tem uma suíte completa de testes automatizados com <strong>93 testes</strong> rodando em SQLite em memória.</p>
 
@@ -1957,103 +2237,63 @@ php artisan test --verbose</pre>
 
         {{-- IMPROVEMENTS --}}
         <section id="improvements" class="step">
-            <h2>19. Melhorias Propostas</h2>
+            <h2>23. Melhorias Propostas</h2>
             <div class="step-body">
-                <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. Abaixo estão as melhorias propostas, organizadas por prioridade.</p>
+                <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 42 passos organizados em 8 fases. Abaixo está o status atual de cada fase:</p>
 
-                <div class="tip">
-                    <strong>&#128209; Plano Completo:</strong> O arquivo <code>IMPROVEMENTS.md</code> na raiz do projeto contém <strong>42 passos detalhados</strong> para implementar todas as melhorias, organizados em 8 fases. Cada passo pode ser testado individualmente. Siga a ordem recomendada no arquivo para implementar semana a semana.
-                </div>
-
-                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Alta Prioridade (Segurança &amp; Confiabilidade)</h3>
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Status das Fases</h3>
                 <table class="widget-table">
-                    <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
-                    <tr><td>1</td><td><strong>Rate Limiting</strong></td><td>Adicionar rate limiting nas rotas de API (save, upload) para evitar abuso</td><td>Segurança</td></tr>
-                    <tr><td>2</td><td><strong>CSRF nas rotas API</strong></td><td>Verificar se todas as rotas POST/PUT/DELETE têm proteção CSRF (middleware web já aplica, mas validar)</td><td>Segurança</td></tr>
-                    <tr><td>3</td><td><strong>Validação de Upload</strong></td><td>Adicionar validação de tipo MIME e tamanho no upload de imagens (atualmente aceita qualquer arquivo)</td><td>Segurança</td></tr>
-                    <tr><td>4</td><td><strong>Soft Delete com Hard Limit</strong></td><td>Adicionar limpeza periódica de registros soft-deleted antigos (>30 dias) para evitar crescimento do banco</td><td>Performance</td></tr>
-                    <tr><td>5</td><td><strong>Lock de Concorrência</strong></td><td>Usar <code>lockForUpdate()</code> ao salvar páginas com múltiplos usuários editando simultaneamente</td><td>Confiabilidade</td></tr>
+                    <tr><th>Fase</th><th>Passos</th><th>Descrição</th><th>Status</th></tr>
+                    <tr><td>1</td><td>1–8</td><td>Novos Widgets: Vídeo, Divisor, Espaçador, Ícone, Galeria, Form, Tabs, Accordion</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover, abas Content/Style/Advanced</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>3</td><td>14–17</td><td>Navigator: Árvore de elementos, drag-and-drop, rename, context menu</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS custom, Animações, Responsividade</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>5</td><td>24–29</td><td>UX do Editor: Live preview, Ctrl+Z visual, context menu, drag handle, zoom, fullscreen</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>5</td><td>30–31</td><td>UX do Editor: Widget search/filtro, dirty state indicator</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
+                    <tr><td>6</td><td>32–33</td><td>Atalhos: Ctrl+D duplicar, Copy/Paste widgets</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
+                    <tr><td>6</td><td>34–35</td><td>Atalhos: Global clipboard, Multi-select</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
+                    <tr><td>7</td><td>36–38</td><td>Temas e Presets: Starter Templates, Color Presets, Typography Presets</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
+                    <tr><td>8</td><td>39–42</td><td>Responsividade: Breakpoints visuais, estilos responsivos por widget, preview devices, mobile editing</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Média Prioridade (Funcionalidade)</h3>
-                <table class="widget-table">
-                    <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
-                    <tr><td>6</td><td><s>Widget de Vídeo</s></td><td><s>Adicionar widget para incorporar vídeos do YouTube/Vimeo com preview no editor</s> — <strong>Implementado</strong> via botão YouTube no editor WYSIWYG do widget de texto</td><td>Funcionalidade</td></tr>
-                    <tr><td>7</td><td><strong>Widget de Ícone</strong></td><td>Widget de ícones com biblioteca Font Awesome ou similar</td><td>Funcionalidade</td></tr>
-                    <tr><td>8</td><td><strong>Widget de Divisor</strong></td><td>Linha horizontal com estilo configurável (cor, espessura, tipo)</td><td>Funcionalidade</td></tr>
-                    <tr><td>9</td><td><strong>Widget de Espaçador</strong></td><td>Espaço em branco com altura configurável para respiração visual</td><td>Funcionalidade</td></tr>
-                    <tr><td>10</td><td><strong>Galeria de Imagens</strong></td><td>Widget para exibir múltiplas imagens em grid ou carrossel</td><td>Funcionalidade</td></tr>
-                    <tr><td>11</td><td><strong>Formulário de Contato</strong></td><td>Widget de formulário com campos configuráveis e envio por email</td><td>Funcionalidade</td></tr>
-                </table>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Resumo do Plano (42 Passos)</h3>
-                <table class="widget-table">
-                    <tr><th>Fase</th><th>Passos</th><th>Descrição</th><th>Semana</th></tr>
-                    <tr><td>1</td><td>1–8</td><td>Novos Widgets: Vídeo, Divisor, Espaçador, Ícone, Galeria, Form, Tabs, Accordion</td><td>1–2</td></tr>
-                    <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover, abas Content/Style/Advanced</td><td>3</td></tr>
-                    <tr><td>3</td><td>14–17</td><td>Navigator: Árvore de elementos, drag-and-drop, rename, context menu</td><td>4</td></tr>
-                    <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS custom, Animações, Responsividade</td><td>5</td></tr>
-                    <tr><td>5</td><td>24–31</td><td>UX do Editor: Live preview, Ctrl+Z visual, context menu, zoom, fullscreen, search</td><td>6</td></tr>
-                    <tr><td>6</td><td>32–35</td><td>Atalhos: Ctrl+D, Copy/Paste, Multi-select</td><td>7</td></tr>
-                    <tr><td>7</td><td>36–42</td><td>Temas, Presets, Responsividade completa</td><td>8</td></tr>
-                </table>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Baixa Prioridade (UX &amp; Performance)</h3>
-                <table class="widget-table">
-                    <tr><th>#</th><th>Melhoria</th><th>Descrição</th><th>Impacto</th></tr>
-                    <tr><td>12</td><td><strong>Ctrl+Z Visual</strong></td><td>Botão de desfazer visível no editor (além do atalho de teclado)</td><td>UX</td></tr>
-                    <tr><td>13</td><td><strong>Preview em Tempo Real</strong></td><td>Ao editar configurações, atualizar o canvas instantaneamente (atualmente requer click fora)</td><td>UX</td></tr>
-                    <tr><td>14</td><td><strong>Drag Handle Melhorado</strong></td><td>Ícone de arrastar mais visível e área de drag maior para facilitar reordenação</td><td>UX</td></tr>
-                    <tr><td>15</td><td><strong>Cache de Widgets</strong></td><td>Cache os controles de widgets no localStorage para carregamento mais rápido do editor</td><td>Performance</td></tr>
-                </table>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Melhorias Já Implementadas</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades Adicionais Implementadas (fora do IMPROVEMENTS.md)</h3>
                 <ul>
+                    <li><strong>Colaboração em tempo real</strong> — presença, bloqueio de elementos, cursores (via Cache)</li>
+                    <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou textarea, processamento via Job</li>
+                    <li><strong>API REST com Sanctum</strong> — autenticação token-based, CRUD completo de páginas e elementos</li>
+                    <li><strong>Jobs de fila</strong> — ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob</li>
                     <li><strong>PagePolicy</strong> — autorização por dono da página</li>
                     <li><strong>Sanitização XSS</strong> — <code>sanitizeContent()</code> e <code>sanitizeSettings()</code></li>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
-                    <li><strong>TemplateManager</strong> — extraído do controller para classe dedicada</li>
-                    <li><strong>prepareSettings()</strong> — merge automático de defaults em todos os 17 widgets</li>
-                    <li><strong>Editor JS extraído</strong> — 2600+ linhas em arquivo separado para cache</li>
-                    <li><strong>JS decomposto em módulos ES</strong> — 6 módulos: state, utils, canvas, history, navigator, dragdrop (via Vite pipeline)</li>
-                    <li><strong>Editor Blade partials</strong> — 507 linhas split em 7 partials reutilizáveis (css, toolbar, widget-panel, canvas, settings-panel, navigator, scripts)</li>
-                    <li><strong>Lógica duplicada extraída</strong> — buildTree() consolidado no ElementManager; controllers injetam ElementManager via DI</li>
-                    <li><strong>FormSubmission model</strong> — model Eloquent dedicado para envios de formulário; FormController refatorado para usar Eloquent ao invés de DB::table()</li>
-                    <li><strong>JS decomposto em módulos ES</strong> — 6 módulos: state, utils, canvas, history, navigator, dragdrop (via Vite pipeline)</li>
-                    <li><strong>Editor Blade partials</strong> — 507 linhas split em 7 partials reutilizáveis (css, toolbar, widget-panel, canvas, settings-panel, navigator, scripts)</li>
-                    <li><strong>Lógica duplicada extraída</strong> — buildTree() consolidado no ElementManager; controllers injetam ElementManager via DI</li>
-                    <li><strong>FormSubmission model</strong> — model Eloquent dedicado para envios de formulário; FormController refatorado para usar Eloquent ao invés de DB::table()</li>
-                    <li><strong>93 testes</strong> — cobertura completa de controllers, services e widgets</li>
-                    <li><strong>Bug fixes</strong> — status default, max order nulo, config key, AuthorizesRequests</li>
-                    <li><strong>Editor WYSIWYG</strong> — widget de texto com toolbar rich-text (negrito, itálico, links, imagens, vídeos, listas)</li>
-                    <li><strong>Upload de imagens no texto</strong> — botão de imagem + colar (Ctrl+V) no editor WYSIWYG</li>
-                    <li><strong>Vídeos YouTube</strong> — botão na toolbar que converte URL em embed responsivo com privacidade</li>
-                    <li><strong>Edição inline corrigida</strong> — preserva HTML (innerHTML) ao invés de destruir com textContent</li>
-                    <li><strong>Widget de Vídeo</strong> — <em>Passo 1 do IMPROVEMENTS.md</em> — widget dedicado com suporte a YouTube (youtube-nocookie.com), Vimeo e URL customizada; controles de autoplay, loop, mute, start/end time, aspect ratio e alinhamento; preview responsivo no canvas</li>
-                    <li><strong>Widget de Divisor</strong> — <em>Passo 2 do IMPROVEMENTS.md</em> — linha horizontal com estilo (solid, dashed, dotted, double), largura, espessura, cor e espaçamento superior/inferior configuráveis</li>
-                    <li><strong>Widget de Espaçador</strong> — <em>Passo 3 do IMPROVEMENTS.md</em> — espaço em branco com altura configurável (0–500px); preview com faixa tracejada e indicação de pixels no editor</li>
-                    <li><strong>Widget de Ícone</strong> — <em>Passo 4 do IMPROVEMENTS.md</em> — biblioteca de 90+ ícones Font Awesome com grid de seleção, busca, cor, tamanho, alinhamento e link; novo tipo de controle <code>icon</code> no editor</li>
-                    <li><strong>Widget de Galeria</strong> — <em>Passo 5 do IMPROVEMENTS.md</em> — upload múltiplo com modal de seleção, grid 1–6 colunas, layout masonry, captions, border radius, drag-to-reorder; novo tipo de controle <code>gallery</code> no editor</li>
-                    <li><strong>Widget de Formulário</strong> — <em>Passo 6 do IMPROVEMENTS.md</em> — campos configuráveis (text, email, tel, number, textarea, select, checkbox, radio) com controles repeater; submit via AJAX; migration <code>form_submissions</code>; rotas de envio e listagem</li>
-                    <li><strong>Widget de Abas</strong> — <em>Passo 7 do IMPROVEMENTS.md</em> — abas com título e conteúdo rich-text; orientação horizontal/vertical; troca de aba com JS; cor ativa configurável</li>
-                    <li><strong>Widget de Accordion</strong> — <em>Passo 8 do IMPROVEMENTS.md</em> — itens expandíveis/colapsáveis com título e conteúdo; ícone de seta; open by default; animation de rotação; estilização por cor</li>
-                    <li><strong>Style Tab — Abas Content/Style/Advanced</strong> — <em>Passos 9–12 do IMPROVEMENTS.md</em> — painel direito com 3 abas; controles de Background (cor, imagem, posição, size, repeat), Border (width, color, radius, style), Box Shadow (horizontal, vertical, blur, spread, color), Typography (font family, size, weight, line height, letter spacing, text transform, color), e Advanced (dimensions padding/margin, CSS classes, CSS ID). Todos os 17 widgets atualizados com abas Style e Advanced.</li>
-                    <li><strong>Style Tab — Hover Effects</strong> — <em>Passo 13 do IMPROVEMENTS.md</em> — controles de hover (background color, text color, border color, transform, transition) para Button, Heading e Text; gera <code>&lt;style&gt;</code> tag inline com escopo por classe; transição configurável em ms</li>
-                    <li><strong>Navigator</strong> — <em>Passos 14–17 do IMPROVEMENTS.md</em> — painel flutuante no canto inferior direito com árvore de elementos; toggle show/hide; highlight no hover e click; drag &amp; drop para reordenar; duplo clique para renomear; menu de contexto (right-click) com Duplicate, Delete, Copy, Paste, Move Up/Down</li>
-                    <li><strong>Advanced Tab — Dimensions com Link</strong> — <em>Passo 18 do IMPROVEMENTS.md</em> — controle de margem/padding com grid visual 4 lados (Top/Right/Bottom/Left); botão de link/unlink (🔗/🔓) para sincronizar todos os lados; layout em grid 4 colunas com labels;</li>
-                    <li><strong>Advanced Tab — Z-Index</strong> — <em>Passo 19 do IMPROVEMENTS.md</em> — controle numérico de Z-Index em todos os 17 widgets; controla empilhamento de camadas no layout</li>
-                    <li><strong>Advanced Tab — CSS ID &amp; Classes</strong> — <em>Passo 20 do IMPROVEMENTS.md</em> — campos de CSS ID e CSS Classes em todos os 17 widgets; CSS ID gera <code>id=""</code> no wrapper; CSS Classes gera classes adicionais</li>
-                    <li><strong>Advanced Tab — Custom CSS</strong> — <em>Passo 21 do IMPROVEMENTS.md</em> — editor de código monospace para CSS customizado por widget; gera <code>&lt;style&gt;</code> tag com seletor automático (<code>#css-id</code> ou <code>[data-element-id]</code>); todos os 17 widgets</li>
-                    <li><strong>Advanced Tab — Animações de Entrada</strong> — <em>Passo 22 do IMPROVEMENTS.md</em> — seletor com 20 animações (fadeIn, slideInUp, zoomIn, bounceIn, etc.); duração (slow/normal/fast); delay em ms; carrega Animate.css via CDN; suporte inline no Moodle via <code>data-element-id</code></li>
-                    <li><strong>Advanced Tab — Responsividade por Widget</strong> — <em>Passo 23 do IMPROVEMENTS.md</em> — toggle de visibilidade por dispositivo (Desktop/Tablet/Mobile); gera <code>@media</code> queries com <code>display:none</code> no render público; no editor, widgets ocultos aparecem com opacity reduzida</li>
+                    <li><strong>93 testes automatizados</strong> — cobertura completa de controllers, services e widgets</li>
+                    <li><strong>Editor WYSIWYG</strong> — toolbar rich-text com imagens, vídeos, listas</li>
+                    <li><strong>Edição inline</strong> — preserva HTML (innerHTML) ao invés de textContent</li>
+                    <li><strong>Upload de imagens no texto</strong> — botão + Ctrl+V no editor WYSIWYG</li>
+                    <li><strong>Vídeos YouTube</strong> — embed responsivo com privacidade (youtube-nocookie.com)</li>
                 </ul>
+
+                <div class="tip">
+                    <strong>&#128209; Plano Completo:</strong> O arquivo <code>IMPROVEMENTS.md</code> na raiz do projeto contém <strong>42 passos detalhados</strong> para implementar todas as melhorias. Cada passo pode ser testado individualmente. As fases 1–5 (29 de 42 passos) já estão implementadas.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Resumo do Plano (42 Passos)</h3>
+                <table class="widget-table">
+                    <tr><th>Fase</th><th>Passos</th><th>Descrição</th><th>Semana</th><th>Status</th></tr>
+                    <tr><td>1</td><td>1–8</td><td>Novos Widgets: Vídeo, Divisor, Espaçador, Ícone, Galeria, Form, Tabs, Accordion</td><td>1–2</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover, abas Content/Style/Advanced</td><td>3</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>3</td><td>14–17</td><td>Navigator: Árvore de elementos, drag-and-drop, rename, context menu</td><td>4</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS custom, Animações, Responsividade</td><td>5</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>5</td><td>24–31</td><td>UX do Editor: Live preview, Ctrl+Z, context menu, zoom, fullscreen, search</td><td>6</td><td style="color:#d97706">&#9202; (6/8)</td></tr>
+                    <tr><td>6</td><td>32–35</td><td>Atalhos: Ctrl+D, Copy/Paste, Multi-select</td><td>7</td><td style="color:#d97706">&#9202; (0/4)</td></tr>
+                    <tr><td>7</td><td>36–38</td><td>Temas e Presets</td><td>8</td><td style="color:#d97706">&#9202; (0/3)</td></tr>
+                    <tr><td>8</td><td>39–42</td><td>Responsividade completa</td><td>8</td><td style="color:#d97706">&#9202; (0/4)</td></tr>
+                </table>
             </div>
         </section>
 
         {{-- MOODLE --}}
-        {{-- MOODLE --}}
         <section id="moodle" class="step">
-            <h2>20. Uso com Moodle 4.5+</h2>
+            <h2>24. Uso com Moodle 4.5+</h2>
             <div class="step-body">
                 <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções detalhadas.</p>
 
