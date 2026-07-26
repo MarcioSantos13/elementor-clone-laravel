@@ -194,12 +194,18 @@
             </a>
         </div>
         <div class="navbar-menu">
-            <a href="{{ route('tutorial') }}" target="_blank" class="nav-link">&#128214; Tutorial</a>
+            <a href="{{ route('tutorial') }}" target="_blank" class="nav-link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Tutorial
+            </a>
             <a href="{{ route('page-builder.pages.index') }}" class="nav-link">Páginas</a>
-            <a href="{{ route('page-builder.pages.create') }}" class="nav-link nav-link-primary">+ Nova Página</a>
+            <a href="{{ route('page-builder.pages.create') }}" class="nav-link nav-link-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nova Página
+            </a>
             <form action="{{ route('logout') }}" method="POST" style="display:inline">
                 @csrf
-                <button type="submit" class="btn btn-secondary btn-sm" style="margin-left:.25rem;background:none;border:none;color:#64748b;cursor:pointer;font-size:.875rem;font-weight:500">Sair</button>
+                <button type="submit" class="nav-link" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-weight:500">Sair</button>
             </form>
         </div>
     </nav>

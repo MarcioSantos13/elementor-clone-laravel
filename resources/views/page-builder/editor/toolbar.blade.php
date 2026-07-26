@@ -1,4 +1,4 @@
-<div class="pb-toolbar">
+<div class="pb-toolbar" role="toolbar" aria-label="Editor toolbar">
     <span class="pb-toolbar-title"><a href="{{ route('page-builder.pages.index') }}" class="btn-back">&#8592; Voltar</a> {{ $page->title }}</span>
     <span class="pb-toolbar-badge badge-{{ $page->status === 'published' ? 'published' : 'draft' }}" style="background:{{ $page->status === 'published' ? 'rgba(34,197,94,.15)' : 'rgba(245,158,11,.15)' }};color:{{ $page->status === 'published' ? '#22c55e' : '#f59e0b' }}">{{ $page->status }}</span>
     <div class="pb-toolbar-spacer"></div>
@@ -15,9 +15,12 @@
     <button id="pb-fullscreen" onclick="editor.toggleFullscreen()" title="Tela Cheia (F11)" style="padding:.4rem .5rem">&#9974;</button>
     <span class="tb-divider"></span>
     <button onclick="editor.showPageSettings()" title="Configurações da Página" id="btn-page-settings">&#9881; <span style="font-size:.65rem;opacity:.6">Página</span></button>
+    <button onclick="editor.showSiteSettings()" title="Configurações do Site" id="btn-site-settings">&#127968; <span style="font-size:.65rem;opacity:.6">Site</span></button>
+    <button onclick="editor.showRevisionHistory()" title="Histórico de Revisões">&#128338; <span style="font-size:.65rem;opacity:.6">Revisões</span></button>
     <a href="{{ route('page-builder.render', $page) }}?t={{ time() }}" target="_blank" class="tb-link">&#128065; <span style="font-size:.65rem;opacity:.6">Visualizar</span></a>
     <span class="tb-divider"></span>
     <button onclick="editor.exportPage()" title="Exportar como JSON">&#128229;</button>
+    <button onclick="editor.saveAsTemplate()" title="Salvar como Template">&#128203; <span style="font-size:.65rem;opacity:.6">Template</span></button>
     <button onclick="editor.copyHtml()" title="Copiar HTML da página">&#128203;</button>
     <button onclick="editor.importHtml()" title="Importar HTML de site externo">&#128228; <span style="font-size:.65rem;opacity:.6">Importar HTML</span></button>
     <span class="tb-divider"></span>

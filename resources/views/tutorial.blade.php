@@ -21,10 +21,10 @@
             <a href="#drag-widgets">Adicionar Widgets</a>
             <a href="#educational-widgets">Widgets Educacionais</a>
             <a href="#select-settings">Editar Configurações</a>
-            <a href="#page-settings">Configurações da Página</a>
+            <a href="#page-settings">Configurações da Página &amp; Site</a>
             <a href="#responsive">Visualização Responsiva</a>
-            <a href="#templates">Usar Templates</a>
-            <a href="#undo-redo">Desfazer &amp; Refazer</a>
+            <a href="#templates">Templates &amp; Save as Template</a>
+            <a href="#undo-redo">Desfazer, Refazer &amp; Revisões</a>
             <a href="#save-publish">Salvar &amp; Publicar</a>
             <a href="#preview">Visualizar Página</a>
             <a href="#duplicate-delete">Duplicar &amp; Excluir</a>
@@ -121,13 +121,13 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Números do Projeto</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th></tr>
-                    <tr><td>Widgets disponíveis</td><td>17 (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</td></tr>
+                    <tr><td>Widgets disponíveis</td><td>29 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel)</td></tr>
                     <tr><td>Templates prontos</td><td>5 (Blank, Landing, About, Contact, Showcase Completo)</td></tr>
                     <tr><td>Rotas definidas</td><td>50+ (CRUD páginas, elementos, revisões, templates, colaboração, HTML import, API REST)</td></tr>
                     <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>4 principais (pages, elements, revisions, form_submissions) + personal_access_tokens</td></tr>
                     <tr><td>Views Blade</td><td>16 (login, register, tutorial, editor + 7 partials, pages)</td></tr>
-                    <tr><td>Linhas de JS do editor</td><td>~2600 (6 módulos ES em resources/js/editor/)</td></tr>
+                    <tr><td>Linhas de JS do editor</td><td>~5000 (8 módulos ES em resources/js/editor/)</td></tr>
                     <tr><td>API REST</td><td>Sanctum (token-based) com CRUD páginas e elementos</td></tr>
                     <tr><td>Jobs (filas)</td><td>3 (ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob)</td></tr>
                 </table>
@@ -136,13 +136,17 @@ php artisan db:seed</code></pre>
                 <ul>
                     <li>Criar páginas com título e status (rascunho / publicado)</li>
                     <li>Abrir um <strong>editor visual</strong> em tela cheia com tema escuro</li>
-                    <li>Arrastar <strong>17 widgets</strong> (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</li>
+                    <li>Arrastar <strong>29 widgets</strong> (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel)</li>
                     <li>Selecionar qualquer elemento e editar suas <strong>configurações</strong> no painel direito</li>
                     <li><strong>Editor de texto rich-text (WYSIWYG)</strong> com toolbar: negrito, itálico, links, imagens, vídeos YouTube, listas, código fonte</li>
                     <li><strong>Inserir imagens</strong> no texto via upload ou colar (Ctrl+V) — imagem inline no conteúdo</li>
                     <li><strong>Inserir vídeos YouTube</strong> — cole a URL e o embed responsivo 16:9 é inserido automaticamente</li>
                     <li>Inline editing — duplo-clique para editar texto diretamente no canvas (preserva HTML)</li>
-                    <li>Alternar entre visualização <strong>desktop / tablet / mobile</strong></li>
+                    <li>Alternar entre visualização <strong>desktop / tablet / mobile</strong> com <strong>frames de dispositivo</strong> (bezel de celular/tablet)</li>
+                    <li><strong>Busca de widgets</strong> — barra de pesquisa no painel esquerdo para encontrar widgets rapidamente</li>
+                    <li><strong>Painéis redimensionáveis</strong> — arraste a borda dos painéis esquerdo/direito para ajustar largura</li>
+                    <li><strong>Multi-select</strong> — Ctrl+Click para selecionar vários elementos, duplicar ou excluir em lote</li>
+                    <li><strong>Tour de onboarding</strong> — tour guiado de 5 passos na primeira vez que o editor é aberto</li>
                     <li>Aplicar <strong>5 templates</strong> prontos</li>
                     <li>Desfazer / refazer alterações (Ctrl+Z / Ctrl+Shift+Z)</li>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
@@ -156,6 +160,22 @@ php artisan db:seed</code></pre>
                     <li><strong>Tela cheia (Fullscreen)</strong> — esconder painéis laterais com botão ou F11</li>
                     <li><strong>Preview em tempo real</strong> — debounce 300ms em todos os controles (text, color, number, etc.)</li>
                     <li><strong>Estilo por widget</strong> — 3 abas (Content, Style, Advanced): tipografia, fundo, borda, sombra, hover, dimensões, animação, CSS customizado, visibilidade responsiva</li>
+                    <li><strong>Responsive Tabs</strong> — abas Desktop/Tablet/Mobile no painel de configurações com valores por breakpoint</li>
+                    <li><strong>Gradient Background</strong> — gradientes lineares e radiais com editor visual de cores e ângulo</li>
+                    <li><strong>Parallax &amp; Video Background</strong> — efeito parallax no scroll e vídeos de fundo autoplay/mute/loop</li>
+                    <li><strong>Shape Dividers</strong> — 10 tipos de divisores SVG (tilt, waves, mountains, clouds, triangles, drip, etc.)</li>
+                    <li><strong>Background Overlay</strong> — cor overlay com blend modes e opacidade</li>
+                    <li><strong>Scroll-Triggered Animations</strong> — fade, zoom, slide ativados no scroll (IntersectionObserver)</li>
+                    <li><strong>Image Filters</strong> — 9 filtros CSS (grayscale, sepia, blur, brightness, etc.) + rotação + flip</li>
+                    <li><strong>Sticky Position</strong> — seções sticky com offset e direção configurável</li>
+                    <li><strong>Column Resize</strong> — slider percentual 1-100% para largura de colunas</li>
+                    <li><strong>Text Shadow &amp; Stroke</strong> — sombra e contorno de texto por elemento</li>
+                    <li><strong>Global Colors &amp; Fonts</strong> — paleta de cores e fontes globais do site</li>
+                    <li><strong>Command Finder (Ctrl+K)</strong> — busca de ações, widgets e configurações</li>
+                    <li><strong>Revision History</strong> — histórico de revisões com diff visual e restauração</li>
+                    <li><strong>Save as Template</strong> — exportar página como template JSON</li>
+                    <li><strong>Column Structure Picker</strong> — 6 opções de layout ao criar seção</li>
+                    <li><strong>ARIA Accessibility</strong> — roles semânticos, navegação por Tab, focus-visible</li>
                     <li><strong>Colaboração em tempo real</strong> — presença de usuários, bloqueio de elementos, cursores</li>
                     <li><strong>API REST</strong> — autenticação via Sanctum tokens, CRUD completo de páginas e elementos</li>
                     <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
@@ -166,26 +186,33 @@ php artisan db:seed</code></pre>
 <pre style="margin:0">┌──────────────────────────────────────────────────┐
 │                  FRONTEND                         │
 │   editor.blade.php (7 partials)                   │
-│   resources/js/editor/ (6 módulos ES)              │
-│   state, utils, canvas, history, navigator, dragdrop (SortableJS)
+│   resources/js/editor/ (8 módulos ES)              │
+│   state, utils, canvas, history, navigator, dragdrop, html-import, css
 ├──────────────────────────────────────────────────┤
 │                CONTROLLERS                        │
 │   PageController │ ElementController              │
 │   RevisionController │ FormController             │
+│   CollaborationController │ HtmlImportController  │
 ├──────────────────────────────────────────────────┤
 │                 SERVICES                          │
 │   PageBuilderService │ Renderer │ WidgetManager   │
 │   TemplateManager │ ElementManager                │
+│   CollaborationService │ HtmlImportService        │
 ├──────────────────────────────────────────────────┤
-│                  WIDGETS (17)                     │
+│                  WIDGETS (29)                     │
 │   BaseWidget → Heading │ Text │ Image │ Button    │
-│              Section │ Column │ Callout            │
-│              Table │ Math │ Video │ Divider        │
-│              Spacer │ Icon │ Gallery │ Form        │
-│              Tabs │ Accordion                      │
+│              Section │ Column │ InnerSection       │
+│              Callout │ Table │ Math │ Video        │
+│              Divider │ Spacer │ Icon │ Gallery     │
+│              Form │ Tabs │ Accordion               │
+│              Counter │ ProgressBar │ SocialIcons   │
+│              IconBox │ ImageBox │ Testimonial      │
+│              PriceTable │ Countdown │ GoogleMaps   │
+│              Carousel                             │
 ├──────────────────────────────────────────────────┤
 │              DATABASE (SQLite)                    │
 │   pages → elements (árvore) → revisions           │
+│   form_submissions │ personal_access_tokens       │
 └──────────────────────────────────────────────────┘</pre>
                 </div>
             </div>
@@ -214,7 +241,7 @@ php artisan db:seed</code></pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que está incluído (gratuito)</h3>
                 <ul>
-                    <li>17 widgets (Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion)</li>
+                    <li>29 widgets (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel)</li>
                     <li>Editor visual completo com drag-and-drop (SortableJS), undo/redo, zoom, fullscreen</li>
                     <li>6 templates prontos (Blank, Landing, About, Contact, Moodle Course, Showcase)</li>
                     <li>Sistema de revisões com diff e restauração</li>
@@ -641,16 +668,20 @@ php artisan db:seed</code></pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Esquerdo — Widgets</h3>
                 <ul>
-                    <li>Lista os 17 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion</li>
+                    <li>Lista os 29 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel</li>
+                    <li><strong>Barra de busca</strong> — digite para filtrar widgets por nome (ex: "título", "imagem", "form")</li>
                     <li>Cada widget mostra um ícone (emoji) e nome</li>
                     <li>O painel começa colapsado — clique no ícone de widgets (☰) na barra superior para expandir</li>
                     <li><strong>Arraste</strong> um widget do painel para o canvas para adicioná-lo (suporte a Drop Indicator com SortableJS)</li>
+                    <li><strong>Painéis redimensionáveis</strong> — arraste a borda entre o painel e o canvas para ajustar largura (200px–500px)</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Centro — Canvas</h3>
                 <ul>
                     <li>Exibe a prévia ao vivo da página (iframe de largura 100%)</li>
                     <li>Clique em qualquer elemento para selecioná-lo — ele fica com borda azul</li>
+                    <li><strong>Multi-select:</strong> Ctrl+Click (ou Cmd+Click) para selecionar vários elementos — borda laranja indicando seleção múltipla</li>
+                    <li>Barra flutuante aparece com opções: Duplicar, Excluir ou Limpar seleção</li>
                     <li>O elemento selecionado aparece destacado no painel direito</li>
                     <li>Duplo-clique em textos de Título e Texto para edição inline</li>
                     <li>Botão de remover (✕) aparece ao passar o mouse sobre elementos</li>
@@ -659,7 +690,8 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Direito — Configurações</h3>
                 <ul>
                     <li>Mostra as configurações do elemento selecionado, ou da página se nada estiver selecionado</li>
-                    <li>Cada configuração tem um campo de entrada (texto, cor, seleção, etc.)</li>
+                    <li><strong>Abas de breakpoint</strong> — Desktop / Tablet / Mobile para definir valores responsivos por dispositivo</li>
+                    <li>Cada configuração tem um campo de entrada (texto, cor, seleção, gradient, etc.)</li>
                     <li>O widget de texto exibe um <strong>editor WYSIWYG</strong> com toolbar para formatação, imagens e vídeos</li>
                     <li>As mudanças são aplicadas instantaneamente ao canvas</li>
                     <li>O painel começa colapsado — clique no ícone de configurações (⚙️) na barra superior para expandir</li>
@@ -671,6 +703,10 @@ php artisan db:seed</code></pre>
                     <tr><td>Layout</td><td>☰, ⚙️</td><td>Expandir/colapsar painéis esquerdo e direito</td></tr>
                     <tr><td>Responsivo</td><td>🖥️ 📱 📲</td><td>Desktop (100%), Tablet (768px), Mobile (360px)</td></tr>
                     <tr><td>Ações</td><td>Desfazer / Refazer</td><td>Ctrl+Z / Ctrl+Shift+Z (máximo 50 estados)</td></tr>
+                    <tr><td>Finder</td><td>🔍 Finder</td><td>Command Finder (Ctrl+K) — busca de ações e widgets</td></tr>
+                    <tr><td>Site</td><td>⚙️ Site Settings</td><td>Configurações globais (cores, fontes)</td></tr>
+                    <tr><td>Revisões</td><td>📋 Revisões</td><td>Histórico de revisões com diff visual</td></tr>
+                    <tr><td>Template</td><td>📦 Template</td><td>Salvar página como template JSON</td></tr>
                     <tr><td>Salvar</td><td>💾 Salvar</td><td>Salva como rascunho (sem publicar)</td></tr>
                     <tr><td>Publicar</td><td>🚀 Publicar</td><td>Muda status para "publicado"</td></tr>
                 </table>
@@ -801,7 +837,7 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Coluna</h3>
                 <table class="widget-table">
                     <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
-                    <tr><td>Column Width</td><td>select</td><td>col-1 até col-12 (grid de 12 colunas, padrão: col-4)</td></tr>
+                    <tr><td>Column Width</td><td>slider (1-100%)</td><td>Largura percentual da coluna (padrão: 50%)</td></tr>
                     <tr><td>Vertical Alignment</td><td>select</td><td>stretch, flex-start, center, flex-end</td></tr>
                     <tr><td>Text Align</td><td>select</td><td>left, center, right, justify</td></tr>
                     <tr><td>Background Color</td><td>color</td><td>Cor de fundo</td></tr>
@@ -997,13 +1033,135 @@ php artisan db:seed</code></pre>
                 <p>O editor inclui funcionalidades avançadas de produtividade:</p>
                 <table class="widget-table">
                     <tr><th>Feature</th><th>Descrição</th></tr>
-                    <tr><td><strong>Navigator</strong></td><td>Painel flutuante com árvore de elementos — drag-and-drop SortableJS para reordenar e aninhar, renomear (duplo clique), menu de contexto</td></tr>
+                    <tr><td><strong>Navigator</strong></td><td>Painel flutuante com árvore de elementos — drag-and-drop SortableJS para reordenar e aninhar, renomear (duplo clique), menu de contexto, busca por nome</td></tr>
+                    <tr><td><strong>Multi-select</strong></td><td>Ctrl+Click para selecionar vários elementos — barra flutuante com Duplicar, Excluir, Limpar seleção</td></tr>
+                    <tr><td><strong>Widget Search</strong></td><td>Barra de busca no painel esquerdo — filtra widgets por nome em tempo real</td></tr>
+                    <tr><td><strong>Command Finder</strong></td><td><kbd>Ctrl</kbd>+<kbd>K</kbd> — modal de busca global para ações, widgets e configurações</td></tr>
                     <tr><td><strong>Right-click</strong></td><td>Menu de contexto no canvas: Editar, Duplicar, Mover cima/baixo, Copiar, Colar, Excluir</td></tr>
                     <tr><td><strong>Drag Handle</strong></td><td>Ícone ⣿ para arrastar reordenar com linhas indicadoras de posição</td></tr>
                     <tr><td><strong>Zoom</strong></td><td>Ctrl+Scroll ou botões +/- (25%-200%), Ctrl+0 para reset</td></tr>
                     <tr><td><strong>Fullscreen</strong></td><td>Botão ou F11 para esconder painéis laterais</td></tr>
-                    <tr><td><strong>Atalhos</strong></td><td>Ctrl+Z desfazer, Ctrl+Shift+Z refazer, Ctrl+S salvar, Delete excluir</td></tr>
+                    <tr><td><strong>Painéis Resizáveis</strong></td><td>Arraste a borda dos painéis esquerdo/direito para ajustar largura (200px–500px)</td></tr>
+                    <tr><td><strong>Onboarding</strong></td><td>Tour guiado de 10 passos na primeira vez que o editor é aberto</td></tr>
+                    <tr><td><strong>Atalhos</strong></td><td>Ctrl+Z desfazer, Ctrl+Shift+Z refazer, Ctrl+S salvar, Ctrl+D duplicar, Ctrl+K finder, Delete excluir, Tab navegar, Escape limpar seleção</td></tr>
                     <tr><td><strong>Inline Editing</strong></td><td>Duplo-clique no canvas para editar texto diretamente (Heading, Text, Button, Callout)</td></tr>
+                    <tr><td><strong>Copy/Paste Styles</strong></td><td>Ctrl+Shift+C para copiar estilos, Ctrl+Shift+V para colar em outro widget</td></tr>
+                    <tr><td><strong>ARIA Accessibility</strong></td><td>Roles semânticos, navegação por Tab/Shift+Tab, focus-visible outlines, screen-reader support</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.5rem;margin-bottom:.5rem">Widgets Avançados</h3>
+                <p>Além dos widgets básicos e educacionais, o Page Builder inclui widgets avançados para elementos visuais comuns em páginas web modernas:</p>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Counter (Contador Animado)</h4>
+                <p>Número animado que conta do valor inicial ao final com efeito visual.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Starting Number</td><td>number</td><td>Número inicial (padrão: 0)</td></tr>
+                    <tr><td>Ending Number</td><td>number</td><td>Número final (padrão: 100)</td></tr>
+                    <tr><td>Separator</td><td>text</td><td>Separador de milhar (ex: , ou .)</td></tr>
+                    <tr><td>Prefix</td><td>text</td><td>Texto antes do número (ex: $)</td></tr>
+                    <tr><td>Suffix</td><td>text</td><td>Texto depois do número (ex: +)</td></tr>
+                    <tr><td>Duration</td><td>number</td><td>Duração da animação em segundos (padrão: 2)</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Progress Bar (Barra de Progresso)</h4>
+                <p>Barra de progresso com título, porcentagem e animação de preenchimento.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Title</td><td>text</td><td>Título da barra</td></tr>
+                    <tr><td>Percentage</td><td>number</td><td>Porcentagem (0-100)</td></tr>
+                    <tr><td>Background Color</td><td>color</td><td>Cor de fundo da barra</td></tr>
+                    <tr><td>Fill Color</td><td>color</td><td>Cor do preenchimento</td></tr>
+                    <tr><td>Animate</td><td>boolean</td><td>Animação de preenchimento ao entrar na viewport</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Social Icons</h4>
+                <p>Grade de ícones de redes sociais com links configuráveis.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Icons</td><td>repeater</td><td>Plataforma (Facebook, Twitter, Instagram, LinkedIn, YouTube, GitHub, WhatsApp, Email), cor, URL</td></tr>
+                    <tr><td>Columns</td><td>select</td><td>1-6 colunas</td></tr>
+                    <tr><td>Icon Size</td><td>number</td><td>Tamanho dos ícones em px</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Icon Box</h4>
+                <p>Caixa com ícone, título e descrição — perfeita para features e benefícios.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Icon</td><td>icon picker</td><td>Ícone Font Awesome</td></tr>
+                    <tr><td>Title</td><td>text</td><td>Título da feature</td></tr>
+                    <tr><td>Description</td><td>textarea</td><td>Descrição curta</td></tr>
+                    <tr><td>Icon Position</td><td>select</td><td>left, top</td></tr>
+                    <tr><td>Icon Color</td><td>color</td><td>Cor do ícone</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Image Box</h4>
+                <p>Caixa com imagem, título e descrição — ideal para cards e conteúdo visual.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Image</td><td>image</td><td>URL da imagem</td></tr>
+                    <tr><td>Title</td><td>text</td><td>Título</td></tr>
+                    <tr><td>Description</td><td>textarea</td><td>Descrição</td></tr>
+                    <tr><td>Title Tag</td><td>select</td><td>h2, h3, h4, h5, h6, p</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Testimonial</h4>
+                <p>Card de depoimento com nome, cargo, empresa, conteúdo e avaliação por estrelas.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Name</td><td>text</td><td>Nome do depoente</td></tr>
+                    <tr><td>Position</td><td>text</td><td>Cargo</td></tr>
+                    <tr><td>Company</td><td>text</td><td>Empresa</td></tr>
+                    <tr><td>Content</td><td>textarea</td><td>Texto do depoimento</td></tr>
+                    <tr><td>Avatar</td><td>image</td><td>Foto do depoente</td></tr>
+                    <tr><td>Rating</td><td>number</td><td>Avaliação 1-5 estrelas</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Price Table</h4>
+                <p>Tabela de preços com features, destaque e período.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Title</td><td>text</td><td>Nome do plano</td></tr>
+                    <tr><td>Price</td><td>text</td><td>Preço (ex: 99)</td></tr>
+                    <tr><td>Currency</td><td>text</td><td>Moeda (ex: R$)</td></tr>
+                    <tr><td>Period</td><td>text</td><td>Período (ex: /mês)</td></tr>
+                    <tr><td>Features</td><td>repeater</td><td>Lista de features incluídas</td></tr>
+                    <tr><td>Featured</td><td>boolean</td><td>Plano destacado</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Countdown</h4>
+                <p>Timer regressivo com contadores de dias, horas, minutos e segundos.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Target Date</td><td>text</td><td>Data alvo (formato ISO)</td></tr>
+                    <tr><td>Show Labels</td><td>boolean</td><td>Mostrar labels (Days, Hours, etc.)</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Google Maps (OpenStreetMap)</h4>
+                <p>Mapa interativo usando OpenStreetMap (sem necessidade de API key).</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Latitude</td><td>text</td><td>Latitude (ex: -15.7975)</td></tr>
+                    <tr><td>Longitude</td><td>text</td><td>Longitude (ex: -47.8919)</td></tr>
+                    <tr><td>Zoom</td><td>number</td><td>Nível de zoom (1-19)</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Carousel (Carrossel de Imagens)</h4>
+                <p>Carrossel CSS com scroll-snap para galerias de imagens.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Images</td><td>gallery</td><td>Upload múltiplo</td></tr>
+                    <tr><td>Columns</td><td>number</td><td>Colunas visíveis (1-5)</td></tr>
+                    <tr><td>Gap</td><td>number</td><td>Espaçamento entre imagens (px)</td></tr>
+                </table>
+
+                <h4 style="font-size:.95rem;margin-top:1.25rem;margin-bottom:.5rem">Inner Section (Seção Interna)</h4>
+                <p>Container para sub-colunas dentro de uma coluna — permite layouts aninhados sem depender de uma nova seção principal.</p>
+                <table class="widget-table">
+                    <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
+                    <tr><td>Columns</td><td>number</td><td>Número de colunas (1-10)</td></tr>
+                    <tr><td>Column Gap</td><td>select</td><td>small, medium, large, no gap</td></tr>
+                    <tr><td>Direction</td><td>select</td><td>row, column</td></tr>
                 </table>
             </div>
         </section>
@@ -1034,7 +1192,7 @@ php artisan db:seed</code></pre>
 
         {{-- PAGE SETTINGS --}}
         <section id="page-settings" class="step">
-            <h2>7. Configurações da Página</h2>
+            <h2>7. Configurações da Página &amp; Configurações do Site</h2>
             <div class="step-body">
                 <p>Você também pode alterar configurações que se aplicam a página inteira:</p>
                 <ol>
@@ -1050,8 +1208,21 @@ php artisan db:seed</code></pre>
                     </li>
                     <li>As alterações se aplicam instantaneamente à prévia no canvas</li>
                 </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Configurações do Site (Global Colors &amp; Fonts)</h3>
+                <p>O Page Builder permite definir <strong>cores e fontes globais</strong> que podem ser reutilizadas em toda a página:</p>
+                <ol>
+                    <li>No editor, clique em <strong>"⚙️ Site"</strong> na barra de ferramentas (ou use <kbd>Ctrl</kbd>+<kbd>K</kbd> e digite "site settings")</li>
+                    <li>O painel mostra duas seções:
+                        <ul>
+                            <li><strong>Cores Globais</strong> — adicione, edite e remova cores que podem ser aplicadas em qualquer widget</li>
+                            <li><strong>Fontes Globais</strong> — selecione entre 14 fontes do sistema (Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Raleway, Nunito, Merriweather, Playfair Display, Oswald, Ubuntu, Crimson Text)</li>
+                        </ul>
+                    </li>
+                    <li>As cores e fontes globais ficam salvas nas configurações da página</li>
+                </ol>
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> Clique em "Config. da Página" novamente para desselecionar e voltar à edição de widgets.
+                    <strong>&#128161; Dica:</strong> Clique em "Config. da Página" novamente para desselecionar e voltar à edição de widgets. As configurações do site ficam acessíveis pelo botão "Site" ou pelo Finder (Ctrl+K).
                 </div>
             </div>
         </section>
@@ -1060,20 +1231,30 @@ php artisan db:seed</code></pre>
         <section id="responsive" class="step">
             <h2>8. Visualização Responsiva</h2>
             <div class="step-body">
-                <p>Veja como sua página fica em diferentes tamanhos de tela:</p>
+                <p>Veja como sua página fica em diferentes tamanhos de tela, com <strong>frames de dispositivo</strong> realistas e <strong>valores responsivos por breakpoint</strong>:</p>
                 <ol>
                     <li>Na barra de ferramentas do editor, clique em um dos ícones responsivos:
                         <ul>
-                            <li>&#128187; <strong>Desktop</strong> — largura total</li>
-                            <li>&#128241; <strong>Tablet</strong> — 768px de largura</li>
-                            <li>&#128241; <strong>Mobile</strong> — 375px de largura</li>
+                            <li>&#128187; <strong>Desktop</strong> — largura total, sem frame</li>
+                            <li>&#128241; <strong>Tablet</strong> — 768px com frame de tablet (bezel escuro, cantos arredondados)</li>
+                            <li>&#128241; <strong>Mobile</strong> — 375px com frame de celular (notch, cantos mais arredondados)</li>
                         </ul>
                     </li>
-                    <li>A largura do canvas se ajusta instantaneamente</li>
-                    <li>Você pode editar configurações e adicionar widgets em qualquer ponto de quebra</li>
+                    <li>O canvas é envolto por um <strong>device frame</strong> com notch e label indicando o tamanho</li>
+                    <li>A largura do canvas se ajusta instantaneamente com transição suave</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Valores Responsivos por Breakpoint</h3>
+                <p>No painel direito de configurações, cada control de estilo possui <strong>abas de breakpoint</strong> (Desktop, Tablet, Mobile) que permitem definir valores diferentes para cada dispositivo:</p>
+                <ol>
+                    <li>Selecione um widget no canvas</li>
+                    <li>No painel direito, observe as <strong>abas de breakpoint</strong> (Desktop / Tablet / Mobile) acima dos controles</li>
+                    <li>Clique em <strong>Tablet</strong> ou <strong>Mobile</strong> para definir valores específicos</li>
+                    <li>O sistema salva automaticamente com sufixos <code>_tablet</code> e <code>_mobile</code></li>
+                    <li>O frontend aplica <strong>media queries CSS</strong> para usar o valor correto em cada breakpoint</li>
                 </ol>
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> Use a visualização mobile para garantir que seu layout fique bem empilhado em telas pequenas.
+                    <strong>&#128161; Dica:</strong> Se você não definir um valor para Tablet ou Mobile, o sistema usa automaticamente o valor do Desktop como fallback. Isso permite definir apenas as exceções responsivas.
                 </div>
             </div>
         </section>
@@ -1098,6 +1279,15 @@ php artisan db:seed</code></pre>
                     <li>Clique em <strong>"Criar &amp; Abrir Editor"</strong> para ver o template carregado no editor</li>
                     <li>Você pode então modificar qualquer elemento ou adicionar mais widgets</li>
                 </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Salvar como Template</h3>
+                <p>Você pode salvar uma página como template reutilizável:</p>
+                <ol>
+                    <li>No editor, clique em <strong>"Template"</strong> na barra de ferramentas</li>
+                    <li>Digite um <strong>nome</strong> para o template</li>
+                    <li>O template é exportado como arquivo JSON nomeado</li>
+                    <li>Para reutilizar, importe o template na criação de uma nova página</li>
+                </ol>
                 <div class="tip">
                     <strong>&#128161; Dica:</strong> Você também pode aplicar um template a uma página existente a partir da lista de páginas usando o botão "Aplicar Template" no menu de ações.
                 </div>
@@ -1106,7 +1296,7 @@ php artisan db:seed</code></pre>
 
         {{-- UNDO / REDO --}}
         <section id="undo-redo" class="step">
-            <h2>10. Desfazer &amp; Refazer</h2>
+            <h2>10. Desfazer, Refazer &amp; Histórico de Revisões</h2>
             <div class="step-body">
                 <p>Toda alteração feita no editor é rastreada, permitindo voltar ou avançar:</p>
                 <ul>
@@ -1114,6 +1304,22 @@ php artisan db:seed</code></pre>
                     <li><strong>Refazer</strong> — pressione <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> ou clique no botão &#8631; na barra de ferramentas</li>
                 </ul>
                 <p>Funciona em todas as ações: adicionar, mover, excluir elementos, alterar configurações, etc.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Histórico de Revisões</h3>
+                <p>O Page Builder mantém um <strong>histórico completo de revisões</strong> da página, permitindo ver todas as versões anteriores e restaurá-las:</p>
+                <ol>
+                    <li>No editor, clique em <strong>"Revisões"</strong> na barra de ferramentas</li>
+                    <li>Uma lista de revisões aparece com data, hora, tipo (manual/auto-save) e autor</li>
+                    <li>Cada revisão tem dois botões:
+                        <ul>
+                            <li><strong>Restaurar</strong> — reverte a página para aquela versão</li>
+                            <li><strong>Ver Diff</strong> — mostra uma comparação linha por linha com cores (verde = adicionado, vermelho = removido)</li>
+                        </ul>
+                    </li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O sistema cria revisões automaticamente a cada 60 segundos (auto-save) e sempre que você salva manualmente. As revisões ficam armazenadas no banco de dados e podem ser comparadas com diff visual colorido.
+                </div>
             </div>
         </section>
 
@@ -1814,11 +2020,11 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Diagrama de Arquitetura</h3>
                 <div style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.78rem;line-height:1.5;overflow-x:auto;font-family:monospace">
 <pre style="margin:0">┌─────────────────────────────────────────────────────────────────┐
-│                        FRONTEND (6 módulos ES)                   │
-│  resources/js/editor/ ← editor.blade.php (partials)            │
-│  drag-drop (SortableJS), undo/redo, auto-save, inline editing, panels       │
+│                        FRONTEND (8 módulos ES)                   │
+│  resources/js/editor/ ← editor.blade.php (7 partials)            │
+│  state, utils, canvas, history, navigator, dragdrop (SortableJS), html-import, css │
 ├─────────────────────────────────────────────────────────────────┤
-│                     CONTROLLERS (7 classes)                       │
+│                     CONTROLLERS (8 classes)                       │
 │  PageController       — CRUD páginas, templates, export/import  │
 │  ElementController    — CRUD elementos, controles, upload       │
 │  RevisionController   — revisões, diff, restore, auto-save      │
@@ -1828,7 +2034,7 @@ php artisan db:seed</code></pre>
 │  PageApiController    — API REST (Sanctum) para páginas         │
 │  ElementApiController — API REST (Sanctum) para elementos       │
 ├─────────────────────────────────────────────────────────────────┤
-│                     SERVICES (7 classes)                         │
+│                     SERVICES (8 classes)                         │
 │  PageBuilderService   — orquestra tudo (create, update, render) │
 │  ElementManager       — CRUD elementos, árvore, reordenação     │
 │  WidgetManager        — registra e gerencia widgets dinamicamente│
@@ -1842,11 +2048,16 @@ php artisan db:seed</code></pre>
 │  ClearPageCacheJob    — limpa cache renderizado da página       │
 │  AutoSaveRevisionJob  — cria revisão automática a cada 60s     │
 ├─────────────────────────────────────────────────────────────────┤
-│                     WIDGETS (17 classes)                          │
+│                     WIDGETS (29 classes)                          │
 │  BaseWidget (abstract) → Heading, Text, Image, Button           │
-│                        → Section, Column, Callout, Table         │
-│                        → Math, Video, Divider, Spacer            │
-│                        → Icon, Gallery, Form, Tabs, Accordion    │
+│                        → Section, Column, InnerSection           │
+│                        → Callout, Table, Math, Video             │
+│                        → Divider, Spacer, Icon, Gallery          │
+│                        → Form, Tabs, Accordion                   │
+│                        → Counter, ProgressBar, SocialIcons       │
+│                        → IconBox, ImageBox, Testimonial          │
+│                        → PriceTable, Countdown, GoogleMaps       │
+│                        → Carousel                                │
 ├─────────────────────────────────────────────────────────────────┤
 │                     DATABASE (SQLite)                             │
 │  pages → elements (árvore via parent_id) → revisions            │
@@ -1860,7 +2071,7 @@ php artisan db:seed</code></pre>
                     <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>6</td><td>PageController, ElementController, RevisionController, FormController, CollaborationController, HtmlImportController</td></tr>
                     <tr><td><code>app/Http/Controllers/Api/</code></td><td>2</td><td>PageApiController, ElementApiController (REST API)</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>7</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager, CollaborationService, HtmlImportService</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>18</td><td>BaseWidget + 17 widgets concretos</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>30</td><td>BaseWidget + 29 widgets concretos</td></tr>
                     <tr><td><code>app/Jobs/</code></td><td>3</td><td>ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob</td></tr>
                     <tr><td><code>app/Providers/</code></td><td>1</td><td>PageBuilderServiceProvider (registra singletons e rotas)</td></tr>
                     <tr><td><code>config/page-builder.php</code></td><td>1</td><td>Configuração: lista de widgets habilitados, config de cache</td></tr>
@@ -1868,7 +2079,7 @@ php artisan db:seed</code></pre>
                     <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>50+ rotas (pages, elements, revisions, collab, html-import)</td></tr>
                     <tr><td><code>routes/api.php</code></td><td>1</td><td>API REST com Sanctum (tokens, pages, elements)</td></tr>
                     <tr><td><code>resources/views/</code></td><td>16</td><td>Blade views (editor, pages, auth, tutorial + 7 partials editor/)</td></tr>
-                    <tr><td><code>resources/js/editor/</code></td><td>6</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop (SortableJS)</td></tr>
+                    <tr><td><code>resources/js/editor/</code></td><td>8</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop (SortableJS), html-import, css</td></tr>
                     <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
                     <tr><td><code>tests/Feature/</code></td><td>4</td><td>PageControllerTest, ElementControllerTest, RevisionControllerTest, ExampleTest</td></tr>
                 </table>
@@ -1876,7 +2087,7 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Injeção de Dependências (Provider)</h3>
                 <p>O <code>PageBuilderServiceProvider</code> registra todos os serviços como <strong>singletons</strong> (uma instância compartilhada):</p>
                 <ul>
-                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 17 widgets</li>
+                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 29 widgets</li>
                     <li><code>ElementManager</code> — CRUD elementos, buildTree() para construir árvore a partir do banco</li>
                     <li><code>Renderer</code> — recebe WidgetManager, renderiza árvore de elementos → HTML</li>
                     <li><code>PageBuilderService</code> — orquestra os três serviços acima</li>
@@ -2290,7 +2501,7 @@ Cache::forget("page.1.json");</pre>
         <section id="improvements" class="step">
             <h2>23. Melhorias Propostas</h2>
             <div class="step-body">
-                <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 42 passos organizados em 8 fases. Abaixo está o status atual de cada fase:</p>
+                <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Status das Fases</h3>
                 <table class="widget-table">
@@ -2299,16 +2510,20 @@ Cache::forget("page.1.json");</pre>
                     <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover, abas Content/Style/Advanced</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
                     <tr><td>3</td><td>14–17</td><td>Navigator: Árvore de elementos, drag-and-drop, rename, context menu</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
                     <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS custom, Animações, Responsividade</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
-                    <tr><td>5</td><td>24–29</td><td>UX do Editor: Live preview, Ctrl+Z visual, context menu, drag handle, zoom, fullscreen</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
-                    <tr><td>5</td><td>30–31</td><td>UX do Editor: Widget search/filtro, dirty state indicator</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
-                    <tr><td>6</td><td>32–33</td><td>Atalhos: Ctrl+D duplicar, Copy/Paste widgets</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
-                    <tr><td>6</td><td>34–35</td><td>Atalhos: Global clipboard, Multi-select</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
+                    <tr><td>5</td><td>24–31</td><td>UX do Editor: Live preview, Ctrl+Z, context menu, zoom, fullscreen, search</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>6</td><td>32–35</td><td>Atalhos: Ctrl+D, Copy/Paste Styles, Command Finder, Multi-select</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
                     <tr><td>7</td><td>36–38</td><td>Temas e Presets: Starter Templates, Color Presets, Typography Presets</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
-                    <tr><td>8</td><td>39–42</td><td>Responsividade: Breakpoints visuais, estilos responsivos por widget, preview devices, mobile editing</td><td style="color:#d97706;font-weight:700">&#9202; Pendente</td></tr>
+                    <tr><td>8</td><td>39–42</td><td>Responsividade: Breakpoints visuais, estilos responsivos por widget</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>9</td><td>43–53</td><td>Widgets Avançados: Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Inner Section</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>10</td><td>54–65</td><td>Features Elementor-Pro: Gradient, Overlay, Shape Dividers, Video BG, Parallax, Scroll Animations, Sticky, Position, Image Filters, Button Gradient, Text Shadow/Stroke, Column Resize</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>11</td><td>66–68</td><td>Sistema Global: Global Colors, Global Fonts, Responsive Tabs</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
+                    <tr><td>12</td><td>69–74</td><td>UX Avançada: Command Finder, Revision History, Save as Template, Column Structure, ARIA Accessibility, Keyboard Navigation</td><td style="color:green;font-weight:700">&#10003; Implementado</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades Adicionais Implementadas (fora do IMPROVEMENTS.md)</h3>
                 <ul>
+                    <li><strong>29 widgets</strong> — Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel</li>
+                    <li><strong>27 tipos de controles</strong> — text, number, textarea, select, color, boolean, url, image, video, wysiwyg, icon, gallery, repeater, typography, background, border, box_shadow, dimensions, hover, custom_css, animation, visibility, gradient, scroll_animation, text_shadow, text_stroke, column_width</li>
                     <li><strong>Colaboração em tempo real</strong> — presença, bloqueio de elementos, cursores (via Cache)</li>
                     <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou textarea, processamento via Job</li>
                     <li><strong>API REST com Sanctum</strong> — autenticação token-based, CRUD completo de páginas e elementos</li>
@@ -2321,23 +2536,48 @@ Cache::forget("page.1.json");</pre>
                     <li><strong>Edição inline</strong> — preserva HTML (innerHTML) ao invés de textContent</li>
                     <li><strong>Upload de imagens no texto</strong> — botão + Ctrl+V no editor WYSIWYG</li>
                     <li><strong>Vídeos YouTube</strong> — embed responsivo com privacidade (youtube-nocookie.com)</li>
+                    <li><strong>Busca de widgets</strong> — barra de pesquisa no painel esquerdo com filtro em tempo real</li>
+                    <li><strong>Device frames</strong> — bezel de celular/tablet no modo responsivo</li>
+                    <li><strong>Painéis redimensionáveis</strong> — arrastar bordas para ajustar largura dos painéis</li>
+                    <li><strong>Multi-select</strong> — Ctrl+Click para selecionar vários elementos, duplicar/excluir em lote</li>
+                    <li><strong>Tour de onboarding</strong> — tour guiado de 10 passos na primeira vez</li>
+                    <li><strong>Command Finder</strong> — Ctrl+K para buscar ações, widgets e configurações</li>
+                    <li><strong>Revision History</strong> — histórico de revisões com diff visual e restauração</li>
+                    <li><strong>Save as Template</strong> — exportar página como template JSON reutilizável</li>
+                    <li><strong>Column Structure Picker</strong> — 6 opções de layout ao criar seção</li>
+                    <li><strong>ARIA Accessibility</strong> — roles semânticos, navegação por Tab, focus-visible</li>
+                    <li><strong>Global Colors &amp; Fonts</strong> — paleta de cores e fontes do site</li>
+                    <li><strong>Responsive Tabs</strong> — valores por breakpoint com fallback</li>
+                    <li><strong>Parallax &amp; Video Background</strong> — efeito parallax e vídeos de fundo</li>
+                    <li><strong>Shape Dividers</strong> — 10 tipos de divisores SVG</li>
+                    <li><strong>Background Overlay</strong> — cor overlay com blend modes</li>
+                    <li><strong>Scroll Animations</strong> — fade, zoom, slide ativados no scroll</li>
+                    <li><strong>Image Filters</strong> — 9 filtros CSS + rotação + flip</li>
+                    <li><strong>Gradient Background</strong> — gradientes lineares e radiais</li>
+                    <li><strong>Text Shadow &amp; Stroke</strong> — sombra e contorno de texto</li>
+                    <li><strong>Sticky Position</strong> — seções sticky com offset</li>
+                    <li><strong>Column Resize</strong> — slider percentual 1-100%</li>
                 </ul>
 
                 <div class="tip">
-                    <strong>&#128209; Plano Completo:</strong> O arquivo <code>IMPROVEMENTS.md</code> na raiz do projeto contém <strong>42 passos detalhados</strong> para implementar todas as melhorias. Cada passo pode ser testado individualmente. As fases 1–5 (29 de 42 passos) já estão implementadas.
+                    <strong>&#128209; Plano Completo:</strong> O arquivo <code>IMPROVEMENTS.md</code> na raiz do projeto contém <strong>74 passos detalhados</strong> organizados em 12 fases. Cada passo pode ser testado individualmente. 11 de 12 fases já estão implementadas (apenas a Fase 7 — Temas e Presets — permanece pendente).
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Resumo do Plano (42 Passos)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Resumo do Plano (74 Passos)</h3>
                 <table class="widget-table">
-                    <tr><th>Fase</th><th>Passos</th><th>Descrição</th><th>Semana</th><th>Status</th></tr>
-                    <tr><td>1</td><td>1–8</td><td>Novos Widgets: Vídeo, Divisor, Espaçador, Ícone, Galeria, Form, Tabs, Accordion</td><td>1–2</td><td style="color:green">&#10003;</td></tr>
-                    <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover, abas Content/Style/Advanced</td><td>3</td><td style="color:green">&#10003;</td></tr>
-                    <tr><td>3</td><td>14–17</td><td>Navigator: Árvore de elementos, drag-and-drop, rename, context menu</td><td>4</td><td style="color:green">&#10003;</td></tr>
-                    <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS custom, Animações, Responsividade</td><td>5</td><td style="color:green">&#10003;</td></tr>
-                    <tr><td>5</td><td>24–31</td><td>UX do Editor: Live preview, Ctrl+Z, context menu, zoom, fullscreen, search</td><td>6</td><td style="color:#d97706">&#9202; (6/8)</td></tr>
-                    <tr><td>6</td><td>32–35</td><td>Atalhos: Ctrl+D, Copy/Paste, Multi-select</td><td>7</td><td style="color:#d97706">&#9202; (0/4)</td></tr>
-                    <tr><td>7</td><td>36–38</td><td>Temas e Presets</td><td>8</td><td style="color:#d97706">&#9202; (0/3)</td></tr>
-                    <tr><td>8</td><td>39–42</td><td>Responsividade completa</td><td>8</td><td style="color:#d97706">&#9202; (0/4)</td></tr>
+                    <tr><th>Fase</th><th>Passos</th><th>Descrição</th><th>Status</th></tr>
+                    <tr><td>1</td><td>1–8</td><td>Novos Widgets: Vídeo, Divisor, Espaçador, Ícone, Galeria, Form, Tabs, Accordion</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>2</td><td>9–13</td><td>Style Tab: Fundo, Borda, Tipografia, Hover</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>3</td><td>14–17</td><td>Navigator: Árvore, drag-and-drop, rename, context menu</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>4</td><td>18–23</td><td>Controles Avançados: Margem/Padding, Z-Index, CSS, Animações</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>5</td><td>24–31</td><td>UX do Editor: Preview, Ctrl+Z, context menu, zoom, fullscreen</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>6</td><td>32–35</td><td>Atalhos: Ctrl+D, Copy/Paste Styles, Finder, Multi-select</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>7</td><td>36–38</td><td>Temas e Presets</td><td style="color:#d97706">&#9202;</td></tr>
+                    <tr><td>8</td><td>39–42</td><td>Responsividade completa</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>9</td><td>43–53</td><td>Widgets Avançados (11 widgets)</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>10</td><td>54–65</td><td>Features Elementor-Pro (12 features)</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>11</td><td>66–68</td><td>Sistema Global (cores, fontes, responsive tabs)</td><td style="color:green">&#10003;</td></tr>
+                    <tr><td>12</td><td>69–74</td><td>UX Avançada (finder, revisões, templates, acessibilidade)</td><td style="color:green">&#10003;</td></tr>
                 </table>
             </div>
         </section>

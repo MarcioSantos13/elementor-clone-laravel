@@ -1,3 +1,3 @@
-<div class="pb-navigator" id="navigator" style="display:none">
-    <div class="pb-navigator-body" id="navigator-body"></div>
+<div class="pb-navigator" id="navigator" style="display:none" role="tree" aria-label="Navegador de estrutura da pagina">
+    <div class="pb-navigator-body" id="navigator-body" role="treeitem"></div>
 </div>

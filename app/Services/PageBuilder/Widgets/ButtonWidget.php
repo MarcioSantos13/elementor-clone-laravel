@@ -35,8 +35,17 @@ class ButtonWidget extends BaseWidget
             'icon_position' => 'left',
             'icon_gap' => '8px',
             'hover_animation' => 'none',
+            'background_type' => 'classic',
+            'background_gradient' => null,
+            'button_text_shadow' => '',
             'css_id' => '',
             'css_classes' => '',
+            'scroll_animation' => 'none',
+            'position_type' => 'default',
+            'position_top' => '',
+            'position_right' => '',
+            'position_bottom' => '',
+            'position_left' => '',
         ];
 
         $this->controls = [
@@ -46,8 +55,11 @@ class ButtonWidget extends BaseWidget
             'size' => ['type' => 'select', 'label' => 'Size', 'options' => ['small', 'medium', 'large', 'xl']],
             'icon' => ['type' => 'icon', 'label' => 'Icon'],
             'icon_position' => ['type' => 'select', 'label' => 'Icon Position', 'options' => ['left', 'right']],
+            'background_type' => ['type' => 'select', 'label' => 'Background Type', 'options' => ['classic', 'gradient']],
             'background_color' => ['type' => 'color', 'label' => 'Background Color', 'tab' => 'style'],
+            'background_gradient' => ['type' => 'gradient', 'label' => 'Gradient', 'tab' => 'style'],
             'text_color' => ['type' => 'color', 'label' => 'Text Color', 'tab' => 'style'],
+            'button_text_shadow' => ['type' => 'text_shadow', 'label' => 'Text Shadow', 'tab' => 'style'],
             'border_radius' => ['type' => 'text', 'label' => 'Border Radius', 'tab' => 'style'],
             'font_size' => ['type' => 'number', 'label' => 'Font Size', 'min' => 10, 'max' => 100, 'tab' => 'style'],
             'typography' => ['type' => 'typography', 'label' => 'Typography', 'tab' => 'style'],
@@ -56,10 +68,16 @@ class ButtonWidget extends BaseWidget
             'hover' => ['type' => 'hover', 'label' => 'Hover Effects', 'tab' => 'style'],
             'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
             'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'position_type' => ['type' => 'select', 'label' => 'Position', 'options' => ['default', 'relative', 'absolute', 'fixed', 'sticky'], 'tab' => 'advanced'],
+            'position_top' => ['type' => 'text', 'label' => 'Top', 'tab' => 'advanced'],
+            'position_right' => ['type' => 'text', 'label' => 'Right', 'tab' => 'advanced'],
+            'position_bottom' => ['type' => 'text', 'label' => 'Bottom', 'tab' => 'advanced'],
+            'position_left' => ['type' => 'text', 'label' => 'Left', 'tab' => 'advanced'],
             'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
             'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
             'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
             'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
+            'scroll_animation' => ['type' => 'scroll_animation', 'label' => 'Scroll Animation', 'tab' => 'advanced'],
             'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
     }
@@ -102,7 +120,35 @@ class ButtonWidget extends BaseWidget
             $fontSize = $sizeMap[$size]['font'];
         }
 
-        $style = "background-color: {$bgColor}; color: {$textColor}; border: {$borderWidth} solid {$borderColor}; border-radius: {$borderRadius}; padding: {$paddingTB} {$paddingLR}; font-size: {$fontSize}; font-weight: {$fontWeight}; cursor: pointer; display: inline-block; text-decoration: none; transition: all 0.3s ease;";
+        $style = "color: {$textColor}; border: {$borderWidth} solid {$borderColor}; border-radius: {$borderRadius}; padding: {$paddingTB} {$paddingLR}; font-size: {$fontSize}; font-weight: {$fontWeight}; cursor: pointer; display: inline-block; text-decoration: none; transition: all 0.3s ease;";
+
+        $bgType = $settings['background_type'] ?? 'classic';
+        $bgGradient = $settings['background_gradient'] ?? null;
+        if ($bgType === 'gradient' && $bgGradient) {
+            $gType = $bgGradient['type'] ?? 'linear';
+            $angle = $bgGradient['angle'] ?? 180;
+            $c1 = $bgGradient['color1'] ?? '#6366f1';
+            $c2 = $bgGradient['color2'] ?? '#8b5cf6';
+            $p1 = $bgGradient['position1'] ?? 0;
+            $p2 = $bgGradient['position2'] ?? 100;
+            if ($gType === 'radial') $style .= " background: radial-gradient(circle,{$c1} {$p1}%,{$c2} {$p2}%);";
+            else $style .= " background: linear-gradient({$angle}deg,{$c1} {$p1}%,{$c2} {$p2}%);";
+        } else {
+            $style .= " background-color: {$bgColor};";
+        }
+
+        $textShadow = $settings['button_text_shadow'] ?? '';
+        if ($textShadow) $style .= " text-shadow: {$textShadow};";
+
+        $posType = $settings['position_type'] ?? 'default';
+        if ($posType !== 'default') {
+            $style .= " position: {$posType};";
+            if (!empty($settings['position_top'])) $style .= " top: {$settings['position_top']};";
+            if (!empty($settings['position_right'])) $style .= " right: {$settings['position_right']};";
+            if (!empty($settings['position_bottom'])) $style .= " bottom: {$settings['position_bottom']};";
+            if (!empty($settings['position_left'])) $style .= " left: {$settings['position_left']};";
+        }
+        if (!empty($settings['z_index'])) $style .= " z-index: {$settings['z_index']};";
 
         if ($fullWidth) {
             $style .= ' width: 100%; text-align: center;';
@@ -130,7 +176,9 @@ class ButtonWidget extends BaseWidget
         }
 
         $hoverData = "data-hover-style=\"{$hoverStyle}\"";
-        $buttonHtml = "<a href=\"{$link}\" target=\"{$target}\" class=\"pb-button pb-button-{$size}\" style=\"{$style}\" {$hoverData}>{$buttonContent}</a>";
+        $scrollAnim = $settings['scroll_animation'] ?? '';
+        $scrollData = $scrollAnim && $scrollAnim !== 'none' ? " data-scroll-animation=\"{$scrollAnim}\"" : '';
+        $buttonHtml = "<a href=\"{$link}\" target=\"{$target}\" class=\"pb-button pb-button-{$size}\" style=\"{$style}\" {$hoverData}{$scrollData}>{$buttonContent}</a>";
 
         $hoverStyle = $this->buildHoverStyle("pb-button-{$size}", $styles);
 

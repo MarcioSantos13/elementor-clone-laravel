@@ -31,6 +31,11 @@ class ImageWidget extends BaseWidget
             'enable_lightbox' => false,
             'object_fit' => 'cover',
             'hover_animation' => 'none',
+            'image_filter' => 'none',
+            'image_filter_intensity' => 100,
+            'image_rotate' => 0,
+            'image_flip' => 'none',
+            'scroll_animation' => 'none',
         ];
 
         $this->controls = [
@@ -44,8 +49,18 @@ class ImageWidget extends BaseWidget
             'background' => ['type' => 'background', 'label' => 'Background', 'tab' => 'style'],
             'border' => ['type' => 'border', 'label' => 'Border', 'tab' => 'style'],
             'box_shadow' => ['type' => 'box_shadow', 'label' => 'Box Shadow', 'tab' => 'style'],
+            'image_filter' => ['type' => 'select', 'label' => 'Image Filter', 'options' => ['none', 'grayscale', 'sepia', 'blur', 'brightness', 'contrast', 'saturate', 'hue-rotate', 'invert', 'drop-shadow'], 'tab' => 'style'],
+            'image_filter_intensity' => ['type' => 'number', 'label' => 'Filter Intensity (%)', 'min' => 0, 'max' => 200, 'tab' => 'style'],
+            'image_rotate' => ['type' => 'number', 'label' => 'Rotate (deg)', 'min' => -360, 'max' => 360, 'tab' => 'style'],
+            'image_flip' => ['type' => 'select', 'label' => 'Flip', 'options' => ['none', 'horizontal', 'vertical', 'both'], 'tab' => 'style'],
             'dimensions' => ['type' => 'dimensions', 'label' => 'Padding & Margin', 'tab' => 'advanced'],
             'z_index' => ['type' => 'number', 'label' => 'Z-Index', 'tab' => 'advanced'],
+            'position_type' => ['type' => 'select', 'label' => 'Position', 'options' => ['default', 'relative', 'absolute', 'fixed', 'sticky'], 'tab' => 'advanced'],
+            'position_top' => ['type' => 'text', 'label' => 'Top', 'tab' => 'advanced'],
+            'position_right' => ['type' => 'text', 'label' => 'Right', 'tab' => 'advanced'],
+            'position_bottom' => ['type' => 'text', 'label' => 'Bottom', 'tab' => 'advanced'],
+            'position_left' => ['type' => 'text', 'label' => 'Left', 'tab' => 'advanced'],
+            'scroll_animation' => ['type' => 'scroll_animation', 'label' => 'Scroll Animation', 'tab' => 'advanced'],
             'css_classes' => ['type' => 'text', 'label' => 'CSS Classes', 'tab' => 'advanced'],
             'css_id' => ['type' => 'text', 'label' => 'CSS ID', 'tab' => 'advanced'],
             'custom_css' => ['type' => 'custom_css', 'label' => 'Custom CSS', 'tab' => 'advanced'],
@@ -70,12 +85,40 @@ class ImageWidget extends BaseWidget
         $enableLightbox = $settings['enable_lightbox'];
         $objectFit = $settings['object_fit'];
         $hoverAnimation = $settings['hover_animation'];
+        $imageFilter = $settings['image_filter'] ?? 'none';
+        $filterIntensity = $settings['image_filter_intensity'] ?? 100;
+        $imageRotate = $settings['image_rotate'] ?? 0;
+        $imageFlip = $settings['image_flip'] ?? 'none';
 
         if (empty($image['url'])) {
             return '<div class="pb-image-placeholder">No image selected</div>';
         }
 
         $imgStyle = "width: {$width}; max-width: {$maxWidth}; height: {$height}; object-fit: {$objectFit}; border-radius: {$borderRadius}; opacity: {$opacity};";
+
+        $filterMap = [
+            'grayscale' => "grayscale({$filterIntensity}%)",
+            'sepia' => "sepia({$filterIntensity}%)",
+            'blur' => "blur({$filterIntensity}px)",
+            'brightness' => "brightness({$filterIntensity}%)",
+            'contrast' => "contrast({$filterIntensity}%)",
+            'saturate' => "saturate({$filterIntensity}%)",
+            'hue-rotate' => "hue-rotate({$filterIntensity}deg)",
+            'invert' => "invert({$filterIntensity}%)",
+            'drop-shadow' => "drop-shadow(2px 2px 4px rgba(0,0,0,0.3))",
+        ];
+        if ($imageFilter !== 'none' && isset($filterMap[$imageFilter])) {
+            $imgStyle .= " filter: {$filterMap[$imageFilter]};";
+        }
+        if ($imageRotate) {
+            $imgStyle .= " transform: rotate({$imageRotate}deg);";
+        }
+        if ($imageFlip !== 'none') {
+            $flipTransform = '';
+            if ($imageFlip === 'horizontal' || $imageFlip === 'both') $flipTransform .= ' scaleX(-1)';
+            if ($imageFlip === 'vertical' || $imageFlip === 'both') $flipTransform .= ' scaleY(-1)';
+            $imgStyle .= " transform:{$flipTransform};";
+        }
 
         $imgAttrs = [
             'src' => $image['url'],

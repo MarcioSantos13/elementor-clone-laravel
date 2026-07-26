@@ -55,6 +55,11 @@ const editor = {
         collabJoin();
         collabHeartbeat();
         bindCollabPresence();
+        bindWidgetSearch();
+        bindResizablePanels();
+        bindMultiSelect();
+        initOnboarding();
+        loadGlobalSettings();
     },
 
     undo() { undo(state); },
@@ -62,6 +67,7 @@ const editor = {
     save(silent) { save(silent); },
     publish() { publish(); },
     setResponsive(mode) { setResponsive(mode); },
+    setResponsiveTab(device) { setResponsiveTab(device); },
     switchTab(tab) { switchTab(tab); },
     switchEditorTab(tab) { switchEditorTab(tab); },
     zoomIn() { setZoom(state.zoomLevel + 10); },
@@ -76,19 +82,41 @@ const editor = {
     showPageSettings() { showPageSettings(); },
     hidePageSettings() { hidePageSettings(); },
     exportPage() { window.open('/page-builder/pages/' + state.pageId + '/export', '_blank'); },
+    saveAsTemplate() { saveAsTemplate(); },
     copyHtml() { copyHtml(); },
     importHtml() { openHtmlImportModal(state.csrf); },
+    copyStyles() { copyStyles(); },
+    pasteStyles() { pasteStyles(); },
+    duplicateSelected() { if (state.selectedId) duplicateElement(state.selectedId); },
+    showSiteSettings() { showSiteSettings(); },
+    hideSiteSettings() { hideSiteSettings(); },
+    showRevisionHistory() { showRevisionHistory(); },
 };
 
-function selectElement(id) {
+function selectElement(id, ctrlKey) {
+    if (ctrlKey) {
+        if (state.multiSelected && state.multiSelected.has(id)) {
+            state.multiSelected.delete(id);
+        } else {
+            if (!state.multiSelected) state.multiSelected = new Set();
+            state.multiSelected.add(id);
+        }
+        refreshMultiSelect();
+        return;
+    }
+    state.multiSelected = null;
     state.selectedId = id;
-    document.querySelectorAll('.pb-el.selected').forEach(el => el.classList.remove('selected'));
+    document.querySelectorAll('.pb-el.selected, .pb-el.multi-selected').forEach(el => {
+        el.classList.remove('selected');
+        el.classList.remove('multi-selected');
+    });
     document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
     const el = document.querySelector(`.pb-el[data-el-id="${id}"]`);
     if (el) el.classList.add('selected');
     const si = document.querySelector(`.pb-structure-item[data-el-id="${id}"]`);
     if (si) si.classList.add('active');
     loadControls(id);
+    removeMultiToolbar();
 }
 
 function loadElements() {
@@ -140,6 +168,27 @@ function loadControls(id) {
         .catch(err => { console.error('loadControls failed:', err); toastError('Falha ao carregar controles: ' + (err.message || err)); });
 }
 
+const RESPONSIVE_KEYS = ['padding_top', 'padding_bottom', 'padding_left', 'padding_right', 'margin_top', 'margin_bottom', 'margin_left', 'margin_right', 'font_size', 'line_height', 'letter_spacing', 'width', 'max_width', 'height', 'border_radius', 'gap'];
+
+function getResponsiveValue(key, ctrl, settings, styles, tab, device) {
+    if (device !== 'desktop' && RESPONSIVE_KEYS.includes(key)) {
+        const respKey = key + '_' + device;
+        if (tab === 'style' || tab === 'advanced') {
+            if (styles[respKey] !== undefined) return styles[respKey];
+        }
+        if (tab === 'content' || tab === 'advanced') {
+            if (settings[respKey] !== undefined) return settings[respKey];
+        }
+    }
+    if (tab === 'style') {
+        return styles[key] !== undefined ? styles[key] : (ctrl.default !== undefined ? ctrl.default : '');
+    } else if (tab === 'advanced') {
+        return styles[key] !== undefined ? styles[key] : (settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : ''));
+    } else {
+        return settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : '');
+    }
+}
+
 function renderControls() {
     const body = document.getElementById('settings-body');
     body.innerHTML = '';
@@ -148,6 +197,7 @@ function renderControls() {
     const styles = state.cachedStyles || {};
     const elementId = state.cachedElementId;
     const tab = state.activeTab;
+    const device = state.responsiveTab || 'desktop';
     const filtered = {};
     for (const [key, ctrl] of Object.entries(controls)) {
         const ctrlTab = ctrl.tab || 'content';
@@ -164,16 +214,17 @@ function renderControls() {
             secDiv.appendChild(title);
         }
         ctrls.forEach(([key, ctrl]) => {
-            let val;
-            if (tab === 'style') {
-                val = styles[key] !== undefined ? styles[key] : (ctrl.default !== undefined ? ctrl.default : '');
-            } else if (tab === 'advanced') {
-                val = styles[key] !== undefined ? styles[key] : (settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : ''));
-            } else {
-                val = settings[key] !== undefined ? settings[key] : (ctrl.default !== undefined ? ctrl.default : '');
-            }
+            let val = getResponsiveValue(key, ctrl, settings, styles, tab, device);
             const control = document.createElement('div');
             control.className = 'pb-control';
+            const isResponsive = device !== 'desktop' && RESPONSIVE_KEYS.includes(key);
+            if (isResponsive) {
+                control.style.position = 'relative';
+                const dot = document.createElement('span');
+                dot.style.cssText = 'position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#6366f1;';
+                dot.title = `Value for ${device}`;
+                control.appendChild(dot);
+            }
             const label = document.createElement('label');
             label.textContent = ctrl.label || key;
             label.htmlFor = `ctrl-${key}`;
@@ -316,6 +367,11 @@ function createInput(key, ctrl, value, elementId) {
         },
         animation: () => createAnimationInput(key, value, saveFn),
         visibility: () => createVisibilityInput(key, value, saveFn),
+        gradient: () => createGradientInput(key, value, elementId),
+        scroll_animation: () => createScrollAnimationInput(key, value, saveFn),
+        text_shadow: () => createTextShadowInput(key, value, elementId),
+        text_stroke: () => createTextStrokeInput(key, value, elementId),
+        column_width: () => createColumnWidthInput(key, value, elementId),
     };
     return (types[ctrl.type] || types.text)();
 }
@@ -843,6 +899,216 @@ function createHoverInput(key, value, elementId) {
     return c;
 }
 
+function createGradientInput(key, value, elementId) {
+    const c = document.createElement('div');
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
+    const grad = (typeof value === 'object' && value !== null) ? value : { type: 'linear', angle: 180, color1: '#6366f1', color2: '#8b5cf6', position1: 0, position2: 100 };
+    const defs = [
+        { fk: 'type', label: 'Type', type: 'select', options: ['linear', 'radial'] },
+        { fk: 'angle', label: 'Angle (deg)', type: 'number', min: 0, max: 360 },
+        { fk: 'color1', label: 'Color 1', type: 'color' },
+        { fk: 'position1', label: 'Position 1 (%)', type: 'number', min: 0, max: 100 },
+        { fk: 'color2', label: 'Color 2', type: 'color' },
+        { fk: 'position2', label: 'Position 2 (%)', type: 'number', min: 0, max: 100 },
+    ];
+    const preview = document.createElement('div');
+    preview.style.cssText = 'height:32px;border-radius:6px;margin-bottom:4px;border:1px solid var(--pb-border)';
+    const updatePreview = () => {
+        if (grad.type === 'radial') preview.style.background = `radial-gradient(circle, ${grad.color1} ${grad.position1}%, ${grad.color2} ${grad.position2}%)`;
+        else preview.style.background = `linear-gradient(${grad.angle}deg, ${grad.color1} ${grad.position1}%, ${grad.color2} ${grad.position2}%)`;
+    };
+    updatePreview();
+    c.appendChild(preview);
+    defs.forEach(({ fk, label, type, options, min, max }) => {
+        const row = document.createElement('div');
+        row.className = 'pb-control';
+        const lbl = document.createElement('label');
+        lbl.textContent = label;
+        row.appendChild(lbl);
+        if (type === 'select') {
+            const sel = document.createElement('select');
+            options.forEach(opt => {
+                const o = document.createElement('option');
+                o.value = opt; o.textContent = opt;
+                if (opt === grad[fk]) o.selected = true;
+                sel.appendChild(o);
+            });
+            sel.onchange = () => { grad[fk] = sel.value; updatePreview(); updateStyle(key, grad, elementId); };
+            row.appendChild(sel);
+        } else {
+            const inp = document.createElement('input');
+            inp.type = type; inp.value = grad[fk] || 0;
+            if (min !== undefined) inp.min = min;
+            if (max !== undefined) inp.max = max;
+            if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+            inp.oninput = () => { grad[fk] = type === 'number' ? parseInt(inp.value) || 0 : inp.value; updatePreview(); _debouncedStyle(key, elementId, () => updateStyle(key, grad, elementId)); };
+            row.appendChild(inp);
+        }
+        c.appendChild(row);
+    });
+    return c;
+}
+
+function createScrollAnimationInput(key, value, saveFn) {
+    const c = document.createElement('div');
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
+    const row = document.createElement('div');
+    row.className = 'pb-control';
+    const lbl = document.createElement('label');
+    lbl.textContent = 'Scroll Animation';
+    row.appendChild(lbl);
+    const sel = document.createElement('select');
+    ['none','fade-up','fade-down','fade-left','fade-right','zoom-in','zoom-out','slide-up','slide-down'].forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        if (opt === (value || 'none')) o.selected = true;
+        sel.appendChild(o);
+    });
+    sel.onchange = () => saveFn(key, sel.value);
+    row.appendChild(sel);
+    c.appendChild(row);
+    const durRow = document.createElement('div');
+    durRow.className = 'pb-control';
+    durRow.style.display = (value && value !== 'none') ? '' : 'none';
+    const durLabel = document.createElement('label');
+    durLabel.textContent = 'Duration';
+    durRow.appendChild(durLabel);
+    const durSel = document.createElement('select');
+    ['0.3s','0.6s','0.9s','1.2s'].forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        if (opt === '0.6s') o.selected = true;
+        durSel.appendChild(o);
+    });
+    durSel.onchange = () => saveFn(key + '_duration', durSel.value);
+    durRow.appendChild(durSel);
+    c.appendChild(durRow);
+    const delayRow = document.createElement('div');
+    delayRow.className = 'pb-control';
+    delayRow.style.display = (value && value !== 'none') ? '' : 'none';
+    const delayLabel = document.createElement('label');
+    delayLabel.textContent = 'Delay';
+    delayRow.appendChild(delayLabel);
+    const delaySel = document.createElement('select');
+    ['0s','0.1s','0.2s','0.3s','0.5s'].forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt; o.textContent = opt;
+        o.selected = opt === '0s';
+        delaySel.appendChild(o);
+    });
+    delaySel.onchange = () => saveFn(key + '_delay', delaySel.value);
+    delayRow.appendChild(delaySel);
+    c.appendChild(delayRow);
+    sel.onchange = () => {
+        saveFn(key, sel.value);
+        const show = sel.value && sel.value !== 'none';
+        durRow.style.display = show ? '' : 'none';
+        delayRow.style.display = show ? '' : 'none';
+    };
+    return c;
+}
+
+function createTextShadowInput(key, value, elementId) {
+    const c = document.createElement('div');
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
+    const shadow = typeof value === 'string' ? value : '';
+    const parse = (v) => {
+        const m = v.match(/(-?\d+\.?\d*)px\s+(-?\d+\.?\d*)px\s+(-?\d+\.?\d*)px\s+(#[0-9a-fA-F]+|rgba?\(.+?\))/);
+        return m ? { x: m[1], y: m[2], blur: m[3], color: m[4] } : { x: '0px', y: '2px', blur: '4px', color: 'rgba(0,0,0,0.3)' };
+    };
+    const s = parse(shadow);
+    const defs = [
+        { fk: 'x', label: 'Horizontal', type: 'text' },
+        { fk: 'y', label: 'Vertical', type: 'text' },
+        { fk: 'blur', label: 'Blur', type: 'text' },
+        { fk: 'color', label: 'Color', type: 'color' },
+    ];
+    const readAll = () => {
+        const inputs = c.querySelectorAll('[data-fk]');
+        const vals = {};
+        inputs.forEach(i => vals[i.dataset.fk] = i.value);
+        return `${vals.x || '0px'} ${vals.y || '2px'} ${vals.blur || '4px'} ${vals.color || 'rgba(0,0,0,0.3)'}`;
+    };
+    defs.forEach(({ fk, label, type }) => {
+        const row = document.createElement('div');
+        row.className = 'pb-control';
+        const lbl = document.createElement('label');
+        lbl.textContent = label;
+        row.appendChild(lbl);
+        const inp = document.createElement('input');
+        inp.type = type; inp.value = s[fk] || '';
+        inp.dataset.fk = fk;
+        if (fk === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+        inp.oninput = () => _debouncedStyle(key, elementId, () => updateStyle(key, readAll(), elementId));
+        row.appendChild(inp);
+        c.appendChild(row);
+    });
+    return c;
+}
+
+function createTextStrokeInput(key, value, elementId) {
+    const c = document.createElement('div');
+    c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
+    const stroke = typeof value === 'string' ? value : '';
+    const parse = (v) => {
+        const m = v.match(/(-?\d+\.?\d*)px\s+(#[0-9a-fA-F]+|rgba?\(.+?\))/);
+        return m ? { width: m[1], color: m[2] } : { width: '0px', color: '#000000' };
+    };
+    const s = parse(stroke);
+    const defs = [
+        { fk: 'width', label: 'Width', type: 'text' },
+        { fk: 'color', label: 'Color', type: 'color' },
+    ];
+    const readAll = () => {
+        const inputs = c.querySelectorAll('[data-fk]');
+        const vals = {};
+        inputs.forEach(i => vals[i.dataset.fk] = i.value);
+        const w = parseFloat(vals.width) || 0;
+        return w > 0 ? `${vals.width} ${vals.color}` : '';
+    };
+    defs.forEach(({ fk, label, type }) => {
+        const row = document.createElement('div');
+        row.className = 'pb-control';
+        const lbl = document.createElement('label');
+        lbl.textContent = label;
+        row.appendChild(lbl);
+        const inp = document.createElement('input');
+        inp.type = type; inp.value = s[fk] || '';
+        inp.dataset.fk = fk;
+        if (fk === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
+        inp.oninput = () => _debouncedStyle(key, elementId, () => updateStyle(key, readAll(), elementId));
+        row.appendChild(inp);
+        c.appendChild(row);
+    });
+    return c;
+}
+
+function createColumnWidthInput(key, value, elementId) {
+    const c = document.createElement('div');
+    c.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+    const numVal = typeof value === 'number' ? value : (typeof value === 'string' && value.startsWith('col-') ? Math.round(parseInt(value.replace('col-', '')) / 12 * 100) : 33.33);
+    const pct = Math.min(100, Math.max(0, numVal));
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    const slider = document.createElement('input');
+    slider.type = 'range'; slider.min = '1'; slider.max = '100'; slider.value = pct;
+    slider.style.cssText = 'flex:1;accent-color:var(--pb-primary);cursor:pointer;';
+    const label = document.createElement('span');
+    label.style.cssText = 'font-size:.75rem;color:var(--pb-text);min-width:38px;text-align:right;font-weight:600;';
+    label.textContent = pct + '%';
+    slider.oninput = () => {
+        label.textContent = slider.value + '%';
+    };
+    slider.onchange = () => {
+        const newPct = parseInt(slider.value);
+        const colNum = Math.max(1, Math.round(newPct / 100 * 12));
+        updateSetting('column_width', `col-${colNum}`, elementId, true);
+    };
+    row.append(slider, label);
+    c.appendChild(row);
+    return c;
+}
+
 function createAnimationInput(key, value, saveFn) {
     const c = document.createElement('div');
     c.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
@@ -938,11 +1204,20 @@ function createVisibilityInput(key, value, saveFn) {
     return c;
 }
 
+function resolveResponsiveKey(key) {
+    const device = state.responsiveTab || 'desktop';
+    if (device !== 'desktop' && RESPONSIVE_KEYS.includes(key)) {
+        return key + '_' + device;
+    }
+    return key;
+}
+
 function updateSetting(key, value, elementId, reload = true) {
+    const resolvedKey = resolveResponsiveKey(key);
     state.dirty = true;
-    if (state.cachedSettings) state.cachedSettings[key] = value;
+    if (state.cachedSettings) state.cachedSettings[resolvedKey] = value;
     const settings = {};
-    settings[key] = value;
+    settings[resolvedKey] = value;
     apiFetch(`/page-builder/elements/${elementId}/settings`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
@@ -956,10 +1231,11 @@ function updateSetting(key, value, elementId, reload = true) {
 }
 
 function updateStyle(key, value, elementId, reload = true) {
+    const resolvedKey = resolveResponsiveKey(key);
     state.dirty = true;
-    if (state.cachedStyles) state.cachedStyles[key] = value;
+    if (state.cachedStyles) state.cachedStyles[resolvedKey] = value;
     const styles = {};
-    styles[key] = value;
+    styles[resolvedKey] = value;
     apiFetch(`/page-builder/elements/${elementId}/styles`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
@@ -977,10 +1253,31 @@ function reloadElement(id) {
         .then(data => {
             const el = document.querySelector(`.pb-el[data-el-id="${id}"]`);
             if (el) {
-                const oldContent = el.querySelector('.pb-el-content');
-                if (oldContent) oldContent.innerHTML = data.html;
-                else el.innerHTML = `<div class="pb-el-content">${data.html}</div>`;
-                renderMath();
+                const elType = el.dataset.elType;
+                if (elType === 'section' || elType === 'column') {
+                    const wrapper = el.querySelector('.pb-section-editor, .pb-column-editor');
+                    if (wrapper) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(`<div>${data.html}</div>`, 'text/html');
+                        const newWrapper = doc.body.firstChild.firstElementChild;
+                        if (newWrapper) {
+                            const existingChildren = el.querySelector('.pb-el-children');
+                            const sectionContent = newWrapper.querySelector('.pb-section-content, .pb-column-content');
+                            if (existingChildren && sectionContent) {
+                                sectionContent.appendChild(existingChildren);
+                            }
+                            wrapper.replaceWith(newWrapper);
+                        }
+                    } else {
+                        el.innerHTML = data.html;
+                    }
+                    renderMath();
+                } else {
+                    const oldContent = el.querySelector('.pb-el-content');
+                    if (oldContent) oldContent.innerHTML = data.html;
+                    else el.innerHTML = `<div class="pb-el-content">${data.html}</div>`;
+                    renderMath();
+                }
             }
         })
         .catch(err => { console.error('reloadElement failed:', err); toastError('Falha ao recarregar elemento'); });
@@ -1038,8 +1335,309 @@ function setResponsive(mode) {
     document.querySelectorAll('.pb-toolbar [data-mode]').forEach(b => b.classList.remove('active'));
     document.querySelector(`.pb-toolbar [data-mode="${mode}"]`).classList.add('active');
     const canvas = document.getElementById('canvas');
+    const frame = document.getElementById('device-frame');
+    const notch = document.getElementById('device-notch');
+    const label = document.getElementById('device-label');
     canvas.className = 'pb-canvas';
-    if (mode !== 'desktop') canvas.classList.add('is-' + mode);
+    document.body.classList.remove('responsive-tablet', 'responsive-mobile');
+    if (mode !== 'desktop') {
+        canvas.classList.add('is-' + mode);
+        document.body.classList.add('responsive-' + mode);
+        if (notch) notch.style.display = '';
+        if (label) {
+            label.style.display = '';
+            const sizes = { tablet: 'Tablet — 768px', mobile: 'Mobile — 375px' };
+            label.textContent = sizes[mode] || '';
+        }
+        if (frame) frame.className = 'pb-device-frame ' + mode;
+    } else {
+        if (notch) notch.style.display = 'none';
+        if (label) label.style.display = 'none';
+        if (frame) frame.className = 'pb-device-frame';
+    }
+}
+
+function setResponsiveTab(device) {
+    state.responsiveTab = device;
+    document.querySelectorAll('.pb-resp-tab').forEach(b => b.classList.remove('active'));
+    const btn = document.querySelector(`.pb-resp-tab[data-device="${device}"]`);
+    if (btn) btn.classList.add('active');
+    if (state.cachedElementId) renderControls();
+}
+
+let _globalSettings = { global_colors: [], global_fonts: [], system_fonts: [] };
+
+function loadGlobalSettings() {
+    return apiFetch(`/page-builder/pages/${state.pageId}/global-settings`)
+        .then(data => { _globalSettings = data; })
+        .catch(() => {});
+}
+
+function saveGlobalSettings(colors, fonts) {
+    apiFetch(`/page-builder/pages/${state.pageId}/global-settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+        body: JSON.stringify({ global_colors: colors, global_fonts: fonts }),
+    })
+    .then(data => {
+        _globalSettings.global_colors = data.global_colors;
+        _globalSettings.global_fonts = data.global_fonts;
+        toastSuccess('Configuracoes globais salvas!');
+    })
+    .catch(() => toastError('Falha ao salvar configuracoes globais'));
+}
+
+function showSiteSettings() {
+    const panel = document.getElementById('settings-empty');
+    const form = document.getElementById('settings-form');
+    const pageForm = document.getElementById('page-settings-form');
+    if (panel) panel.style.display = 'none';
+    if (form) form.style.display = 'none';
+    if (pageForm) pageForm.style.display = 'none';
+    state._prevSelected = state.selectedId;
+    if (state.selectedId) { deselectAll(); state.selectedId = null; }
+    loadGlobalSettings();
+    renderSiteSettings();
+}
+
+function renderSiteSettings() {
+    const body = document.getElementById('settings-body');
+    if (!body) return;
+    body.innerHTML = '';
+    document.getElementById('settings-title').textContent = 'Configuracoes do Site';
+    document.getElementById('settings-type').textContent = 'global';
+    const empty = document.getElementById('settings-empty');
+    const form = document.getElementById('settings-form');
+    if (empty) empty.style.display = 'none';
+    if (form) form.style.display = 'block';
+    document.getElementById('editor-tabs').style.display = 'none';
+    document.getElementById('responsive-tabs').style.display = 'none';
+
+    const colors = _globalSettings.global_colors || [];
+    const fonts = _globalSettings.global_fonts || [];
+    const systemFonts = _globalSettings.system_fonts || [];
+
+    const colorsSection = document.createElement('div');
+    colorsSection.className = 'pb-settings-section';
+    colorsSection.innerHTML = '<div class="pb-settings-section-title">Cores Globais</div>';
+
+    const colorList = document.createElement('div');
+    colorList.id = 'global-colors-list';
+    colorList.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-bottom:8px;';
+    colors.forEach((c, i) => {
+        colorList.appendChild(createGlobalColorRow(c, i, colors));
+    });
+    colorsSection.appendChild(colorList);
+
+    const addColorBtn = document.createElement('button');
+    addColorBtn.className = 'pb-btn-add-global';
+    addColorBtn.textContent = '+ Adicionar Cor Global';
+    addColorBtn.style.cssText = 'width:100%;padding:.4rem;background:rgba(99,102,241,.1);border:1px dashed rgba(99,102,241,.3);color:var(--pb-accent);border-radius:6px;cursor:pointer;font-size:.75rem;';
+    addColorBtn.onclick = () => {
+        colors.push({ name: 'Nova Cor', value: '#6366f1', system: false });
+        saveGlobalSettings(colors, fonts);
+        renderSiteSettings();
+    };
+    colorsSection.appendChild(addColorBtn);
+    body.appendChild(colorsSection);
+
+    const fontsSection = document.createElement('div');
+    fontsSection.className = 'pb-settings-section';
+    fontsSection.innerHTML = '<div class="pb-settings-section-title">Fontes Globais</div>';
+
+    const fontList = document.createElement('div');
+    fontList.id = 'global-fonts-list';
+    fontList.style.cssText = 'display:flex;flex-direction:column;gap:6px;margin-bottom:8px;';
+    fonts.forEach((f, i) => {
+        fontList.appendChild(createGlobalFontRow(f, i, fonts, systemFonts));
+    });
+    fontsSection.appendChild(fontList);
+
+    const addFontBtn = document.createElement('button');
+    addFontBtn.className = 'pb-btn-add-global';
+    addFontBtn.textContent = '+ Adicionar Fonte Global';
+    addFontBtn.style.cssText = 'width:100%;padding:.4rem;background:rgba(99,102,241,.1);border:1px dashed rgba(99,102,241,.3);color:var(--pb-accent);border-radius:6px;cursor:pointer;font-size:.75rem;';
+    addFontBtn.onclick = () => {
+        fonts.push({ name: 'Nova Fonte', family: 'Inter, sans-serif' });
+        saveGlobalSettings(colors, fonts);
+        renderSiteSettings();
+    };
+    fontsSection.appendChild(addFontBtn);
+    body.appendChild(fontsSection);
+}
+
+function createGlobalColorRow(color, index, colors) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;background:var(--pb-surface2);border-radius:6px;padding:6px 8px;';
+    const swatch = document.createElement('input');
+    swatch.type = 'color'; swatch.value = color.value || '#6366f1';
+    swatch.style.cssText = 'width:28px;height:28px;border:none;border-radius:4px;cursor:pointer;padding:0;';
+    swatch.onchange = () => { colors[index].value = swatch.value; saveGlobalSettings(colors, _globalSettings.global_fonts); };
+    const nameInput = document.createElement('input');
+    nameInput.value = color.name || '';
+    nameInput.placeholder = 'Nome';
+    nameInput.style.cssText = 'flex:1;background:var(--pb-surface3);border:1px solid var(--pb-border);border-radius:4px;padding:4px 8px;color:var(--pb-text);font-size:.75rem;';
+    nameInput.onchange = () => { colors[index].name = nameInput.value; saveGlobalSettings(colors, _globalSettings.global_fonts); };
+    const del = document.createElement('button');
+    del.textContent = '×'; del.title = 'Remover';
+    del.style.cssText = 'background:none;border:none;color:var(--pb-danger);cursor:pointer;font-size:1rem;padding:0 4px;';
+    del.onclick = () => { colors.splice(index, 1); saveGlobalSettings(colors, _globalSettings.global_fonts); renderSiteSettings(); };
+    row.append(swatch, nameInput, del);
+    return row;
+}
+
+function createGlobalFontRow(font, index, fonts, systemFonts) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;background:var(--pb-surface2);border-radius:6px;padding:6px 8px;';
+    const nameInput = document.createElement('input');
+    nameInput.value = font.name || '';
+    nameInput.placeholder = 'Nome';
+    nameInput.style.cssText = 'flex:1;background:var(--pb-surface3);border:1px solid var(--pb-border);border-radius:4px;padding:4px 8px;color:var(--pb-text);font-size:.75rem;';
+    nameInput.onchange = () => { fonts[index].name = nameInput.value; saveGlobalSettings(_globalSettings.global_colors, fonts); };
+    const sel = document.createElement('select');
+    sel.style.cssText = 'flex:1;background:var(--pb-surface3);border:1px solid var(--pb-border);border-radius:4px;padding:4px 8px;color:var(--pb-text);font-size:.75rem;';
+    systemFonts.forEach(sf => {
+        const opt = document.createElement('option');
+        opt.value = sf.family; opt.textContent = sf.name;
+        if (sf.family === font.family) opt.selected = true;
+        sel.appendChild(opt);
+    });
+    sel.onchange = () => { fonts[index].family = sel.value; saveGlobalSettings(_globalSettings.global_colors, fonts); };
+    const del = document.createElement('button');
+    del.textContent = '×'; del.title = 'Remover';
+    del.style.cssText = 'background:none;border:none;color:var(--pb-danger);cursor:pointer;font-size:1rem;padding:0 4px;';
+    del.onclick = () => { fonts.splice(index, 1); saveGlobalSettings(_globalSettings.global_colors, fonts); renderSiteSettings(); };
+    row.append(nameInput, sel, del);
+    return row;
+}
+
+function hideSiteSettings() {
+    const form = document.getElementById('settings-form');
+    const empty = document.getElementById('settings-empty');
+    const pageForm = document.getElementById('page-settings-form');
+    const tabs = document.getElementById('editor-tabs');
+    const respTabs = document.getElementById('responsive-tabs');
+    if (form) { form.style.display = ''; form.classList.remove('active'); }
+    if (pageForm) pageForm.classList.remove('active');
+    if (tabs) tabs.style.display = '';
+    if (respTabs) respTabs.style.display = '';
+    if (state._prevSelected) { selectElement(state._prevSelected); }
+    else { if (form) form.style.display = 'none'; if (empty) empty.style.display = ''; }
+}
+
+function showRevisionHistory() {
+    const panel = document.getElementById('settings-empty');
+    const form = document.getElementById('settings-form');
+    const pageForm = document.getElementById('page-settings-form');
+    if (panel) panel.style.display = 'none';
+    if (form) form.style.display = 'none';
+    if (pageForm) pageForm.style.display = 'none';
+    state._prevSelected = state.selectedId;
+    if (state.selectedId) { deselectAll(); state.selectedId = null; }
+
+    document.getElementById('settings-title').textContent = 'Historico de Revisoes';
+    document.getElementById('settings-type').textContent = 'revisions';
+    document.getElementById('editor-tabs').style.display = 'none';
+    document.getElementById('responsive-tabs').style.display = 'none';
+    form.style.display = 'block';
+
+    const body = document.getElementById('settings-body');
+    body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--pb-text2)">Carregando...</div>';
+
+    apiFetch(`/page-builder/pages/${state.pageId}/revisions`)
+        .then(data => {
+            const revisions = data.revisions?.data || data.revisions || [];
+            body.innerHTML = '';
+            if (revisions.length === 0) {
+                body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--pb-text2)">Nenhuma revisao encontrada</div>';
+                return;
+            }
+            revisions.forEach(rev => {
+                const card = document.createElement('div');
+                card.style.cssText = 'background:var(--pb-surface2);border-radius:8px;padding:10px;margin-bottom:8px;border:1px solid var(--pb-border);';
+                const date = new Date(rev.created_at).toLocaleString('pt-BR');
+                const userName = rev.user?.name || 'Sistema';
+                const version = rev.version || 'v1';
+                card.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <span style="font-weight:600;font-size:.8rem;color:var(--pb-text);">${version}</span>
+                        <span style="font-size:.65rem;color:var(--pb-text2);">${date}</span>
+                    </div>
+                    <div style="font-size:.7rem;color:var(--pb-text2);margin-bottom:6px;">por ${userName}</div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="pb-rev-restore" data-rev-id="${rev.id}" style="flex:1;padding:4px 8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--pb-success);border-radius:4px;cursor:pointer;font-size:.7rem;">Restaurar</button>
+                        <button class="pb-rev-diff" data-rev-id="${rev.id}" style="flex:1;padding:4px 8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);color:var(--pb-accent);border-radius:4px;cursor:pointer;font-size:.7rem;">Ver Diff</button>
+                    </div>
+                `;
+                card.querySelector('.pb-rev-restore').onclick = () => {
+                    if (!confirm(`Restaurar a revisao ${version}?`)) return;
+                    apiFetch(`/page-builder/pages/${state.pageId}/revisions/${rev.id}/restore`, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': state.csrf },
+                    })
+                    .then(() => { toastSuccess('Revisao restaurada! Recarregando...'); setTimeout(() => location.reload(), 800); })
+                    .catch(() => toastError('Falha ao restaurar revisao'));
+                };
+                card.querySelector('.pb-rev-diff').onclick = () => {
+                    showRevisionDiff(rev.id);
+                };
+                body.appendChild(card);
+            });
+        })
+        .catch(() => { body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--pb-danger)">Erro ao carregar revisoes</div>'; });
+}
+
+function showRevisionDiff(revId) {
+    const body = document.getElementById('settings-body');
+    if (!body) return;
+    body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--pb-text2)">Carregando diff...</div>';
+    apiFetch(`/page-builder/pages/${state.pageId}/revisions/${revId}/diff`)
+        .then(data => {
+            body.innerHTML = '';
+            const current = data.current || {};
+            const previous = data.previous || {};
+            const version = data.version || '?';
+            const prevVersion = data.previous_version || 'Inicio';
+
+            const header = document.createElement('div');
+            header.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;';
+            header.innerHTML = `<button id="diff-back" style="background:none;border:none;color:var(--pb-accent);cursor:pointer;font-size:.8rem;">&#8592; Voltar</button><span style="font-weight:600;font-size:.85rem;">Diff: ${prevVersion} → ${version}</span>`;
+            body.appendChild(header);
+            document.getElementById('diff-back').onclick = () => showRevisionHistory();
+
+            const diffContainer = document.createElement('div');
+            diffContainer.style.cssText = 'background:var(--pb-surface2);border-radius:8px;padding:12px;font-family:monospace;font-size:.7rem;max-height:400px;overflow-y:auto;';
+
+            const prevContent = JSON.stringify(previous.content || [], null, 2);
+            const currContent = JSON.stringify(current.content || [], null, 2);
+            const prevLines = prevContent.split('\n');
+            const currLines = currContent.split('\n');
+            const maxLines = Math.max(prevLines.length, currLines.length);
+
+            for (let i = 0; i < maxLines; i++) {
+                const pl = prevLines[i] || '';
+                const cl = currLines[i] || '';
+                const line = document.createElement('div');
+                if (pl !== cl) {
+                    if (pl && !cl) {
+                        line.style.cssText = 'background:rgba(239,68,68,.15);color:var(--pb-danger);padding:1px 6px;border-radius:2px;';
+                        line.textContent = `- ${pl}`;
+                    } else if (!pl && cl) {
+                        line.style.cssText = 'background:rgba(34,197,94,.15);color:var(--pb-success);padding:1px 6px;border-radius:2px;';
+                        line.textContent = `+ ${cl}`;
+                    } else {
+                        line.style.cssText = 'background:rgba(245,158,11,.15);color:var(--pb-warning);padding:1px 6px;border-radius:2px;';
+                        line.textContent = `~ ${cl}`;
+                    }
+                } else {
+                    line.style.cssText = 'color:var(--pb-text2);padding:1px 6px;';
+                    line.textContent = `  ${pl}`;
+                }
+                diffContainer.appendChild(line);
+            }
+            body.appendChild(diffContainer);
+        })
+        .catch(() => { body.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--pb-danger)">Erro ao carregar diff</div>'; });
 }
 
 function switchTab(tab) {
@@ -1105,6 +1703,7 @@ function observeCanvas() {
 
 function bindKeyboard() {
     document.addEventListener('keydown', e => {
+        const isInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.isContentEditable;
         if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); editor.undo(); }
         if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) { e.preventDefault(); editor.redo(); }
         if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); editor.redo(); }
@@ -1112,10 +1711,42 @@ function bindKeyboard() {
         if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); editor.zoomReset(); }
         if ((e.ctrlKey || e.metaKey) && e.key === '=') { e.preventDefault(); editor.zoomIn(); }
         if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); editor.zoomOut(); }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); editor.duplicateSelected(); }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') { e.preventDefault(); editor.copyStyles(); }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'V') { e.preventDefault(); editor.pasteStyles(); }
         if (e.key === 'F11') { e.preventDefault(); editor.toggleFullscreen(); }
         if (e.key === 'Escape' && state.isFullscreen) { editor.toggleFullscreen(); }
+        else if (e.key === 'Escape' && state.multiSelected && state.multiSelected.size > 0) { editor.clearMultiSelect(); }
+        else if (e.key === 'Escape' && document.getElementById('pb-finder-overlay')) { document.getElementById('pb-finder-overlay').remove(); }
+        else if (e.key === 'Escape' && state.selectedId) { deselectAll(); state.selectedId = null; }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleFinder(); }
         if (e.key === 'Delete' && state.selectedId) { editor.deleteSelected(); }
+        if (!isInput && state.selectedId) {
+            if (e.key === 'Tab') { e.preventDefault(); navigateElements(e.shiftKey ? -1 : 1); }
+        }
     });
+}
+
+function deselectAll() {
+    document.querySelectorAll('.pb-el.selected, .pb-el.multi-selected').forEach(el => {
+        el.classList.remove('selected');
+        el.classList.remove('multi-selected');
+    });
+    document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
+    document.getElementById('settings-empty').style.display = '';
+    document.getElementById('settings-form').classList.remove('active');
+    document.getElementById('page-settings-form').classList.remove('active');
+}
+
+function navigateElements(direction) {
+    const els = Array.from(document.querySelectorAll('#canvas-dropzone .pb-el'));
+    if (!els.length) return;
+    const currentIdx = els.findIndex(el => el.dataset.elId === String(state.selectedId));
+    let nextIdx = currentIdx + direction;
+    if (nextIdx < 0) nextIdx = els.length - 1;
+    if (nextIdx >= els.length) nextIdx = 0;
+    const nextId = els[nextIdx].dataset.elId;
+    if (nextId) selectElement(parseInt(nextId));
 }
 
 function bindInlineEditing() {
@@ -1210,13 +1841,92 @@ function showPageSettings() {
     document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
     document.getElementById('settings-empty').style.display = 'none';
     document.getElementById('settings-form').classList.remove('active');
+    document.getElementById('settings-form').style.display = '';
     document.getElementById('page-settings-form').classList.add('active');
+    document.getElementById('editor-tabs').style.display = '';
+    document.getElementById('responsive-tabs').style.display = '';
     renderPageSettings();
 }
 
 function hidePageSettings() {
     document.getElementById('page-settings-form').classList.remove('active');
     document.getElementById('settings-empty').style.display = '';
+}
+
+function copyStyles() {
+    if (!state.selectedId) {
+        showToast('Selecione um elemento para copiar estilos', 'error');
+        return;
+    }
+    const styles = state.cachedStyles || {};
+    if (Object.keys(styles).length === 0) {
+        showToast('Nenhum estilo para copiar', 'error');
+        return;
+    }
+    state._styleClipboard = JSON.parse(JSON.stringify(styles));
+    showToast('Estilos copiados! Selecione outro elemento e use Ctrl+Shift+V para colar.', 'success');
+}
+
+function pasteStyles() {
+    if (!state.selectedId) {
+        showToast('Selecione um elemento para colar estilos', 'error');
+        return;
+    }
+    if (!state._styleClipboard || Object.keys(state._styleClipboard).length === 0) {
+        showToast('Nenhum estilo copiado. Use Ctrl+Shift+C primeiro.', 'error');
+        return;
+    }
+    const elId = state.selectedId;
+    const styles = state._styleClipboard;
+    let applied = 0;
+    const applyNext = (keys) => {
+        if (keys.length === 0) {
+            if (applied > 0) {
+                showToast(`${applied} estilo(s) aplicado(s)!`, 'success');
+                loadElements();
+                setTimeout(() => selectElement(elId), 200);
+            }
+            return;
+        }
+        const [key, ...rest] = keys;
+        const val = styles[key];
+        if (val !== undefined && val !== '' && val !== null) {
+            applied++;
+            apiFetch(`/page-builder/elements/${elId}/styles`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+                body: JSON.stringify({ styles: { [key]: val } }),
+            }).then(() => applyNext(rest)).catch(() => applyNext(rest));
+        } else {
+            applyNext(rest);
+        }
+    };
+    applyNext(Object.keys(styles));
+}
+
+function saveAsTemplate() {
+    const name = prompt('Nome do template:', document.title.replace('Editando: ', '').replace(' - PageBuilder', ''));
+    if (!name) return;
+    apiFetch('/page-builder/pages/' + state.pageId + '/export')
+        .then(r => r.blob())
+        .then(blob => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const data = JSON.parse(reader.result);
+                    data.template_name = name;
+                    const blob2 = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob2);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = name.toLowerCase().replace(/\s+/g, '-') + '.json';
+                    document.body.appendChild(a); a.click(); a.remove();
+                    URL.revokeObjectURL(url);
+                    showToast('Template exportado! Use Importar HTML para reutilizar.', 'success');
+                } catch(e) { showToast('Erro ao criar template', 'error'); }
+            };
+            reader.readAsText(blob);
+        })
+        .catch(() => showToast('Erro ao exportar template', 'error'));
 }
 
 function copyHtml() {
@@ -1388,6 +2098,355 @@ function unlockElement(elementId) {
     }).catch(() => {});
 }
 
+function bindWidgetSearch() {
+    const input = document.getElementById('widget-search-input');
+    if (!input) return;
+    const items = document.querySelectorAll('#panel-widgets .pb-widget-item');
+    const groups = document.querySelectorAll('#panel-widgets .pb-widget-group');
+    const empty = document.getElementById('widget-search-empty');
+    input.addEventListener('input', () => {
+        const q = input.value.toLowerCase().trim();
+        let found = 0;
+        items.forEach(item => {
+            const search = (item.dataset.search || '') + ' ' + (item.dataset.type || '');
+            const match = !q || search.toLowerCase().includes(q);
+            item.classList.toggle('pb-widget-hidden', !match);
+            if (match) found++;
+        });
+        groups.forEach(g => {
+            const visible = g.querySelectorAll('.pb-widget-item:not(.pb-widget-hidden)').length;
+            g.classList.toggle('pb-widget-hidden', visible === 0);
+        });
+        if (empty) empty.style.display = found === 0 ? '' : 'none';
+    });
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { input.value = ''; input.dispatchEvent(new Event('input')); input.blur(); }
+    });
+}
+
+function bindResizablePanels() {
+    const layout = document.querySelector('.pb-layout');
+    if (!layout) return;
+    const panels = layout.querySelectorAll('.pb-panel');
+    panels.forEach(panel => {
+        const handle = document.createElement('div');
+        handle.className = 'pb-panel-resize';
+        const isRight = panel.classList.contains('pb-panel-right');
+        if (!isRight) panel.appendChild(handle);
+        else panel.insertBefore(handle, panel.firstChild);
+        let startX, startW;
+        const onMove = (e) => {
+            const dx = e.clientX - startX;
+            const newW = isRight ? startW - dx : startW + dx;
+            panel.style.width = Math.max(200, Math.min(500, newW)) + 'px';
+        };
+        const onUp = () => {
+            handle.classList.remove('active');
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startX = e.clientX;
+            startW = panel.offsetWidth;
+            handle.classList.add('active');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        });
+    });
+}
+
+function refreshMultiSelect() {
+    document.querySelectorAll('.pb-el').forEach(el => {
+        el.classList.remove('multi-selected');
+    });
+    if (state.multiSelected && state.multiSelected.size > 0) {
+        state.multiSelected.forEach(id => {
+            const el = document.querySelector(`.pb-el[data-el-id="${id}"]`);
+            if (el) el.classList.add('multi-selected');
+        });
+        showMultiToolbar();
+    } else {
+        removeMultiToolbar();
+    }
+}
+
+function showMultiToolbar() {
+    removeMultiToolbar();
+    const count = state.multiSelected ? state.multiSelected.size : 0;
+    if (count < 2) return;
+    const bar = document.createElement('div');
+    bar.className = 'pb-multi-toolbar';
+    bar.id = 'pb-multi-toolbar';
+    bar.innerHTML = `
+        <span class="pb-multi-count">${count} selecionados</span>
+        <button class="pb-multi-btn" onclick="editor.duplicateSelected()">&#128203; Duplicar</button>
+        <button class="pb-multi-btn danger" onclick="editor.deleteSelected()">&#128465; Excluir</button>
+        <button class="pb-multi-btn" onclick="editor.clearMultiSelect()">&#10005; Limpar</button>
+    `;
+    document.body.appendChild(bar);
+}
+
+function removeMultiToolbar() {
+    const bar = document.getElementById('pb-multi-toolbar');
+    if (bar) bar.remove();
+}
+
+editor.duplicateSelected = function() {
+    if (!state.multiSelected || state.multiSelected.size === 0) return;
+    const ids = [...state.multiSelected];
+    Promise.all(ids.map(id =>
+        apiFetch(`/page-builder/elements/${id}/duplicate`, { method: 'POST', headers: { 'X-CSRF-TOKEN': state.csrf } })
+    )).then(() => { state.multiSelected = null; removeMultiToolbar(); loadElements(); })
+     .catch(() => toastError('Falha ao duplicar elementos'));
+};
+
+editor.deleteSelected = function() {
+    if (state.multiSelected && state.multiSelected.size > 0) {
+        if (!confirm(`Excluir ${state.multiSelected.size} elementos?`)) return;
+        const ids = [...state.multiSelected];
+        Promise.all(ids.map(id =>
+            apiFetch(`/page-builder/elements/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': state.csrf } })
+        )).then(() => { state.multiSelected = null; removeMultiToolbar(); loadElements(); })
+         .catch(() => toastError('Falha ao excluir elementos'));
+    } else if (state.selectedId) {
+        deleteElement(state.selectedId);
+    }
+};
+
+editor.clearMultiSelect = function() {
+    state.multiSelected = null;
+    document.querySelectorAll('.pb-el.multi-selected').forEach(el => el.classList.remove('multi-selected'));
+    removeMultiToolbar();
+};
+
+function toggleFinder() {
+    const existing = document.getElementById('pb-finder-overlay');
+    if (existing) { existing.remove(); return; }
+    const overlay = document.createElement('div');
+    overlay.id = 'pb-finder-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999999;display:flex;justify-content:center;padding-top:15vh;backdrop-filter:blur(4px);animation:fadeIn .15s';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'width:480px;max-height:400px;background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.4);display:flex;flex-direction:column;animation:tourPop .2s';
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Buscar widgets, configuracoes, acoes...';
+    searchInput.style.cssText = 'width:100%;padding:14px 16px;background:transparent;border:none;border-bottom:1px solid var(--pb-border);color:var(--pb-text);font-size:.9rem;outline:none';
+    const results = document.createElement('div');
+    results.style.cssText = 'flex:1;overflow-y:auto;padding:4px';
+    const actions = [
+        { label: 'Salvar', icon: '&#128190;', action: () => editor.save() },
+        { label: 'Publicar', icon: '&#128227;', action: () => editor.publish() },
+        { label: 'Desfazer', icon: '&#8617;', action: () => editor.undo() },
+        { label: 'Refazer', icon: '&#8618;', action: () => editor.redo() },
+        { label: 'Navigator', icon: '&#9776;', action: () => editor.toggleNavigator() },
+        { label: 'Exportar JSON', icon: '&#128230;', action: () => editor.exportPage() },
+        { label: 'Copiar HTML', icon: '&#128196;', action: () => editor.copyHtml() },
+        { label: 'Importar HTML', icon: '&#128229;', action: () => editor.importHtml() },
+        { label: 'Configuracoes da Pagina', icon: '&#9881;', action: () => editor.showPageSettings() },
+        { label: 'Configuracoes do Site', icon: '&#127968;', action: () => editor.showSiteSettings() },
+        { label: 'Historico de Revisoes', icon: '&#128338;', action: () => editor.showRevisionHistory() },
+        { label: 'Modo Desktop', icon: '&#128187;', action: () => editor.setResponsive('desktop') },
+        { label: 'Modo Tablet', icon: '&#128241;', action: () => editor.setResponsive('tablet') },
+        { label: 'Modo Mobile', icon: '&#128241;', action: () => editor.setResponsive('mobile') },
+        { label: 'Zoom 100%', icon: '&#128269;', action: () => editor.zoomReset() },
+        { label: 'Tela Cheia', icon: '&#9974;', action: () => editor.toggleFullscreen() },
+    ];
+    const widgetTypes = [
+        { type: 'heading', label: 'Titulo' }, { type: 'text', label: 'Texto' },
+        { type: 'image', label: 'Imagem' }, { type: 'button', label: 'Botao' },
+        { type: 'video', label: 'Video' }, { type: 'section', label: 'Secao' },
+        { type: 'column', label: 'Coluna' }, { type: 'divider', label: 'Divisor' },
+        { type: 'spacer', label: 'Espacador' }, { type: 'icon', label: 'Icone' },
+        { type: 'gallery', label: 'Galeria' }, { type: 'form', label: 'Formulario' },
+        { type: 'tabs', label: 'Abas' }, { type: 'accordion', label: 'Accordion' },
+        { type: 'callout', label: 'Callout' }, { type: 'table', label: 'Tabela' },
+        { type: 'math', label: 'Matematica' }, { type: 'counter', label: 'Contador' },
+        { type: 'progress_bar', label: 'Barra de Progresso' }, { type: 'social_icons', label: 'Social Icons' },
+        { type: 'icon_box', label: 'Icon Box' }, { type: 'image_box', label: 'Image Box' },
+        { type: 'testimonial', label: 'Testimonial' }, { type: 'price_table', label: 'Price Table' },
+        { type: 'countdown', label: 'Countdown' }, { type: 'google_maps', label: 'Google Maps' },
+        { type: 'carousel', label: 'Carrossel' },
+    ];
+    const renderResults = (q) => {
+        results.innerHTML = '';
+        const query = q.toLowerCase().trim();
+        const matchedActions = query ? actions.filter(a => a.label.toLowerCase().includes(query)) : actions;
+        if (matchedActions.length) {
+            const sec = document.createElement('div');
+            sec.style.cssText = 'padding:6px 10px;font-size:.65rem;color:var(--pb-text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600';
+            sec.textContent = 'Acoes';
+            results.appendChild(sec);
+            matchedActions.forEach(a => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:6px;font-size:.82rem;transition:background .1s';
+                item.innerHTML = `<span style="width:20px;text-align:center;opacity:.6">${a.icon}</span><span>${a.label}</span>`;
+                item.onmouseenter = () => item.style.background = 'var(--pb-surface2)';
+                item.onmouseleave = () => item.style.background = 'transparent';
+                item.onclick = () => { overlay.remove(); a.action(); };
+                results.appendChild(item);
+            });
+        }
+        const matchedWidgets = query ? widgetTypes.filter(w => w.label.toLowerCase().includes(query) || w.type.includes(query)) : [];
+        if (matchedWidgets.length) {
+            const sec = document.createElement('div');
+            sec.style.cssText = 'padding:6px 10px;font-size:.65rem;color:var(--pb-text2);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:4px';
+            sec.textContent = 'Widgets';
+            results.appendChild(sec);
+            matchedWidgets.forEach(w => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:6px;font-size:.82rem;transition:background .1s';
+                item.innerHTML = `<span style="width:20px;text-align:center;opacity:.6">&#10010;</span><span>${w.label}</span><span style="font-size:.65rem;color:var(--pb-text2);margin-left:auto">${w.type}</span>`;
+                item.onmouseenter = () => item.style.background = 'var(--pb-surface2)';
+                item.onmouseleave = () => item.style.background = 'transparent';
+                item.onclick = () => { overlay.remove(); document.querySelector(`.pb-widget-item[data-type="${w.type}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+                results.appendChild(item);
+            });
+        }
+        if (!matchedActions.length && !matchedWidgets.length) {
+            results.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--pb-text2);font-size:.82rem">Nenhum resultado encontrado</div>';
+        }
+    };
+    searchInput.addEventListener('input', () => renderResults(searchInput.value));
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') overlay.remove();
+        if (e.key === 'Enter') {
+            const first = results.querySelector('div[style*="cursor:pointer"]');
+            if (first) first.click();
+        }
+    });
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    modal.appendChild(searchInput);
+    modal.appendChild(results);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    setTimeout(() => { searchInput.focus(); renderResults(''); }, 50);
+}
+
+function showColumnStructurePicker(state, sectionElId) {
+    const existing = document.getElementById('pb-col-picker');
+    if (existing) existing.remove();
+    const sectionEl = document.querySelector(`.pb-el[data-el-id="${sectionElId}"]`);
+    if (!sectionEl) return;
+    const rect = sectionEl.getBoundingClientRect();
+    const picker = document.createElement('div');
+    picker.id = 'pb-col-picker';
+    picker.style.cssText = `position:fixed;top:${rect.top}px;left:${rect.left}px;width:${rect.width}px;background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:10px;padding:12px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.3);animation:tourPop .2s`;
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:.75rem;font-weight:600;color:var(--pb-text2);margin-bottom:8px;text-align:center';
+    title.textContent = 'Estrutura de Colunas';
+    picker.appendChild(title);
+    const layouts = [
+        { cols: [50, 50], label: '50/50' },
+        { cols: [33.33, 33.33, 33.33], label: '33/33/33' },
+        { cols: [25, 25, 25, 25], label: '25/25/25/25' },
+        { cols: [33.33, 66.67], label: '33/67' },
+        { cols: [66.67, 33.33], label: '67/33' },
+        { cols: [20, 60, 20], label: '20/60/20' },
+    ];
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:6px';
+    layouts.forEach(layout => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'padding:8px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;cursor:pointer;transition:all .15s;display:flex;gap:2px;height:36px';
+        layout.cols.forEach(pct => {
+            const col = document.createElement('div');
+            col.style.cssText = `flex:${pct};background:var(--pb-accent);border-radius:3px;opacity:.6`;
+            btn.appendChild(col);
+        });
+        btn.onmouseenter = () => { btn.style.borderColor = 'var(--pb-accent)'; btn.style.background = 'var(--pb-primary-light)'; };
+        btn.onmouseleave = () => { btn.style.borderColor = 'var(--pb-border)'; btn.style.background = 'var(--pb-surface2)'; };
+        btn.onclick = () => {
+            picker.remove();
+            createColumnsForSection(state, sectionElId, layout.cols);
+        };
+        grid.appendChild(btn);
+    });
+    picker.appendChild(grid);
+    document.body.appendChild(picker);
+    const closeHandler = (e) => { if (!picker.contains(e.target)) { picker.remove(); document.removeEventListener('click', closeHandler); } };
+    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+}
+
+function createColumnsForSection(state, sectionId, colPercentages) {
+    const promises = [];
+    colPercentages.forEach((pct, idx) => {
+        promises.push(
+            apiFetch(`/page-builder/pages/${state.pageId}/elements`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+                body: JSON.stringify({ type: 'column', parent_id: sectionId, settings: { column_width: pct } }),
+            })
+        );
+    });
+    Promise.all(promises).then(() => state.loadElements());
+}
+
+function initOnboarding() {
+    if (localStorage.getItem('pb_onboarded_v2')) return;
+    const steps = [
+        { title: 'Bem-vindo ao Page Builder!', desc: 'Este é o editor visual. Arraste widgets do painel esquerdo para criar sua página.', target: '.pb-panel:not(.pb-panel-right)', arrow: 'right' },
+        { title: 'Canvas', desc: 'Aqui você vê uma prévia ao vivo da sua página. Clique em qualquer elemento para editá-lo.', target: '#canvas', arrow: 'bottom' },
+        { title: 'Painel de Configuracoes', desc: 'Selecione um elemento e edite suas configuracoes aqui (Conteudo, Estilo, Avancado).', target: '.pb-panel-right', arrow: 'left' },
+        { title: 'Modo Responsivo', desc: 'Teste como sua pagina aparece em Desktop, Tablet e Mobile.', target: '[data-mode="tablet"]', arrow: 'bottom' },
+        { title: 'Navigator', desc: 'Use o Navigator para ver a arvore de elementos e reordenar com drag-and-drop.', target: '[data-tab="navigator"]', arrow: 'right' },
+        { title: 'Duplicar com Ctrl+D', desc: 'Selecione um elemento e pressione <strong>Ctrl+D</strong> para duplicar rapidamente. Funciona no canvas e no Navigator.', target: '#canvas', arrow: 'bottom' },
+        { title: 'Copiar/Colar Estilos', desc: 'Selecione um elemento, pressione <strong>Ctrl+Shift+C</strong> para copiar seus estilos. Selecione outro e pressione <strong>Ctrl+Shift+V</strong> para colar. Tambem disponivel nos menus de contexto (botao direito).', target: '.pb-panel-right', arrow: 'left' },
+        { title: 'Shape Dividers', desc: 'Nas configuracoes de uma Section (aba Estilo), adicione divisores de forma (waves, mountains, tilt, etc.) no topo e/ou base. Deixe suas secoes mais profissionais!', target: '.pb-panel-right', arrow: 'left' },
+        { title: 'Background Overlay', desc: 'Na aba Estilo de uma Section, configure um overlay semi-transparente sobre o background com cor, opacidade e blend mode. Perfeito para contraste com texto sobre imagens.', target: '.pb-panel-right', arrow: 'left' },
+        { title: 'Atalhos de Teclado', desc: '<strong>Ctrl+Z</strong> Desfazer | <strong>Ctrl+Shift+Z</strong> Refazer | <strong>Ctrl+S</strong> Salvar | <strong>Ctrl+D</strong> Duplicar | <strong>Ctrl+Shift+C/V</strong> Copiar/Colar Estilos | <strong>Delete</strong> Excluir | <strong>F11</strong> Tela Cheia', target: '.pb-toolbar', arrow: 'bottom' },
+    ];
+    let currentStep = 0;
+    const overlay = document.createElement('div');
+    overlay.className = 'pb-tour-overlay';
+    const tooltip = document.createElement('div');
+    tooltip.className = 'pb-tour-tooltip';
+    document.body.appendChild(overlay);
+    document.body.appendChild(tooltip);
+    function showStep(idx) {
+        if (idx >= steps.length) { finish(); return; }
+        const s = steps[idx];
+        tooltip.className = 'pb-tour-tooltip arrow-' + s.arrow;
+        tooltip.innerHTML = `
+            <div class="pb-tour-step">Passo ${idx + 1} de ${steps.length}</div>
+            <div class="pb-tour-title">${s.title}</div>
+            <div class="pb-tour-desc">${s.desc}</div>
+            <div class="pb-tour-actions">
+                <button class="pb-tour-btn pb-tour-btn-primary" id="tour-next">${idx === steps.length - 1 ? 'Começar!' : 'Próximo'}</button>
+                <button class="pb-tour-skip" id="tour-skip">Pular tour</button>
+            </div>
+        `;
+        const target = document.querySelector(s.target);
+        if (target) {
+            const r = target.getBoundingClientRect();
+            const tw = 300;
+            let left = r.left + r.width / 2 - tw / 2;
+            let top;
+            if (s.arrow === 'bottom') top = r.bottom + 10;
+            else if (s.arrow === 'right') { top = r.top + r.height / 2 - 60; left = r.right + 10; }
+            else if (s.arrow === 'left') { top = r.top + r.height / 2 - 60; left = r.left - tw - 10; }
+            else { top = r.top - 10; }
+            left = Math.max(8, Math.min(window.innerWidth - tw - 8, left));
+            top = Math.max(8, Math.min(window.innerHeight - 200, top));
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        document.getElementById('tour-next').onclick = () => { currentStep++; showStep(currentStep); };
+        document.getElementById('tour-skip').onclick = finish;
+    }
+    function finish() {
+        overlay.remove();
+        tooltip.remove();
+        localStorage.setItem('pb_onboarded_v2', '1');
+    }
+    setTimeout(() => showStep(currentStep), 500);
+}
+
 window.editor = editor;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1399,10 +2458,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('click', (e) => {
-    if (!e.target.closest('.pb-el') && !e.target.closest('.pb-structure-item') && !e.target.closest('.pb-settings') && !e.target.closest('.pb-toolbar') && !e.target.closest('.pb-nav-context')) {
-        document.querySelectorAll('.pb-el.selected').forEach(el => el.classList.remove('selected'));
+    if (!e.target.closest('.pb-el') && !e.target.closest('.pb-structure-item') && !e.target.closest('.pb-settings') && !e.target.closest('.pb-toolbar') && !e.target.closest('.pb-nav-context') && !e.target.closest('.pb-multi-toolbar')) {
+        document.querySelectorAll('.pb-el.selected, .pb-el.multi-selected').forEach(el => {
+            el.classList.remove('selected');
+            el.classList.remove('multi-selected');
+        });
         document.querySelectorAll('.pb-structure-item.active').forEach(el => el.classList.remove('active'));
         state.selectedId = null;
+        state.multiSelected = null;
+        removeMultiToolbar();
         document.getElementById('settings-empty').style.display = '';
         document.getElementById('settings-form').classList.remove('active');
     }

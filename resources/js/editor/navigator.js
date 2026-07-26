@@ -28,9 +28,44 @@ export function renderNavigator(state) {
     const body = document.getElementById('navigator-body');
     body.innerHTML = '';
     destroyNavSortables();
+
+    const searchBox = document.createElement('div');
+    searchBox.className = 'pb-nav-search';
+    searchBox.innerHTML = '<input type="text" id="nav-search-input" placeholder="Buscar elementos..." autocomplete="off"><span class="pb-nav-search-icon">&#128269;</span>';
+    body.appendChild(searchBox);
+
+    const treeWrap = document.createElement('div');
+    treeWrap.className = 'pb-nav-tree';
+    body.appendChild(treeWrap);
+
     const els = state._lastElements || [];
-    _renderNavItems(state, els, body, 0);
-    _initNavSortable(body, state, null);
+    _renderNavItems(state, els, treeWrap, 0);
+    _initNavSortable(treeWrap, state, null);
+
+    const searchInput = document.getElementById('nav-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.toLowerCase().trim();
+            const items = treeWrap.querySelectorAll('.pb-nav-item');
+            items.forEach(item => {
+                if (!q) { item.style.display = ''; return; }
+                const name = (item.querySelector('.nav-name')?.textContent || '').toLowerCase();
+                const type = (item.dataset.elType || '').toLowerCase();
+                const match = name.includes(q) || type.includes(q);
+                item.style.display = match ? '' : 'none';
+                if (match) {
+                    let parent = item.parentElement;
+                    while (parent && parent !== treeWrap) {
+                        if (parent.classList.contains('pb-nav-children')) parent.style.display = '';
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+        });
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { searchInput.value = ''; searchInput.dispatchEvent(new Event('input')); searchInput.blur(); }
+        });
+    }
 }
 
 export function _renderNavItems(state, elements, container, depth) {
@@ -197,6 +232,9 @@ export function _showNavContext(state, x, y, el) {
         { label: '\u29C9 Copy', action: () => { state._clipboard = JSON.parse(JSON.stringify(el)); state.showToast('Elemento copiado', 'success'); } },
         { label: '\uD83D\uDCCB Paste (ap\u00F3s)', action: () => _navPasteAfter(state, el.id) },
         { sep: true },
+        { label: '\uD83C\uDFA8 Copy Styles', action: () => { state.onSelectElement(el.id); setTimeout(() => { state._styleClipboard = JSON.parse(JSON.stringify(state.cachedStyles || {})); state.showToast('Estilos copiados!', 'success'); }, 100); } },
+        { label: '\uD83C\uDFA8 Paste Styles', action: () => { state.onSelectElement(el.id); setTimeout(() => { if (!state._styleClipboard) { state.showToast('Nenhum estilo copiado', 'error'); return; } const elId = el.id; const styles = state._styleClipboard; let applied = 0; const keys = Object.keys(styles); const applyNext = (idx) => { if (idx >= keys.length) { if (applied > 0) { state.showToast(`${applied} estilo(s) aplicado(s)!`, 'success'); state.loadElements(); setTimeout(() => state.onSelectElement(elId), 200); } return; } const k = keys[idx]; const v = styles[k]; if (v !== undefined && v !== '' && v !== null) { applied++; fetch(`/page-builder/elements/${elId}/styles`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf }, body: JSON.stringify({ styles: { [k]: v } }) }).then(() => applyNext(idx + 1)).catch(() => applyNext(idx + 1)); } else { applyNext(idx + 1); } }; applyNext(0); }, 100); } },
+        { sep: true },
         { label: '\u2715 Delete', cls: 'danger', action: () => state.deleteElement(el.id) },
     ];
 
@@ -241,6 +279,9 @@ export function _showCanvasContext(state, x, y, elId) {
         { sep: true },
         { label: '\u29C9 Copiar', action: () => { const els = state._lastElements || []; const find = (list) => { for (const e of list) { if (e.id === elId) return e; if (e.children) { const f = find(e.children); if (f) return f; } } return null; }; const found = find(els); if (found) { state._clipboard = JSON.parse(JSON.stringify(found)); state.showToast('Elemento copiado', 'success'); } } },
         { label: '\uD83D\uDCCB Colar (ap\u00F3s)', action: () => _navPasteAfter(state, elId) },
+        { sep: true },
+        { label: '\uD83C\uDFA8 Copiar Estilos', action: () => { state.onSelectElement(elId); setTimeout(() => { state._styleClipboard = JSON.parse(JSON.stringify(state.cachedStyles || {})); state.showToast('Estilos copiados!', 'success'); }, 100); } },
+        { label: '\uD83C\uDFA8 Colar Estilos', action: () => { state.onSelectElement(elId); setTimeout(() => { if (!state._styleClipboard) { state.showToast('Nenhum estilo copiado', 'error'); return; } const styles = state._styleClipboard; let applied = 0; const keys = Object.keys(styles); const applyNext = (idx) => { if (idx >= keys.length) { if (applied > 0) { state.showToast(`${applied} estilo(s) aplicado(s)!`, 'success'); state.loadElements(); setTimeout(() => state.onSelectElement(elId), 200); } return; } const k = keys[idx]; const v = styles[k]; if (v !== undefined && v !== '' && v !== null) { applied++; fetch(`/page-builder/elements/${elId}/styles`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf }, body: JSON.stringify({ styles: { [k]: v } }) }).then(() => applyNext(idx + 1)).catch(() => applyNext(idx + 1)); } else { applyNext(idx + 1); } }; applyNext(0); }, 100); } },
         { sep: true },
         { label: '\u2715 Excluir', cls: 'danger', action: () => state.deleteElement(elId) },
     ];

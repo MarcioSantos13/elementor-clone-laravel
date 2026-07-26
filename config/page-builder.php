@@ -29,6 +29,17 @@ return [
         \App\Services\PageBuilder\Widgets\FormWidget::class,
         \App\Services\PageBuilder\Widgets\TabsWidget::class,
         \App\Services\PageBuilder\Widgets\AccordionWidget::class,
+        \App\Services\PageBuilder\Widgets\CounterWidget::class,
+        \App\Services\PageBuilder\Widgets\ProgressBarWidget::class,
+        \App\Services\PageBuilder\Widgets\SocialIconsWidget::class,
+        \App\Services\PageBuilder\Widgets\IconBoxWidget::class,
+        \App\Services\PageBuilder\Widgets\ImageBoxWidget::class,
+        \App\Services\PageBuilder\Widgets\TestimonialWidget::class,
+        \App\Services\PageBuilder\Widgets\PriceTableWidget::class,
+        \App\Services\PageBuilder\Widgets\CountdownWidget::class,
+        \App\Services\PageBuilder\Widgets\GoogleMapsWidget::class,
+        \App\Services\PageBuilder\Widgets\CarouselWidget::class,
+        \App\Services\PageBuilder\Widgets\InnerSectionWidget::class,
     ],
 
     'upload' => [

@@ -500,7 +500,7 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ---
 
-### Passo 30: Widget search/filtro
+### Passo 30: Widget search/filtro ✅ IMPLEMENTADO
 - Campo de busca no painel esquerdo
 - Filtrar widgets por nome/descrição
 - Realce no match
@@ -511,7 +511,7 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ---
 
-### Passo 31: Indicador de dirty state (modificações não salvas)
+### Passo 31: Indicador de dirty state (modificações não salvas) ✅ IMPLEMENTADO
 - Mudar título da aba para "• Editando: Título" quando há mudanças não salvas
 - Alert ao sair da página com mudanças pendentes
 
@@ -523,52 +523,60 @@ Já existe `undo()` e `redo()` no JS, mas precisa de botões visíveis:
 
 ## FASE 6 — Atalhos e Duplicação (Média Prioridade)
 
-### Passo 32: Atalhos de teclado expandidos
-**Arquivo:** `public/js/page-builder-editor.js` em `bindKeyboard()`
+### Passo 32: Atalhos de teclado expandidos ✅ IMPLEMENTADO
+**Arquivo:** `resources/js/editor/index.js` em `bindKeyboard()`
 
-Adicionar:
+Atalhos implementados:
+- `Ctrl+Z` → Desfazer
+- `Ctrl+Shift+Z` / `Ctrl+Y` → Refazer
+- `Ctrl+S` → Salvar
 - `Ctrl+D` → Duplicar selecionado
-- `Ctrl+C` → Copiar
-- `Ctrl+V` → Colar
-- `Ctrl+Shift+V` → Colar mantendo estilo
-- `Ctrl+A` → Selecionar todos
-- `Arrow Up/Down` → Navegar entre widgets
-- `Ctrl+Arrow` → Mover widget
+- `Ctrl+K` → Finder/Command Palette
+- `Ctrl+Shift+C` → Copiar estilos
+- `Ctrl+Shift+V` → Colar estilos
+- `Ctrl+0` → Reset zoom
+- `Ctrl++` / `Ctrl+-` → Zoom in/out
+- `Tab` / `Shift+Tab` → Navegar entre elementos
+- `F11` → Fullscreen toggle
+- `Delete` → Excluir selecionado
+- `Escape` → Deselecionar / fechar overlay
 
 **Como testar:**
 1. Selecionar widget → Ctrl+D → Duplicado
-2. Ctrl+C → Copiado
-3. Ctrl+V → Colado
+2. Ctrl+K → Finder abre
+3. Tab → Navega entre elementos
 
 ---
 
-### Passo 33: Copy/Paste de widgets
-- Ctrl+C salva o widget no clipboard (localStorage)
-- Ctrl+V cola como novo widget abaixo do selecionado
-- Clipboard persiste entre sessões
+### Passo 33: Copy/Paste de estilos ✅ IMPLEMENTADO
+- `Ctrl+Shift+C` copia estilos do widget selecionado
+- `Ctrl+Shift+V` cola estilos em outro widget
+- Clipboard em memória (state._styleClipboard)
 
 **Como testar:**
-1. Selecionar heading estilizado → Ctrl+C
-2. Criar nova section → Ctrl+V
-3. Heading aparece com mesmos estilos
+1. Selecionar heading estilizado → Ctrl+Shift+C
+2. Selecionar outro heading → Ctrl+Shift+V
+3. Estilos aplicados
 
 ---
 
-### Passo 34: Global clipboard no editor
-- Botão "Copy" / "Paste" na toolbar
-- Indicador visual de "Widget copied" no toast
+### Passo 34: Command Finder (Ctrl+K) ✅ IMPLEMENTADO
+- `Ctrl+K` abre modal de busca
+- Pesquisa sobre todas as ações, widgets e configurações
+- Navegação por teclado (↑↓ Enter Esc)
+- Inclui Site Settings e Revision History
 
 **Como testar:**
-1. Selecionar → Clicar "Copy" na toolbar
-2. Toast "Widget copied!"
-3. Em outro lugar → Clicar "Paste"
-4. Widget aparece
+1. Ctrl+K → Finder abre
+2. Digitar "video" → Filtra widgets
+3. Digitar "site" → Mostra Site Settings
+4. Enter → Executa ação
 
 ---
 
-### Passo 35: Multi-select
+### Passo 35: Multi-select ✅ IMPLEMENTADO
 - Ctrl+Click para selecionar múltiplos widgets
-- Arrastar área de seleção no canvas
+- Barra flutuante com Duplicar, Excluir, Limpar seleção
 - Delete/Copy dos selecionados
 
 **Como testar:**
@@ -675,6 +683,179 @@ Cada template é um JSON com elementos pré-configurados.
 
 ---
 
+## FASE 9 — Widgets Avançados (Alta Prioridade)
+
+### Passo 43: Widget Counter (Contador) ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/CounterWidget.php`
+
+- Controls: starting_number, ending_number, separator, prefix, suffix, duration
+- Canvas renderiza animação com requestAnimationFrame
+- Contador animado de números do valor inicial ao final
+
+### Passo 44: Widget Progress Bar (Barra de Progresso) ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/ProgressBarWidget.php`
+
+- Controls: title, percentage, colors, animate
+- Barra de progresso com fill animado
+
+### Passo 45: Widget Social Icons ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/SocialIconsWidget.php`
+
+- Controls: repeater com platform, color, url
+- 8 plataformas com ícones Font Awesome
+
+### Passo 46: Widget Icon Box ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/IconBoxWidget.php`
+
+- Controls: icon, title, description, icon_position (left/top)
+- Ícone + título + descrição
+
+### Passo 47: Widget Image Box ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/ImageBoxWidget.php`
+
+- Controls: image, title, description, title_tag
+- Imagem + título + descrição
+
+### Passo 48: Widget Testimonial ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/TestimonialWidget.php`
+
+- Controls: name, position, company, content, avatar, rating (1-5 estrelas)
+
+### Passo 49: Widget Price Table ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/PriceTableWidget.php`
+
+- Controls: title, price, currency, period, features (repeater), featured
+
+### Passo 50: Widget Countdown ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/CountdownWidget.php`
+
+- Controls: target_date, labels
+- Timer regressivo com atualização a cada segundo
+
+### Passo 51: Widget Google Maps ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/GoogleMapsWidget.php`
+
+- Controls: lat, lng, zoom
+- Embed OpenStreetMap (sem API key)
+
+### Passo 52: Widget Carousel (Carrossel de Imagens) ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/CarouselWidget.php`
+
+- Controls: gallery repeater, columns
+- Carrossel CSS com scroll-snap
+
+### Passo 53: Widget Inner Section (Seção Interna) ✅ IMPLEMENTADO
+**Arquivo:** `app/Services/PageBuilder/Widgets/InnerSectionWidget.php`
+
+- Container para sub-colunas dentro de uma coluna
+- Suporta columns, column_gap, direction, background
+
+---
+
+## FASE 10 — Features Elementor-Pro (Alta Prioridade)
+
+### Passo 54: Background Gradient Visual ✅ IMPLEMENTADO
+- Controle `gradient` no painel direito
+- Seletor linear/radial, ângulo, 2 cores com posições
+- Preview visual em tempo real
+
+### Passo 55: Background Overlay ✅ IMPLEMENTADO
+- Cor overlay, opacidade, blend mode (17 opções)
+- Renderiza com div overlay posicionado
+
+### Passo 56: Shape Dividers (10 tipos) ✅ IMPLEMENTADO
+- tilt, waves, mountains, clouds, triangles, drip, etc.
+- SVG inline com caminhos customizados
+
+### Passo 57: Video Background na Seção ✅ IMPLEMENTADO
+- URL de vídeo, autoplay, loop, mute
+- Renderiza `<video>` tag dentro da seção
+
+### Passo 58: Parallax Scroll ✅ IMPLEMENTADO
+- Seções com `pb-parallax` recebem efeito parallax
+- Transform baseado no scroll via IntersectionObserver
+
+### Passo 59: Scroll-Triggered Animations ✅ IMPLEMENTADO
+- fade-up/down/left/right, zoom-in/out, slide-up/down
+- IntersectionObserver com threshold configurável
+
+### Passo 60: Sticky Position ✅ IMPLEMENTADO
+- position_type: sticky com offset e top/bottom
+- CSS `position: sticky` com z-index automático
+
+### Passo 61: Position Controls ✅ IMPLEMENTADO
+- position_type, position_top/right/bottom/left, z_index
+- Suporta fixed, absolute, relative, sticky
+
+### Passo 62: Image Filters ✅ IMPLEMENTADO
+- 9 filtros: grayscale, sepia, blur, brightness, contrast, saturate, hue-rotate, invert, drop-shadow
+- Intensidade %, rotação (-360 a 360), flip horizontal/vertical/both
+
+### Passo 63: Button Gradient ✅ IMPLEMENTADO
+- background_type: classic/gradient
+- background_gradient: linear/radial, angle, 2 cores
+
+### Passo 64: Text Shadow & Stroke ✅ IMPLEMENTADO
+- Controles text_shadow (x, y, blur, color) e text_stroke (width, color)
+- Aplicados em Heading e Button
+
+### Passo 65: Column Resize (Percentual) ✅ IMPLEMENTADO
+- column_width: slider 1-100%
+- Renderiza com width/flex/max-width CSS
+
+---
+
+## FASE 11 — Sistema Global (Média Prioridade)
+
+### Passo 66: Global Colors ✅ IMPLEMENTADO
+- CRUD de cores globais via `GET/PUT pages/{page}/global-settings`
+- Paleta de cores global com swatches
+- Integração com Finder
+
+### Passo 67: Global Fonts ✅ IMPLEMENTADO
+- 14 fontes do sistema (Inter, Roboto, Open Sans, etc.)
+- Seletor de fonte global no painel
+- Salva em page settings
+
+### Passo 68: Responsive Tabs (Desktop/Tablet/Mobile) ✅ IMPLEMENTADO
+- Abas de breakpoint no painel de configurações
+- Valores por dispositivo com fallback desktop
+- Media queries CSS para responsividade
+
+---
+
+## FASE 12 — UX Avançada (Média Prioridade)
+
+### Passo 69: Command Finder (Ctrl+K) ✅ IMPLEMENTADO
+- Modal de busca com navegação por teclado
+- Pesquisa widgets, ações, configurações
+- Integração com Site Settings e Revision History
+
+### Passo 70: Revision History Panel ✅ IMPLEMENTADO
+- Lista de revisões com data, usuário, tipo
+- Botão "Restaurar" para reverter
+- Botão "Ver Diff" com diff visual colorido
+
+### Passo 71: Save as Template ✅ IMPLEMENTADO
+- Botão "Template" na toolbar
+- Exporta página como JSON nomeado
+
+### Passo 72: Column Structure Picker ✅ IMPLEMENTADO
+- 6 opções de layout de colunas (50/50, 33/33/33, etc.)
+- Aplica automaticamente ao criar seção
+
+### Passo 73: ARIA Accessibility ✅ IMPLEMENTADO
+- Roles: toolbar, main, list, complementary, tree, navigation
+- aria-selected, aria-controls, aria-label
+- Screen-reader only (sr-only) classes
+
+### Passo 74: Keyboard Navigation ✅ IMPLEMENTADO
+- Tab/Shift+Tab para navegar entre elementos
+- Escape para deselecionar
+- Focus-visible outlines
+
+---
+
 ## Ordem Recomendada de Implementação
 
 | Semana | Passos | Motivo |
@@ -687,6 +868,10 @@ Cada template é um JSON com elementos pré-configurados.
 | 6 | 24-31 | UX do editor |
 | 7 | 32-35 | Atalhos e copy/paste |
 | 8 | 36-42 | Temas, responsividade, polish |
+| 9 | 43-53 | Widgets avançados (counter, progress, social, testimonial, etc.) |
+| 10 | 54-65 | Features Elementor-Pro (gradient, parallax, filters, etc.) |
+| 11 | 66-68 | Sistema global (cores, fontes, responsive tabs) |
+| 12 | 69-74 | UX avançada (finder, revisões, templates, acessibilidade) |
 
 ---
 

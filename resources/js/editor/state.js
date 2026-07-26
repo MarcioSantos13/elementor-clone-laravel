@@ -1,6 +1,7 @@
 export default {
     pageId: null,
     selectedId: null,
+    multiSelected: null,
     activeTab: 'content',
     cachedControls: null,
     cachedSettings: null,
@@ -9,6 +10,7 @@ export default {
     history: [],
     historyIndex: -1,
     responsiveMode: 'desktop',
+    responsiveTab: 'desktop',
     csrf: '',
     saving: false,
     dirty: false,
@@ -17,5 +19,6 @@ export default {
     _timers: {},
     _lastElements: [],
     _clipboard: null,
+    _styleClipboard: null,
     _imagePasteHandler: null,
 };

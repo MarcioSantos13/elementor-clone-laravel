@@ -37,13 +37,7 @@ class ColumnWidget extends BaseWidget
         ];
 
         $this->controls = [
-            'column_width' => ['type' => 'select', 'label' => 'Column Width',
-                'options' => [
-                    'col-1', 'col-2', 'col-3', 'col-4', 'col-5', 'col-6',
-                    'col-7', 'col-8', 'col-9', 'col-10', 'col-11', 'col-12',
-                ],
-                'default' => 'col-4',
-            ],
+            'column_width' => ['type' => 'column_width', 'label' => 'Column Width (%)', 'default' => 33.33],
             'vertical_alignment' => ['type' => 'select', 'label' => 'Vertical Alignment',
                 'options' => ['stretch', 'flex-start', 'center', 'flex-end'],
             ],
@@ -63,6 +57,17 @@ class ColumnWidget extends BaseWidget
             'animation' => ['type' => 'animation', 'label' => 'Animation', 'tab' => 'advanced'],
             'visibility' => ['type' => 'visibility', 'label' => 'Responsive Visibility', 'tab' => 'advanced'],
         ];
+    }
+
+    protected function resolveWidth($columnWidth): float
+    {
+        $colClassMap = ['col-1' => 8.33, 'col-2' => 16.67, 'col-3' => 25, 'col-4' => 33.33, 'col-5' => 41.67, 'col-6' => 50, 'col-7' => 58.33, 'col-8' => 66.67, 'col-9' => 75, 'col-10' => 83.33, 'col-11' => 91.67, 'col-12' => 100];
+
+        if (is_numeric($columnWidth)) {
+            return max(1, min(100, (int) $columnWidth));
+        }
+
+        return $colClassMap[$columnWidth] ?? 33;
     }
 
     public function render(array $settings, array $content = [], array $styles = []): string
@@ -104,13 +109,15 @@ class ColumnWidget extends BaseWidget
             $style .= " box-shadow: {$boxShadow};";
         }
 
-        $classes = "pb-column {$columnWidth}";
+        $pct = $this->resolveWidth($columnWidth);
+        $style .= " width: {$pct}%; flex: 0 0 {$pct}%; max-width: {$pct}%;";
+
+        $classes = 'pb-column';
 
         if ($cssClasses) {
             $classes .= " {$cssClasses}";
         }
 
-        $responsiveHide = '';
         if ($settings['responsive_hide_mobile']) {
             $classes .= ' pb-hide-mobile';
         }
@@ -168,7 +175,11 @@ HTML;
             $style .= " box-shadow: {$boxShadow};";
         }
 
-        $classes = "pb-column-editor {$columnWidth}";
+        $pct = $this->resolveWidth($columnWidth);
+        $style .= " width: {$pct}%; flex: 0 0 {$pct}%; max-width: {$pct}%;";
+
+        $classes = 'pb-column-editor';
+
         if ($cssClasses) {
             $classes .= " {$cssClasses}";
         }

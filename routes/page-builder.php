@@ -24,6 +24,8 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::get('templates', [PageController::class, 'listTemplates'])->name('templates.list');
     Route::post('pages/{page}/apply-template', [PageController::class, 'applyTemplate'])->name('pages.apply-template');
     Route::put('pages/{page}/layout', [PageController::class, 'updateLayout'])->name('pages.layout');
+    Route::get('pages/{page}/global-settings', [PageController::class, 'getGlobalSettings'])->name('pages.global-settings');
+    Route::put('pages/{page}/global-settings', [PageController::class, 'updateGlobalSettings'])->name('pages.global-settings.update');
 
     Route::get('pages/{page}/elements', [ElementController::class, 'index'])->name('elements.index');
     Route::post('pages/{page}/elements', [ElementController::class, 'store'])->name('elements.store');

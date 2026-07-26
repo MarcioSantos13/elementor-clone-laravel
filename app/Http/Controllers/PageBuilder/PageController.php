@@ -144,6 +144,57 @@ class PageController extends Controller
         ]);
     }
 
+    public function getGlobalSettings(Request $request, Page $page): JsonResponse
+    {
+        $this->authorize('update', $page);
+        $settings = $page->settings ?? [];
+        return response()->json([
+            'global_colors' => $settings['global_colors'] ?? [],
+            'global_fonts' => $settings['global_fonts'] ?? [],
+            'system_fonts' => [
+                ['name' => 'System Default', 'family' => 'system-ui, -apple-system, sans-serif'],
+                ['name' => 'Inter', 'family' => 'Inter, sans-serif'],
+                ['name' => 'Roboto', 'family' => 'Roboto, sans-serif'],
+                ['name' => 'Open Sans', 'family' => 'Open Sans, sans-serif'],
+                ['name' => 'Lato', 'family' => 'Lato, sans-serif'],
+                ['name' => 'Montserrat', 'family' => 'Montserrat, sans-serif'],
+                ['name' => 'Poppins', 'family' => 'Poppins, sans-serif'],
+                ['name' => 'Raleway', 'family' => 'Raleway, sans-serif'],
+                ['name' => 'Nunito', 'family' => 'Nunito, sans-serif'],
+                ['name' => 'Merriweather', 'family' => 'Merriweather, serif'],
+                ['name' => 'Playfair Display', 'family' => 'Playfair Display, serif'],
+                ['name' => 'Oswald', 'family' => 'Oswald, sans-serif'],
+                ['name' => 'Ubuntu', 'family' => 'Ubuntu, sans-serif'],
+                ['name' => 'Crimson Text', 'family' => 'Crimson Text, serif'],
+            ],
+        ]);
+    }
+
+    public function updateGlobalSettings(Request $request, Page $page): JsonResponse
+    {
+        $this->authorize('update', $page);
+        $validated = $request->validate([
+            'global_colors' => 'nullable|array',
+            'global_fonts' => 'nullable|array',
+        ]);
+
+        $settings = $page->settings ?? [];
+        if (isset($validated['global_colors'])) {
+            $settings['global_colors'] = $validated['global_colors'];
+        }
+        if (isset($validated['global_fonts'])) {
+            $settings['global_fonts'] = $validated['global_fonts'];
+        }
+        $page->settings = $settings;
+        $page->save();
+
+        return response()->json([
+            'message' => 'Global settings updated',
+            'global_colors' => $settings['global_colors'] ?? [],
+            'global_fonts' => $settings['global_fonts'] ?? [],
+        ]);
+    }
+
     protected function importTemplateElements(Page $page, array $elements, ?int $parentId = null, string $widgetType = null): void
     {
         foreach ($elements as $index => $elData) {
