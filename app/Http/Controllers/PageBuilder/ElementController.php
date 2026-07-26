@@ -129,28 +129,35 @@ class ElementController extends Controller
             'order' => 'required|array',
             'order.*.id' => 'required|integer|exists:elements,id',
             'order.*.children' => 'nullable|array',
-            'order.*.children.*' => 'integer|exists:elements,id',
         ]);
 
         $order = $validated['order'];
-
-        foreach ($order as $index => $item) {
-            Element::where('id', $item['id'])
-                ->where('page_id', $page->id)
-                ->update(['order' => $index, 'parent_id' => null]);
-
-            if (isset($item['children'])) {
-                foreach ($item['children'] as $childIndex => $childId) {
-                    Element::where('id', $childId)
-                        ->where('page_id', $page->id)
-                        ->update(['order' => $childIndex, 'parent_id' => $item['id']]);
-                }
-            }
-        }
+        $this->applyOrder($order, $page->id, null);
 
         return response()->json([
             'message' => 'Elements reordered successfully',
         ]);
+    }
+
+    private function applyOrder(array $items, int $pageId, ?int $parentId): void
+    {
+        foreach ($items as $index => $item) {
+            Element::where('id', $item['id'])
+                ->where('page_id', $pageId)
+                ->update(['order' => $index, 'parent_id' => $parentId]);
+
+            if (!empty($item['children']) && is_array($item['children'])) {
+                if (isset($item['children'][0]) && is_int($item['children'][0])) {
+                    foreach ($item['children'] as $childIndex => $childId) {
+                        Element::where('id', $childId)
+                            ->where('page_id', $pageId)
+                            ->update(['order' => $childIndex, 'parent_id' => $item['id']]);
+                    }
+                } else {
+                    $this->applyOrder($item['children'], $pageId, $item['id']);
+                }
+            }
+        }
     }
 
     public function move(Request $request, Element $element): JsonResponse

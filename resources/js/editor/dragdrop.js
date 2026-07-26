@@ -31,8 +31,6 @@ function _bindWidgetPanel(state) {
             filter: '.pb-widget-group-title',
             onStart(evt) {
                 document.body.classList.add('pb-is-dragging');
-                const item = evt.item;
-                item.dataset._origParent = '';
             },
             onEnd(evt) {
                 document.body.classList.remove('pb-is-dragging');
@@ -49,7 +47,7 @@ function _bindCanvasDropzone(state) {
 
     _canvasSortable = Sortable.create(dz, {
         group: {
-            name: 'canvas',
+            name: 'widgets',
             pull: false,
             put: ['widgets'],
         },
@@ -63,9 +61,6 @@ function _bindCanvasDropzone(state) {
         onAdd(evt) {
             _handleNewWidgetDrop(state, evt);
         },
-        onUpdate(evt) {
-            _handleCanvasReorder(state, evt);
-        },
     });
 }
 
@@ -73,11 +68,11 @@ function _handleNewWidgetDrop(state, evt) {
     const item = evt.item;
     const type = item.dataset.type;
 
+    if (!type) return;
+
     if (item.parentNode) {
         item.parentNode.removeChild(item);
     }
-
-    if (!type) return;
 
     let parentId = null;
     let insertBeforeId = null;
@@ -116,7 +111,17 @@ function _handleCanvasReorder(state, evt) {
     const elId = parseInt(el.dataset.elId);
     if (!elId) return;
 
-    state.loadElements();
+    const order = _buildOrderFromDOM();
+    apiFetch(`/page-builder/pages/${state.pageId}/elements/reorder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+        body: JSON.stringify({ order }),
+    }).then(() => {
+        setTimeout(() => state.loadElements(), 50);
+    }).catch(err => {
+        toastError('Falha ao reordenar');
+        setTimeout(() => state.loadElements(), 50);
+    });
 }
 
 export function initContainerSortables(state) {
@@ -141,11 +146,13 @@ function _initSortableForContainer(container, state, parentId) {
         _containerSortables.get(container).destroy();
     }
 
+    const containerId = 'sb-' + Math.random().toString(36).slice(2, 8);
+
     const sortable = Sortable.create(container, {
         group: {
-            name: 'canvas',
+            name: containerId,
             pull: false,
-            put: ['widgets', 'canvas'],
+            put: ['widgets'],
         },
         animation: 200,
         ghostClass: 'pb-sortable-ghost',
@@ -187,4 +194,24 @@ export function _saveElementOrder(state) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
         body: JSON.stringify({ order }),
     }).catch(() => toastError('Falha ao reordenar'));
+}
+
+function _buildOrderFromDOM() {
+    function buildContainer(el) {
+        const children = [];
+        el.querySelectorAll(':scope > .pb-el').forEach(child => {
+            const childId = parseInt(child.dataset.elId);
+            if (childId) {
+                const childItem = { id: childId, children: [] };
+                const childChildren = child.querySelector('.pb-el-children');
+                if (childChildren) {
+                    childItem.children = buildContainer(childChildren);
+                }
+                children.push(childItem);
+            }
+        });
+        return children;
+    }
+    const dz = document.getElementById('canvas-dropzone');
+    return dz ? buildContainer(dz) : [];
 }
