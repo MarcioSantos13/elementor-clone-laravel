@@ -127,6 +127,11 @@ function _handleCanvasReorder(state, evt) {
 export function initContainerSortables(state) {
     destroyAllContainerSortables();
 
+    if (_canvasSortable) {
+        _canvasSortable.destroy();
+        _canvasSortable = null;
+    }
+
     const dz = document.getElementById('canvas-dropzone');
     if (dz) {
         _initSortableForContainer(dz, state, null);
