@@ -434,26 +434,27 @@
         .pb-list-row {
             display: flex; justify-content: space-between; align-items: center;
             background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
-            padding: .85rem 1.25rem; transition: all .2s; gap: 1rem;
+            padding: .85rem 1.25rem; transition: all .2s; gap: 1.5rem;
         }
         .pb-list-row:hover { border-color: #c7d2fe; box-shadow: 0 2px 12px rgba(99,102,241,.06); }
-        .pb-list-info { display: flex; align-items: center; gap: .75rem; min-width: 0; flex: 1; }
+        .pb-list-info { display: flex; align-items: center; gap: .75rem; flex: 1; }
         .pb-list-icon {
             width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9;
             display: flex; align-items: center; justify-content: center; color: #6366f1;
             flex-shrink: 0;
         }
-        .pb-list-text { min-width: 0; flex: 1; }
+        .pb-list-text { flex: 1 1 auto; }
         .pb-list-title {
             font-weight: 600; font-size: .92rem; color: #0f172a;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
         }
-        .pb-list-meta { display: flex; align-items: center; gap: .5rem; margin-top: .2rem; flex-wrap: nowrap; overflow: hidden; }
+        .pb-list-meta { display: flex; align-items: center; gap: .5rem; margin-top: .2rem; flex-wrap: nowrap; overflow: hidden; min-width: 0; }
         .pb-list-slug {
             font-size: .72rem; color: #94a3b8; font-family: ui-monospace, monospace;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+            max-width: 200px;
         }
-        .pb-list-actions { display: flex; align-items: center; gap: .4rem; flex-shrink: 0; }
+        .pb-list-actions { display: flex; align-items: center; gap: .25rem; flex-shrink: 0; white-space: nowrap; }
 
         .pb-empty {
             text-align: center; padding: 4rem 2rem; background: #fff;
