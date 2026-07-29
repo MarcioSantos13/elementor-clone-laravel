@@ -1363,6 +1363,7 @@ function setResponsiveTab(device) {
     const btn = document.querySelector(`.pb-resp-tab[data-device="${device}"]`);
     if (btn) btn.classList.add('active');
     if (state.cachedElementId) renderControls();
+    setResponsive(device);
 }
 
 let _globalSettings = { global_colors: [], global_fonts: [], system_fonts: [] };

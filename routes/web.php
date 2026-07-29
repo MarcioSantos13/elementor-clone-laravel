@@ -22,3 +22,10 @@ Route::post('/logout', [\App\Http\Controllers\Auth\AuthController::class, 'logou
 Route::middleware('auth')->get('/tutorial', function () {
     return view('tutorial');
 })->name('tutorial');
+
+Route::middleware('web')->get('/p/{slug}', function ($slug) {
+    $page = \App\Models\Page::where('slug', $slug)->where('status', 'published')->firstOrFail();
+    $themeService = app(\App\Services\PageBuilder\Theme\ThemeService::class);
+    $html = $themeService->renderPageWithTheme($page);
+    return response($html)->header('Content-Type', 'text/html');
+})->name('page.public');

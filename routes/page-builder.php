@@ -7,6 +7,7 @@ use App\Http\Controllers\PageBuilder\RevisionController;
 use App\Http\Controllers\PageBuilder\FormController;
 use App\Http\Controllers\PageBuilder\HtmlImportController;
 use App\Http\Controllers\PageBuilder\CollaborationController;
+use App\Http\Controllers\PageBuilder\ThemeTemplateController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::resource('pages', PageController::class)->except(['show', 'edit']);
@@ -61,4 +62,18 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::get('pages/{page}/collab/users', [CollaborationController::class, 'activeUsers'])->name('collab.users');
     Route::post('pages/{page}/elements/{elementId}/lock', [CollaborationController::class, 'lockElement'])->name('collab.lock');
     Route::post('pages/{page}/elements/{elementId}/unlock', [CollaborationController::class, 'unlockElement'])->name('collab.unlock');
+
+    Route::get('themes', [ThemeTemplateController::class, 'index'])->name('themes.index');
+    Route::get('themes/create', [ThemeTemplateController::class, 'create'])->name('themes.create');
+    Route::post('themes', [ThemeTemplateController::class, 'store'])->name('themes.store');
+    Route::get('themes/{theme_template}/edit', [ThemeTemplateController::class, 'edit'])->name('themes.edit');
+    Route::put('themes/{theme_template}', [ThemeTemplateController::class, 'update'])->name('themes.update');
+    Route::delete('themes/{theme_template}', [ThemeTemplateController::class, 'destroy'])->name('themes.destroy');
+    Route::get('themes/{theme_template}/editor', [ThemeTemplateController::class, 'editor'])->name('themes.editor');
+    Route::get('themes/{theme_template}/render', [ThemeTemplateController::class, 'render'])->name('themes.render');
+    Route::get('themes/{theme_template}/conditions', [ThemeTemplateController::class, 'editConditions'])->name('themes.conditions');
+    Route::get('themes/{theme_template}/conditions-data', [ThemeTemplateController::class, 'getConditions'])->name('themes.conditions.data');
+    Route::put('themes/{theme_template}/conditions', [ThemeTemplateController::class, 'updateConditions'])->name('themes.conditions.update');
+    Route::post('themes/{theme_template}/publish', [ThemeTemplateController::class, 'publish'])->name('themes.publish');
+    Route::post('themes/{theme_template}/unpublish', [ThemeTemplateController::class, 'unpublish'])->name('themes.unpublish');
 });

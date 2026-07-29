@@ -57,4 +57,10 @@ return [
             'desktop' => 1920,
         ],
     ],
+
+    'theme_builder' => [
+        'enabled' => env('PAGE_BUILDER_THEME_BUILDER', true),
+        'home_slug' => env('PAGE_BUILDER_HOME_SLUG', 'home'),
+        'cache_ttl' => env('PAGE_BUILDER_THEME_CACHE_TTL', 300),
+    ],
 ];
