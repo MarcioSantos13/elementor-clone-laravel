@@ -32,6 +32,8 @@
         <a href="{{ route('page-builder.render', $page) }}?t={{ time() }}" target="_blank" class="tb-link">&#128065; <span style="font-size:.65rem;opacity:.6">Visualizar</span></a>
     @endif
     <span class="tb-divider"></span>
+    <button onclick="editor.openFindReplace()" title="Find &amp; Replace">&#128269; <span style="font-size:.65rem;opacity:.6">Find</span></button>
+    <span class="tb-divider"></span>
     <button onclick="editor.exportPage()" title="Exportar como JSON">&#128229;</button>
     <button onclick="editor.saveAsTemplate()" title="Salvar como Template">&#128203; <span style="font-size:.65rem;opacity:.6">Template</span></button>
     <button onclick="editor.copyHtml()" title="Copiar HTML da página">&#128203;</button>

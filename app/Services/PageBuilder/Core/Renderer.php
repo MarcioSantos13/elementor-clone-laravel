@@ -4,6 +4,7 @@ namespace App\Services\PageBuilder\Core;
 
 use App\Models\Page;
 use App\Models\Element;
+use App\Services\PageBuilder\DynamicTags\DynamicTagService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -11,11 +12,13 @@ use Illuminate\Support\Str;
 class Renderer
 {
     protected WidgetManager $widgetManager;
+    protected DynamicTagService $dynamicTagService;
     protected string $theme = 'default';
 
-    public function __construct(WidgetManager $widgetManager)
+    public function __construct(WidgetManager $widgetManager, ?DynamicTagService $dynamicTagService = null)
     {
         $this->widgetManager = $widgetManager;
+        $this->dynamicTagService = $dynamicTagService ?? app(DynamicTagService::class);
     }
 
     public function render(Page $page, array $options = []): string
@@ -104,6 +107,11 @@ HTML;
             $element->styles ?? []
         );
 
+        $innerHtml = $this->dynamicTagService->processTags($innerHtml, [
+            'page' => $element->page ?? null,
+            'user' => $element->page?->user ?? null,
+        ]);
+
         $innerHtml = $this->processEmbeds($innerHtml);
 
         $attributes = $this->buildAttributes($element);
@@ -181,6 +189,11 @@ HTML;
             array_merge($element->content ?? [], ['children' => $childrenHtml]),
             $element->styles ?? []
         );
+
+        $innerHtml = $this->dynamicTagService->processTags($innerHtml, [
+            'page' => $element->page ?? null,
+            'user' => $element->page?->user ?? null,
+        ]);
 
         $innerHtml = $this->processEmbeds($innerHtml);
 
@@ -389,6 +402,8 @@ HTML;
             $css .= "\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css\">\n";
         }
 
+        $css .= "\n<style>.pb-popup-content { animation: popupFadeIn .3s ease; }\n@keyframes popupFadeIn { from { opacity: 0; transform: scale(.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }\n.pb-popup-overlay { transition: opacity .2s; }\n</style>\n";
+
         return $css;
     }
 
@@ -408,6 +423,8 @@ HTML;
             $scripts .= "\n<script src=\"https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js\"></script>\n";
             $scripts .= "\n<script>\ndocument.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('.pb-math').forEach(function(el){try{katex.render(el.getAttribute('data-formula'),el,{displayMode:el.getAttribute('data-display')==='true',throwOnError:false})}catch(e){el.textContent=el.getAttribute('data-formula')}})})\n</script>\n";
         }
+
+        $scripts .= "\n<script>\nclass PopupManager{constructor(){this.openPopups=[];this.init()}init(){document.querySelectorAll('.pb-popup-overlay').forEach(p=>{this.setupPopup(p)})}setupPopup(p){const t=JSON.parse(p.dataset.triggers||'[]'),c=p.querySelector('.pb-popup-close');c&&(c.onclick=()=>this.close(p));p.onclick=e=>{e.target===p&&this.close(p)};t.forEach(r=>{switch(r.type){case 'on_load':document.addEventListener('DOMContentLoaded',()=>this.open(p));break;case 'on_timer':setTimeout(()=>this.open(p),(r.value||3)*1e3);break;case 'on_scroll':window.addEventListener('scroll',()=>{if(!p._triggered){const s=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;s>=(parseFloat(r.value)||50)&&(p._triggered=!0,this.open(p))}});break;case 'on_exit':document.addEventListener('mouseleave',e=>{e.clientY<=0&&!p._triggered&&(p._triggered=!0,this.open(p))});break;case 'on_click':r.value&&document.querySelectorAll(r.value).forEach(el=>{el.addEventListener('click',()=>this.open(p))})}})}open(p){this.openPopups.length>0||(p.style.display='flex',this.openPopups.push(p),document.body.style.overflow='hidden')}close(p){p.style.display='none',this.openPopups=this.openPopups.filter(o=>o!==p),0===this.openPopups.length&&(document.body.style.overflow='')}}document.addEventListener('DOMContentLoaded',()=>{window._popupManager=new PopupManager()});\n</script>\n";
 
         return $scripts;
     }

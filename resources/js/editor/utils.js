@@ -41,6 +41,6 @@ export function toastSuccess(msg) {
 }
 
 export function structureIcon(type) {
-    const icons = { section: '&#9638;', column: '&#9646;', heading: 'H', text: 'T', image: '&#128247;', button: '&#128206;', callout: '&#9888;', table: '&#9638;', math: '&Sigma;' };
+    const icons = { section: '&#9638;', column: '&#9646;', heading: 'H', text: 'T', image: '&#128247;', button: '&#128206;', callout: '&#9888;', table: '&#9638;', math: '&Sigma;', mega_menu: '&#9776;', lottie: '&#127916;' };
     return icons[type] || '&#9679;';
 }

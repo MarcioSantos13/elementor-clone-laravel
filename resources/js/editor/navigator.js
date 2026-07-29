@@ -283,6 +283,9 @@ export function _showCanvasContext(state, x, y, elId) {
         { label: '\uD83C\uDFA8 Copiar Estilos', action: () => { state.onSelectElement(elId); setTimeout(() => { state._styleClipboard = JSON.parse(JSON.stringify(state.cachedStyles || {})); state.showToast('Estilos copiados!', 'success'); }, 100); } },
         { label: '\uD83C\uDFA8 Colar Estilos', action: () => { state.onSelectElement(elId); setTimeout(() => { if (!state._styleClipboard) { state.showToast('Nenhum estilo copiado', 'error'); return; } const styles = state._styleClipboard; let applied = 0; const keys = Object.keys(styles); const applyNext = (idx) => { if (idx >= keys.length) { if (applied > 0) { state.showToast(`${applied} estilo(s) aplicado(s)!`, 'success'); state.loadElements(); setTimeout(() => state.onSelectElement(elId), 200); } return; } const k = keys[idx]; const v = styles[k]; if (v !== undefined && v !== '' && v !== null) { applied++; fetch(`/page-builder/elements/${elId}/styles`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf }, body: JSON.stringify({ styles: { [k]: v } }) }).then(() => applyNext(idx + 1)).catch(() => applyNext(idx + 1)); } else { applyNext(idx + 1); } }; applyNext(0); }, 100); } },
         { sep: true },
+        { label: '\uD83C\uDF10 Salvar como Global Widget', action: () => { state.onSelectElement(elId); setTimeout(() => { if (typeof saveAsGlobalWidget === 'function') saveAsGlobalWidget(); else if (window.editor && window.editor.saveAsGlobalWidget) window.editor.saveAsGlobalWidget(); }, 50); } },
+        { label: '\uD83D\uDD04 Sincronizar Global Widget', action: () => { if (typeof syncGlobalWidgets === 'function') syncGlobalWidgets(); else if (window.editor && window.editor.syncGlobalWidgets) window.editor.syncGlobalWidgets(); } },
+        { sep: true },
         { label: '\u2715 Excluir', cls: 'danger', action: () => state.deleteElement(elId) },
     ];
 

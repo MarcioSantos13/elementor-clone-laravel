@@ -8,6 +8,11 @@ use App\Http\Controllers\PageBuilder\FormController;
 use App\Http\Controllers\PageBuilder\HtmlImportController;
 use App\Http\Controllers\PageBuilder\CollaborationController;
 use App\Http\Controllers\PageBuilder\ThemeTemplateController;
+use App\Http\Controllers\PageBuilder\CustomFontController;
+use App\Http\Controllers\PageBuilder\DynamicTagController;
+use App\Http\Controllers\PageBuilder\FindReplaceController;
+use App\Http\Controllers\PageBuilder\GlobalWidgetController;
+use App\Http\Controllers\PageBuilder\PopupController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::resource('pages', PageController::class)->except(['show', 'edit']);
@@ -63,6 +68,17 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::post('pages/{page}/elements/{elementId}/lock', [CollaborationController::class, 'lockElement'])->name('collab.lock');
     Route::post('pages/{page}/elements/{elementId}/unlock', [CollaborationController::class, 'unlockElement'])->name('collab.unlock');
 
+    Route::get('dynamic-tags', [DynamicTagController::class, 'index'])->name('dynamic-tags');
+
+    Route::post('find-replace/search', [FindReplaceController::class, 'search'])->name('find.search');
+    Route::post('find-replace/replace', [FindReplaceController::class, 'replace'])->name('find.replace');
+
+    Route::get('fonts', [CustomFontController::class, 'index'])->name('fonts.index');
+    Route::post('fonts', [CustomFontController::class, 'store'])->name('fonts.store');
+    Route::put('fonts/{custom_font}', [CustomFontController::class, 'update'])->name('fonts.update');
+    Route::delete('fonts/{custom_font}', [CustomFontController::class, 'destroy'])->name('fonts.destroy');
+    Route::get('fonts/{custom_font}/download/{format}', [CustomFontController::class, 'download'])->name('fonts.download');
+
     Route::get('themes', [ThemeTemplateController::class, 'index'])->name('themes.index');
     Route::get('themes/create', [ThemeTemplateController::class, 'create'])->name('themes.create');
     Route::post('themes', [ThemeTemplateController::class, 'store'])->name('themes.store');
@@ -76,4 +92,21 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::put('themes/{theme_template}/conditions', [ThemeTemplateController::class, 'updateConditions'])->name('themes.conditions.update');
     Route::post('themes/{theme_template}/publish', [ThemeTemplateController::class, 'publish'])->name('themes.publish');
     Route::post('themes/{theme_template}/unpublish', [ThemeTemplateController::class, 'unpublish'])->name('themes.unpublish');
+
+    Route::get('global-widgets', [GlobalWidgetController::class, 'index'])->name('global-widgets.index');
+    Route::post('global-widgets', [GlobalWidgetController::class, 'store'])->name('global-widgets.store');
+    Route::get('global-widgets/{global_widget}', [GlobalWidgetController::class, 'show'])->name('global-widgets.show');
+    Route::put('global-widgets/{global_widget}', [GlobalWidgetController::class, 'update'])->name('global-widgets.update');
+    Route::delete('global-widgets/{global_widget}', [GlobalWidgetController::class, 'destroy'])->name('global-widgets.destroy');
+    Route::get('global-widgets/{global_widget}/render', [GlobalWidgetController::class, 'render'])->name('global-widgets.render');
+
+    Route::resource('popups', PopupController::class)->except(['show']);
+    Route::get('popups/{popup}/editor', [PopupController::class, 'editor'])->name('popups.editor');
+    Route::get('popups/{popup}/render', [PopupController::class, 'render'])->name('popups.render');
+    Route::get('popups/{popup}/triggers', [PopupController::class, 'getTriggers'])->name('popups.triggers');
+    Route::put('popups/{popup}/triggers', [PopupController::class, 'updateTriggers'])->name('popups.triggers.update');
+    Route::get('popups/{popup}/conditions', [PopupController::class, 'getConditions'])->name('popups.conditions');
+    Route::put('popups/{popup}/conditions', [PopupController::class, 'updateConditions'])->name('popups.conditions.update');
+    Route::post('popups/{popup}/publish', [PopupController::class, 'publish'])->name('popups.publish');
+    Route::post('popups/{popup}/unpublish', [PopupController::class, 'unpublish'])->name('popups.unpublish');
 });

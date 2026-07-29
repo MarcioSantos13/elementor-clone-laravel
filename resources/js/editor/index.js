@@ -6,6 +6,18 @@ import { bindDragDrop, refreshSortables, initContainerSortables, _saveElementOrd
 import { openHtmlImportModal } from './html-import.js';
 import { toggleNavigator, renderNavigator as renderNav, _showNavContext, _hideNavContext, _showCanvasContext, _hideCanvasContext, _navMoveElement, _navMoveRelative, _navPasteAfter, _startNavRename } from './navigator.js';
 
+function getRecentColors() {
+    try { return JSON.parse(localStorage.getItem('pb_recent_colors') || '[]'); } catch { return []; }
+}
+function addRecentColor(color) {
+    if (!color || color === '#000000' || color === '#ffffff') return;
+    let recent = getRecentColors();
+    recent = recent.filter(c => c !== color);
+    recent.unshift(color);
+    if (recent.length > 12) recent = recent.slice(0, 12);
+    try { localStorage.setItem('pb_recent_colors', JSON.stringify(recent)); } catch {}
+}
+
 function renderStructureWithSelect(elements, parentUl) {
     const ul = parentUl || document.getElementById('structure-tree');
     if (!parentUl) ul.innerHTML = '';
@@ -81,6 +93,7 @@ const editor = {
     deleteSelected() { if (state.selectedId) deleteElement(state.selectedId); },
     showPageSettings() { showPageSettings(); },
     hidePageSettings() { hidePageSettings(); },
+    openFindReplace() { openFindReplace(); },
     exportPage() { window.open('/page-builder/pages/' + state.pageId + '/export', '_blank'); },
     saveAsTemplate() { saveAsTemplate(); },
     copyHtml() { copyHtml(); },
@@ -91,6 +104,9 @@ const editor = {
     showSiteSettings() { showSiteSettings(); },
     hideSiteSettings() { hideSiteSettings(); },
     showRevisionHistory() { showRevisionHistory(); },
+    saveAsGlobalWidget() { saveAsGlobalWidget(); },
+    insertGlobalWidget() { insertGlobalWidget(); },
+    syncGlobalWidgets() { syncGlobalWidgets(); },
 };
 
 function selectElement(id, ctrlKey) {
@@ -220,14 +236,35 @@ function renderControls() {
             const isResponsive = device !== 'desktop' && RESPONSIVE_KEYS.includes(key);
             if (isResponsive) {
                 control.style.position = 'relative';
-                const dot = document.createElement('span');
-                dot.style.cssText = 'position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#6366f1;';
-                dot.title = `Value for ${device}`;
-                control.appendChild(dot);
+                const badge = document.createElement('span');
+                const deviceIcons = { tablet: '\uD83D\uDCF1', mobile: '\uD83D\uDCF2' };
+                badge.innerHTML = deviceIcons[device] || '\uD83D\uDCBB';
+                badge.style.cssText = 'position:absolute;top:3px;right:3px;font-size:10px;opacity:.7;z-index:1';
+                badge.title = 'Valor para ' + device;
+                control.appendChild(badge);
+            }
+            if (RESPONSIVE_KEYS.includes(key)) {
+                const devRow = document.createElement('div');
+                devRow.style.cssText = 'display:flex;gap:2px;margin-bottom:2px';
+                ['desktop', 'tablet', 'mobile'].forEach(dev => {
+                    const devBtn = document.createElement('button');
+                    const icons = { desktop: '\uD83D\uDCBB', tablet: '\uD83D\uDCF1', mobile: '\uD83D\uDCF2' };
+                    devBtn.innerHTML = icons[dev] || '';
+                    devBtn.type = 'button';
+                    devBtn.title = 'Valor para ' + dev;
+                    devBtn.style.cssText = 'padding:1px 4px;font-size:9px;border:1px solid var(--pb-border);border-radius:3px;background:' + (dev === device ? 'var(--pb-accent)' : 'transparent') + ';color:' + (dev === device ? '#fff' : 'var(--pb-text2)') + ';cursor:pointer;opacity:.7';
+                    devBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setResponsiveTab(dev);
+                    };
+                    devRow.appendChild(devBtn);
+                });
+                control.appendChild(devRow);
             }
             const label = document.createElement('label');
             label.textContent = ctrl.label || key;
-            label.htmlFor = `ctrl-${key}`;
+            label.htmlFor = 'ctrl-' + key;
             control.appendChild(label);
             control.appendChild(createInput(key, ctrl, val, elementId));
             secDiv.appendChild(control);
@@ -271,6 +308,113 @@ function _debouncedStyle(key, elementId, fn) {
     state._timers[id] = setTimeout(fn, 300);
 }
 
+function _colorInput(key, value, saveFn, elementId) {
+    const container = document.createElement('div');
+    container.style.cssText = 'display:flex;flex-direction:column;gap:.35rem';
+
+    const row1 = document.createElement('div');
+    row1.style.cssText = 'display:flex;gap:.35rem;align-items:center';
+
+    const swatch = document.createElement('div');
+    swatch.style.cssText = 'width:32px;height:32px;border-radius:6px;border:2px solid var(--pb-border);cursor:pointer;background:' + (value || '#000000') + ';flex-shrink:0';
+
+    const inp = document.createElement('input');
+    inp.type = 'color'; inp.id = 'ctrl-' + key; inp.value = value || '#000000';
+    inp.style.cssText = 'width:0;height:0;padding:0;border:none;opacity:0;position:absolute;pointer-events:none';
+
+    const txt = document.createElement('input');
+    txt.type = 'text'; txt.value = value || '#000000';
+    txt.placeholder = '#000000';
+    txt.dataset.fk = key;
+    txt.style.cssText = 'flex:1;padding:.4rem .55rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:.78rem;font-family:monospace';
+
+    const update = (v) => {
+        const color = v || '#000000';
+        inp.value = color;
+        txt.value = color;
+        swatch.style.background = color;
+        saveFn(key, color);
+        addRecentColor(color);
+    };
+
+    swatch.onclick = () => inp.click();
+    inp.oninput = (e) => {
+        update(e.target.value);
+    };
+    txt.oninput = (e) => {
+        if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) update(e.target.value);
+        else swatch.style.background = e.target.value;
+    };
+
+    row1.appendChild(swatch);
+    row1.appendChild(inp);
+    row1.appendChild(txt);
+    container.appendChild(row1);
+
+    const globalColors = (_globalSettings && _globalSettings.global_colors) || [];
+    const recentColors = getRecentColors();
+
+    if (globalColors.length > 0 || recentColors.length > 0) {
+        const paletteDiv = document.createElement('div');
+        paletteDiv.style.cssText = 'display:flex;flex-direction:column;gap:.25rem';
+
+        if (globalColors.length > 0) {
+            const glLabel = document.createElement('div');
+            glLabel.textContent = 'Global Colors';
+            glLabel.style.cssText = 'font-size:.65rem;font-weight:600;color:var(--pb-accent);text-transform:uppercase;letter-spacing:.5px';
+            paletteDiv.appendChild(glLabel);
+
+            const glGrid = document.createElement('div');
+            glGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px';
+            globalColors.forEach(c => {
+                const colorVal = c.value || c.color || '#6366f1';
+                const colorName = c.name || c.label || '';
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.style.cssText = 'width:22px;height:22px;border-radius:4px;border:2px solid transparent;background:' + colorVal + ';cursor:pointer;transition:all .15s';
+                dot.title = colorName + ' (' + colorVal + ')';
+                dot.onmouseenter = () => { dot.style.borderColor = 'var(--pb-accent)'; dot.style.transform = 'scale(1.15)'; };
+                dot.onmouseleave = () => { dot.style.borderColor = 'transparent'; dot.style.transform = 'scale(1)'; };
+                dot.onclick = () => update(colorVal);
+                glGrid.appendChild(dot);
+            });
+            paletteDiv.appendChild(glGrid);
+        }
+
+        if (recentColors.length > 0) {
+            const rcLabel = document.createElement('div');
+            rcLabel.textContent = 'Recent';
+            rcLabel.style.cssText = 'font-size:.65rem;font-weight:600;color:var(--pb-text2);text-transform:uppercase;letter-spacing:.5px;margin-top:.2rem';
+            paletteDiv.appendChild(rcLabel);
+
+            const rcGrid = document.createElement('div');
+            rcGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px';
+            recentColors.forEach(c => {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.style.cssText = 'width:18px;height:18px;border-radius:3px;border:1px solid var(--pb-border);background:' + c + ';cursor:pointer;transition:all .15s';
+                dot.title = c;
+                dot.onmouseenter = () => { dot.style.borderColor = 'var(--pb-accent)'; dot.style.transform = 'scale(1.15)'; };
+                dot.onmouseleave = () => { dot.style.borderColor = 'var(--pb-border)'; dot.style.transform = 'scale(1)'; };
+                dot.onclick = () => update(c);
+                rcGrid.appendChild(dot);
+            });
+            paletteDiv.appendChild(rcGrid);
+        }
+
+        container.appendChild(paletteDiv);
+    }
+
+    const clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.textContent = 'Clear';
+    clearBtn.style.cssText = 'padding:.2rem .5rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-text2);cursor:pointer;font-size:.7rem;align-self:flex-start;margin-top:.15rem';
+    clearBtn.onclick = () => update('');
+    container.appendChild(clearBtn);
+
+    return container;
+}
+
 function createInput(key, ctrl, value, elementId) {
     const isStyle = ctrl.tab === 'style';
     const saveFn = (k, v) => isStyle ? updateStyle(k, v, elementId) : updateSetting(k, v, elementId);
@@ -278,11 +422,21 @@ function createInput(key, ctrl, value, elementId) {
 
     const types = {
         text: () => {
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'display:flex;gap:.25rem;align-items:stretch';
             const inp = document.createElement('input');
             inp.type = 'text'; inp.id = `ctrl-${key}`; inp.value = value || '';
             inp.spellcheck = false;
+            inp.style.cssText = 'flex:1;min-width:0';
             inp.oninput = (e) => debouncedSave(key, () => saveFn(key, e.target.value));
-            return inp;
+            wrap.appendChild(inp);
+            const tagBtn = document.createElement('button');
+            tagBtn.type = 'button'; tagBtn.textContent = '{}';
+            tagBtn.title = 'Inserir Tag Dinâmica';
+            tagBtn.style.cssText = 'padding:0 6px;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:4px;color:var(--pb-accent);cursor:pointer;font-size:10px;font-weight:700;font-family:monospace';
+            tagBtn.onclick = (e) => { e.preventDefault(); showTagPicker(e.target.getBoundingClientRect().left, e.target.getBoundingClientRect().bottom, inp); };
+            wrap.appendChild(tagBtn);
+            return wrap;
         },
         number: () => {
             const inp = document.createElement('input');
@@ -311,22 +465,7 @@ function createInput(key, ctrl, value, elementId) {
             sel.onchange = (e) => saveFn(key, e.target.value);
             return sel;
         },
-        color: () => {
-            const container = document.createElement('div');
-            container.style.cssText = 'display:flex;gap:.5rem;align-items:center';
-            const inp = document.createElement('input');
-            inp.type = 'color'; inp.id = `ctrl-${key}`; inp.value = value || '#000000';
-            const txt = document.createElement('input');
-            txt.type = 'text'; txt.value = value || '#000000';
-            txt.placeholder = '#000000';
-            txt.style.cssText = 'flex:1';
-            const update = (v) => { inp.value = v; txt.value = v; saveFn(key, v); };
-            inp.oninput = (e) => debouncedSave(key, () => update(e.target.value));
-            txt.oninput = (e) => { if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) debouncedSave(key, () => update(e.target.value)); };
-            container.appendChild(inp);
-            container.appendChild(txt);
-            return container;
-        },
+        color: () => _colorInput(key, value, saveFn, elementId),
         boolean: () => {
             const container = document.createElement('div');
             container.style.cssText = 'display:flex;align-items:center;gap:.5rem';
@@ -468,6 +607,140 @@ function createVideoInput(key, value, saveFn, elementId) {
     return container;
 }
 
+function showTagPicker(x, y, inputEl) {
+    const existing = document.getElementById('pb-tag-picker');
+    if (existing) existing.remove();
+
+    const picker = document.createElement('div');
+    picker.id = 'pb-tag-picker';
+    picker.style.cssText = `position:fixed;top:${y}px;left:${x}px;z-index:9999;background:var(--pb-surface);border:1px solid var(--pb-border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:.5rem;min-width:240px;max-height:320px;overflow-y:auto`;
+
+    fetch('/page-builder/dynamic-tags')
+        .then(r => r.json())
+        .then(data => {
+            const groups = data.groups || {};
+            let html = '<div style="font-size:.7rem;font-weight:600;color:var(--pb-text2);padding:.25rem .5rem .5rem;border-bottom:1px solid var(--pb-border);margin-bottom:.25rem">Dynamic Tags</div>';
+            for (const [key, group] of Object.entries(groups)) {
+                html += `<div style="font-size:.65rem;font-weight:600;color:var(--pb-accent);padding:.35rem .5rem .15rem">${group.label}</div>`;
+                group.tags.forEach(t => {
+                    html += `<div class="pb-tag-item" data-tag="${t.tag}" style="padding:.35rem .5rem;border-radius:4px;cursor:pointer;font-size:.78rem;display:flex;justify-content:space-between;transition:background .1s" title="${t.description || ''}"><span>{{ ${t.tag} }}</span><span style="font-size:.65rem;color:var(--pb-text2)">${t.label}</span></div>`;
+                });
+            }
+            picker.innerHTML = html;
+            picker.querySelectorAll('.pb-tag-item').forEach(item => {
+                item.onmouseenter = () => item.style.background = 'var(--pb-surface2)';
+                item.onmouseleave = () => item.style.background = 'transparent';
+                item.onclick = () => {
+                    const tag = '{{ ' + item.dataset.tag + ' }}';
+                    if (inputEl) {
+                        inputEl.focus();
+                        if (inputEl.contentEditable === 'true') {
+                            document.execCommand('insertText', false, tag);
+                        } else {
+                            const start = inputEl.selectionStart;
+                            const end = inputEl.selectionEnd;
+                            const val = inputEl.value;
+                            inputEl.value = val.substring(0, start) + tag + val.substring(end);
+                            inputEl.selectionStart = inputEl.selectionEnd = start + tag.length;
+                            inputEl.dispatchEvent(new Event('input', {bubbles: true}));
+                        }
+                    }
+                    picker.remove();
+                };
+            });
+        })
+        .catch(() => { picker.innerHTML = '<div style="padding:.5rem;color:var(--pb-danger);font-size:.78rem">Failed to load tags</div>'; });
+
+    document.body.appendChild(picker);
+
+    document.addEventListener('click', function closePicker(e) {
+        if (!picker.contains(e.target)) {
+            picker.remove();
+            document.removeEventListener('click', closePicker);
+        }
+    });
+}
+
+function openFindReplace() {
+    const existing = document.getElementById('pb-find-replace-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'pb-find-replace-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+
+    modal.innerHTML = `
+        <div style="background:var(--pb-surface);border-radius:12px;width:90%;max-width:520px;box-shadow:0 16px 48px rgba(0,0,0,.2);max-height:80vh;display:flex;flex-direction:column">
+            <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--pb-border);display:flex;justify-content:space-between;align-items:center">
+                <h3 style="font-size:1rem;font-weight:600">Find & Replace</h3>
+                <button onclick="this.closest('#pb-find-replace-modal').remove()" style="background:none;border:none;color:var(--pb-text2);cursor:pointer;font-size:1.3rem">&times;</button>
+            </div>
+            <div style="padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;overflow-y:auto">
+                <div>
+                    <label style="font-size:.78rem;font-weight:500;color:var(--pb-text2);display:block;margin-bottom:.25rem">Find</label>
+                    <input type="text" id="fr-find" placeholder="Search text..." style="width:100%;padding:.5rem .65rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:.85rem;box-sizing:border-box">
+                </div>
+                <div>
+                    <label style="font-size:.78rem;font-weight:500;color:var(--pb-text2);display:block;margin-bottom:.25rem">Replace with</label>
+                    <input type="text" id="fr-replace" placeholder="Replacement text..." style="width:100%;padding:.5rem .65rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:.85rem;box-sizing:border-box">
+                </div>
+                <div style="display:flex;gap:.5rem">
+                    <button id="fr-search-btn" style="flex:1;padding:.55rem;background:var(--pb-accent);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:.82rem;font-weight:500">Search</button>
+                    <button id="fr-replace-btn" style="flex:1;padding:.55rem;background:#22c55e;border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:.82rem;font-weight:500">Replace All</button>
+                </div>
+                <div id="fr-results" style="font-size:.78rem;color:var(--pb-text2);max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:.25rem"></div>
+            </div>
+        </div>`;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('fr-search-btn').onclick = () => {
+        const q = document.getElementById('fr-find').value;
+        if (!q) return;
+        const results = document.getElementById('fr-results');
+        results.innerHTML = '<span style="color:var(--pb-text2)">Searching...</span>';
+        apiFetch('/page-builder/find-replace/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+            body: JSON.stringify({ query: q, page_id: state.pageId }),
+        }).then(data => {
+            if (data.elements && data.elements.length > 0) {
+                results.innerHTML = `<span style="color:var(--pb-text2);margin-bottom:.35rem">Found ${data.total} matches:</span>` +
+                    data.elements.map(e =>
+                        `<div style="padding:.35rem .5rem;background:var(--pb-surface2);border-radius:4px;font-size:.75rem;display:flex;justify-content:space-between">
+                            <span><strong>${e.page_title}</strong> › ${e.type}: ${e.name}</span>
+                            <span style="color:var(--pb-text2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.match || ''}</span>
+                        </div>`
+                    ).join('');
+            } else {
+                results.innerHTML = '<span style="color:var(--pb-text2)">No matches found</span>';
+            }
+        }).catch(err => {
+            results.innerHTML = `<span style="color:var(--pb-danger)">Error: ${err.message}</span>`;
+        });
+    };
+
+    document.getElementById('fr-replace-btn').onclick = () => {
+        const find = document.getElementById('fr-find').value;
+        const replace = document.getElementById('fr-replace').value;
+        if (!find) return;
+        if (!confirm(`Replace all occurrences of "${find}" with "${replace}"? This cannot be undone.`)) return;
+        const results = document.getElementById('fr-results');
+        results.innerHTML = '<span style="color:var(--pb-text2)">Replacing...</span>';
+        apiFetch('/page-builder/find-replace/replace', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+            body: JSON.stringify({ find, replace, page_id: state.pageId }),
+        }).then(data => {
+            results.innerHTML = `<span style="color:#22c55e">${data.message}</span>`;
+        }).catch(err => {
+            results.innerHTML = `<span style="color:var(--pb-danger)">Error: ${err.message}</span>`;
+        });
+    };
+
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+}
+
 function createWysiwygInput(key, value, saveFn, elementId) {
     const wrap = document.createElement('div');
     wrap.style.cssText = 'display:flex;flex-direction:column;border:1px solid var(--pb-border);border-radius:6px;overflow:hidden;background:var(--pb-bg)';
@@ -501,6 +774,19 @@ function createWysiwygInput(key, value, saveFn, elementId) {
     const sep2 = document.createElement('span'); sep2.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px'; toolbar.appendChild(sep2);
     toolbar.appendChild(makeBtn('&#8226;', 'Lista', 'insertUnorderedList'));
     toolbar.appendChild(makeBtn('1.', 'Lista Numerada', 'insertOrderedList'));
+
+    const sep3 = document.createElement('span'); sep3.style.cssText = 'width:1px;background:var(--pb-border);margin:2px 4px'; toolbar.appendChild(sep3);
+    const tagBtn = document.createElement('button');
+    tagBtn.type = 'button'; tagBtn.innerHTML = '{}'; tagBtn.title = 'Inserir Tag Dinâmica';
+    tagBtn.style.cssText = 'width:28px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--pb-accent);cursor:pointer;font-size:11px;font-weight:700';
+    tagBtn.onmouseenter = () => { tagBtn.style.background = 'var(--pb-border)'; };
+    tagBtn.onmouseleave = () => { tagBtn.style.background = 'transparent'; };
+    tagBtn.onclick = (e) => {
+        e.preventDefault();
+        const rect = tagBtn.getBoundingClientRect();
+        showTagPicker(rect.left, rect.bottom, content);
+    };
+    toolbar.appendChild(tagBtn);
 
     const debounceSave = (() => { let timer; return (html) => { clearTimeout(timer); timer = setTimeout(() => saveFn(key, html), 300); }; })();
     content.oninput = () => { debounceSave(content.innerHTML); };
@@ -680,10 +966,12 @@ function createTypographyInput(key, value, elementId) {
             });
             sel.onchange = () => updateStyle(fk, sel.value, elementId);
             row.appendChild(sel);
+        } else if (type === 'color') {
+            const colorSave = (k, v) => updateStyle(k, v, elementId);
+            row.appendChild(_colorInput(fk, value || '', colorSave, elementId));
         } else {
             const inp = document.createElement('input');
             inp.type = type; inp.value = value || '';
-            if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
             inp.oninput = () => _debouncedStyle(fk, elementId, () => updateStyle(fk, inp.value, elementId));
             row.appendChild(inp);
         }
@@ -717,10 +1005,12 @@ function createBackgroundInput(key, value, elementId) {
             });
             sel.onchange = () => updateStyle(fk, sel.value, elementId);
             row.appendChild(sel);
+        } else if (type === 'color') {
+            const colorSave = (k, v) => updateStyle(k, v, elementId);
+            row.appendChild(_colorInput(fk, value || '', colorSave, elementId));
         } else {
             const inp = document.createElement('input');
             inp.type = type; inp.value = value || '';
-            if (fk === 'backgroundColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
             inp.oninput = () => _debouncedStyle(fk, elementId, () => updateStyle(fk, inp.value, elementId));
             row.appendChild(inp);
         }
@@ -754,10 +1044,12 @@ function createBorderInput(key, value, elementId) {
             });
             sel.onchange = () => updateStyle(fk, sel.value, elementId);
             row.appendChild(sel);
+        } else if (type === 'color') {
+            const colorSave = (k, v) => updateStyle(k, v, elementId);
+            row.appendChild(_colorInput(fk, value || def || '', colorSave, elementId));
         } else {
             const inp = document.createElement('input');
             inp.type = type; inp.value = value || def || '';
-            if (fk === 'borderColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
             inp.oninput = () => _debouncedStyle(fk, elementId, () => updateStyle(fk, inp.value, elementId));
             row.appendChild(inp);
         }
@@ -790,12 +1082,20 @@ function createBoxShadowInput(key, value, elementId) {
         const lbl = document.createElement('label');
         lbl.textContent = label;
         row.appendChild(lbl);
-        const inp = document.createElement('input');
-        inp.type = type; inp.value = value || def || '';
-        inp.dataset.fk = fk;
-        if (fk === 'shadowColor') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
-        inp.oninput = () => _debouncedStyle('boxShadow', elementId, () => updateStyle('boxShadow', readAll(), elementId));
-        row.appendChild(inp);
+        if (type === 'color') {
+            const colorSave = (k, v) => {
+                const inp = c.querySelector('[data-fk="' + fk + '"]');
+                if (inp) inp.value = v;
+                _debouncedStyle('boxShadow', elementId, () => updateStyle('boxShadow', readAll(), elementId));
+            };
+            row.appendChild(_colorInput(fk, value || def || '', colorSave, elementId));
+        } else {
+            const inp = document.createElement('input');
+            inp.type = type; inp.value = value || def || '';
+            inp.dataset.fk = fk;
+            inp.oninput = () => _debouncedStyle('boxShadow', elementId, () => updateStyle('boxShadow', readAll(), elementId));
+            row.appendChild(inp);
+        }
         c.appendChild(row);
     });
     return c;
@@ -887,10 +1187,12 @@ function createHoverInput(key, value, elementId) {
             });
             sel.onchange = () => updateStyle(fk, sel.value, elementId);
             row.appendChild(sel);
+        } else if (type === 'color') {
+            const colorSave = (k, v) => updateStyle(k, v, elementId);
+            row.appendChild(_colorInput(fk, value || '', colorSave, elementId));
         } else {
             const inp = document.createElement('input');
             inp.type = type; inp.value = value || '';
-            if (type === 'color') inp.style.cssText = 'height:32px;padding:2px;cursor:pointer';
             inp.oninput = () => _debouncedStyle(fk, elementId, () => updateStyle(fk, inp.value, elementId));
             row.appendChild(inp);
         }
@@ -1928,6 +2230,143 @@ function saveAsTemplate() {
             reader.readAsText(blob);
         })
         .catch(() => showToast('Erro ao exportar template', 'error'));
+}
+
+function saveAsGlobalWidget() {
+    const id = state.selectedId;
+    if (!id) { showToast('Selecione um elemento primeiro', 'error'); return; }
+    const name = prompt('Nome do Global Widget:');
+    if (!name) return;
+    apiFetch('/page-builder/elements/' + id)
+        .then(r => r.json())
+        .then(data => {
+            const el = data.element;
+            return apiFetch('/page-builder/global-widgets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+                body: JSON.stringify({
+                    title: name,
+                    type: el.type,
+                    settings: el.settings || {},
+                    content: el.content || {},
+                    styles: el.styles || {},
+                }),
+            });
+        })
+        .then(data => {
+            showToast('Global widget "' + data.global_widget.title + '" criado!', 'success');
+        })
+        .catch(err => { console.error(err); showToast('Erro ao criar global widget', 'error'); });
+}
+
+function insertGlobalWidget() {
+    apiFetch('/page-builder/global-widgets')
+        .then(r => r.json())
+        .then(data => {
+            const widgets = data.global_widgets || [];
+            if (widgets.length === 0) {
+                showToast('Nenhum global widget disponivel', 'error');
+                return;
+            }
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Inserir Global Widget</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body" style="max-height:400px;overflow-y:auto">
+                        ${widgets.map(w => `
+                            <div class="gw-item" data-id="${w.id}" style="padding:.75rem;border:1px solid var(--pb-border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:.75rem" onmouseenter="this.style.background='var(--pb-surface2)'" onmouseleave="this.style.background=''" onclick="this.closest('.modal-overlay').remove(); window._insertGlobalWidget(${w.id}, '${w.type}', ${JSON.stringify(w.settings || {})}, ${JSON.stringify(w.content || {})}, ${JSON.stringify(w.styles || {})})">
+                                <span style="font-size:1.2rem">🔧</span>
+                                <div>
+                                    <div style="font-weight:600;font-size:.85rem;color:var(--pb-text)">${escHtml(w.title)}</div>
+                                    <div style="font-size:.72rem;color:var(--pb-text2)">${w.type} ${w.status === 'published' ? '✅' : '📝'}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        })
+        .catch(err => { console.error(err); showToast('Erro ao carregar global widgets', 'error'); });
+}
+
+window._insertGlobalWidget = function(id, type, settings, content, styles) {
+    const section = document.querySelector('.pb-el.selected') || document.querySelector('.pb-canvas .pb-el:first-child');
+    let parentId = null;
+    if (section && (section.dataset.elType === 'section' || section.dataset.elType === 'column')) {
+        parentId = parseInt(section.dataset.elId);
+    }
+    settings._global_widget_id = id;
+    apiFetch('/page-builder/pages/' + state.pageId + '/elements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+        body: JSON.stringify({
+            type: type,
+            parent_id: parentId,
+            settings: settings,
+            content: content,
+            styles: styles,
+            name: 'Global Widget',
+        }),
+    })
+    .then(() => {
+        state.loadElements();
+        showToast('Global widget inserido!', 'success');
+    })
+    .catch(() => showToast('Erro ao inserir global widget', 'error'));
+};
+
+function syncGlobalWidgets() {
+    const section = document.querySelector('.pb-canvas');
+    if (!section) return;
+    const elements = section.querySelectorAll('.pb-el[data-el-id]');
+    const ids = new Set();
+    elements.forEach(el => {
+        const elId = parseInt(el.dataset.elId);
+        if (elId && !isNaN(elId)) ids.add(elId);
+    });
+    const promises = [];
+    ids.forEach(elId => {
+        promises.push(
+            apiFetch('/page-builder/elements/' + elId)
+                .then(r => r.json())
+                .then(data => {
+                    const element = data.element;
+                    if (element && element.settings && element.settings._global_widget_id) {
+                        return apiFetch('/page-builder/global-widgets/' + element.settings._global_widget_id);
+                    }
+                    return null;
+                })
+                .then(gwData => {
+                    if (gwData && gwData.global_widget) {
+                        const gw = gwData.global_widget;
+                        return apiFetch('/page-builder/elements/' + elId + '/settings', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': state.csrf },
+                            body: JSON.stringify({
+                                settings: Object.assign({}, gw.settings || {}, { _global_widget_id: gw.id }),
+                                content: gw.content || {},
+                                styles: gw.styles || {},
+                            }),
+                        });
+                    }
+                    return null;
+                })
+                .catch(() => {})
+        );
+    });
+    if (promises.length > 0) {
+        Promise.all(promises).then(() => {
+            state.loadElements();
+            showToast('Global widgets sincronizados!', 'success');
+        });
+    } else {
+        showToast('Nenhum global widget para sincronizar', 'info');
+    }
 }
 
 function copyHtml() {

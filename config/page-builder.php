@@ -40,6 +40,8 @@ return [
         \App\Services\PageBuilder\Widgets\GoogleMapsWidget::class,
         \App\Services\PageBuilder\Widgets\CarouselWidget::class,
         \App\Services\PageBuilder\Widgets\InnerSectionWidget::class,
+        \App\Services\PageBuilder\Widgets\MegaMenuWidget::class,
+        \App\Services\PageBuilder\Widgets\LottieWidget::class,
     ],
 
     'upload' => [
@@ -56,6 +58,12 @@ return [
             'tablet' => 1024,
             'desktop' => 1920,
         ],
+    ],
+
+    'fonts' => [
+        'max_file_size' => env('PAGE_BUILDER_FONT_MAX_SIZE', 5120),
+        'allowed_types' => ['ttf', 'woff', 'woff2'],
+        'path' => 'page-builder/fonts',
     ],
 
     'theme_builder' => [

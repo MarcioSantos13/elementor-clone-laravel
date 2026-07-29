@@ -534,6 +534,30 @@ export function elementHtml(el) {
             }
             break;
         }
+        case 'mega_menu': {
+            const items = Array.isArray(s.menu_items) ? s.menu_items : [];
+            const dir = s.layout === 'vertical' ? 'column' : 'row';
+            let mhtml = `<div style="display:flex;flex-direction:${dir};gap:${s.item_spacing || 0}px;background:${s.background_color || '#fff'};padding:0">`;
+            if (items.length === 0) {
+                mhtml += '<div style="padding:8px 16px;color:#999;font-size:12px">No menu items</div>';
+            } else {
+                items.forEach(item => {
+                    const ic = item.icon ? `<i class="${item.icon}" style="margin-right:4px"></i>` : '';
+                    mhtml += `<a href="${item.link || '#'}" style="padding:${s.item_padding?.top||'12px'} ${s.item_padding?.right||'20px'} ${s.item_padding?.bottom||'12px'} ${s.item_padding?.left||'20px'};text-decoration:none;color:#333;font-size:13px;display:flex;align-items:center;gap:6px;border-radius:4px">${ic}${item.label || 'Menu Item'}</a>`;
+                });
+            }
+            mhtml += '</div>';
+            preview = mhtml;
+            break;
+        }
+        case 'lottie': {
+            if (s.lottie_url) {
+                preview = `<div style="display:flex;justify-content:${s.alignment||'center'};padding:8px 0"><lottie-player src="${escHtml(s.lottie_url)}" ${s.loop ? 'loop' : ''} ${s.autoplay ? 'autoplay' : ''} speed="${s.speed||1}" direction="${s.direction||1}" style="width:${s.width||300}px;height:${s.height||300}px;${s.background ? 'background:'+s.background+';' : ''}" renderer="${s.renderer||'svg'}"></lottie-player></div>`;
+            } else {
+                preview = '<div style="display:flex;justify-content:center;padding:2rem;color:#999;background:#f5f5f5;border-radius:8px">🎬 Lottie Animation</div>';
+            }
+            break;
+        }
         default: preview = `<div class="pb-el-placeholder">${el.type}</div>`;
     }
     return `<div class="pb-el-drag" draggable="true" title="Arrastar para reordenar">&#10023;</div><div class="pb-el-toolbar"><span class="pb-el-name">${escHtml(name)}</span><span class="pb-el-type">${el.type}</span><span style="flex:1"></span><button class="pb-el-action" onclick="event.stopPropagation();editor.duplicateElement(${el.id})" title="Duplicate">&#128203;</button><button class="pb-el-action" onclick="event.stopPropagation();editor.deleteElement(${el.id})" title="Delete">&#128465;</button></div><div class="pb-el-content">${preview}</div>`;

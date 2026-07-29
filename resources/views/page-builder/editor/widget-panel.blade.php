@@ -49,6 +49,8 @@
                     <div class="pb-widget-item" draggable="true" data-type="price_table" data-search="price table preço plano pricing"><span class="pb-widget-icon">&#128176;</span><span class="pb-widget-label">Price Table</span></div>
                     <div class="pb-widget-item" draggable="true" data-type="countdown" data-search="countdown contagem regressiva timer"><span class="pb-widget-icon">&#9201;</span><span class="pb-widget-label">Countdown</span></div>
                     <div class="pb-widget-item" draggable="true" data-type="google_maps" data-search="google maps mapa localização"><span class="pb-widget-icon">&#128205;</span><span class="pb-widget-label">Mapa</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="mega_menu" data-search="mega menu navegação navigation"><span class="pb-widget-icon">&#9776;</span><span class="pb-widget-label">Mega Menu</span></div>
+                    <div class="pb-widget-item" draggable="true" data-type="lottie" data-search="lottie animation animação"><span class="pb-widget-icon">&#127916;</span><span class="pb-widget-label">Lottie</span></div>
                 </div>
             </div>
             <div class="pb-widget-group" data-group="edu">
