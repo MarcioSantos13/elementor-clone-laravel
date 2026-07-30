@@ -110,20 +110,58 @@ class PageBuilderService
         }
     }
 
-    /**
-     * Renderizar pÃ¡gina
-     */
+    protected function cachePage(string $key, int $ttl, \Closure $callback, Page $page): mixed
+    {
+        try {
+            return Cache::tags("page:{$page->id}")->remember($key, $ttl, $callback);
+        } catch (\Throwable) {
+            return Cache::remember($key, $ttl, $callback);
+        }
+    }
+
     public function renderPage(Page $page, array $options = []): string
     {
-        $cacheKey = "page.{$page->id}.render." . md5(json_encode($options));
+        $cacheEnabled = $this->config['template_cache']['enabled'] ?? false;
 
-        if ($this->config['template_cache']['enabled'] ?? false) {
-            return Cache::remember($cacheKey, $this->config['template_cache']['ttl'] ?? 3600, function () use ($page, $options) {
-                return $this->renderer->render($page, $options);
-            });
+        if (!$cacheEnabled) {
+            return $this->renderer->render($page, $options);
         }
 
-        return $this->renderer->render($page, $options);
+        $timestamp = $page->updated_at?->timestamp ?? $page->created_at?->timestamp ?? time();
+        $cacheKey = "page.{$page->id}.v{$timestamp}." . md5(serialize($options)) . '.render';
+        $ttl = $this->config['template_cache']['ttl'] ?? 3600;
+
+        return $this->cachePage($cacheKey, $ttl, fn() => $this->renderer->render($page, $options), $page);
+    }
+
+    public function renderEditor(Page $page): string
+    {
+        $cacheEnabled = $this->config['template_cache']['enabled'] ?? false;
+
+        if (!$cacheEnabled) {
+            return $this->renderer->renderEditor($page);
+        }
+
+        $timestamp = $page->updated_at?->timestamp ?? $page->created_at?->timestamp ?? time();
+        $cacheKey = "page.{$page->id}.v{$timestamp}.editor";
+        $ttl = $this->config['template_cache']['ttl'] ?? 3600;
+
+        return $this->cachePage($cacheKey, $ttl, fn() => $this->renderer->renderEditor($page), $page);
+    }
+
+    public function renderJson(Page $page): array
+    {
+        $cacheEnabled = $this->config['template_cache']['enabled'] ?? false;
+
+        if (!$cacheEnabled) {
+            return $this->renderer->renderJson($page);
+        }
+
+        $timestamp = $page->updated_at?->timestamp ?? $page->created_at?->timestamp ?? time();
+        $cacheKey = "page.{$page->id}.v{$timestamp}.json";
+        $ttl = $this->config['template_cache']['ttl'] ?? 3600;
+
+        return $this->cachePage($cacheKey, $ttl, fn() => $this->renderer->renderJson($page), $page);
     }
 
     /**
@@ -429,19 +467,32 @@ class PageBuilderService
         return $string !== strip_tags($string);
     }
 
-    /**
-     * Limpar cache da pÃ¡gina
-     */
     protected function clearPageCache(Page $page): void
     {
-        \App\Jobs\ClearPageCacheJob::dispatch($page);
+        $page->touch();
+        try {
+            Cache::tags("page:{$page->id}")->flush();
+        } catch (\Throwable) {
+        }
     }
 
-    /**
-     * Exportar pÃ¡gina para JSON
-     */
+    protected function preloadElements(Page $page): void
+    {
+        $allElements = $page->allElements()->get()->keyBy('id');
+        $rootElements = $allElements->whereNull('parent_id')->sortBy('order')->values();
+
+        foreach ($allElements as $element) {
+            $children = $allElements->where('parent_id', $element->id)->sortBy('order')->values();
+            $element->setRelation('children', $children);
+        }
+
+        $page->setRelation('elements', $rootElements);
+    }
+
     public function exportPage(Page $page, array $options = []): array
     {
+        $this->preloadElements($page);
+
         return [
             'version' => '1.0.0',
             'title' => $page->title,

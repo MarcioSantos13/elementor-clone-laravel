@@ -277,7 +277,25 @@ class ElementController extends Controller
         ]);
 
         $file = $request->file('image');
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file->getPathname());
+        finfo_close($finfo);
+
+        $allowedImageMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($mimeType, $allowedImageMimes)) {
+            return response()->json(['error' => 'Tipo de arquivo inválido.'], 422);
+        }
+
+        $extension = match ($mimeType) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => throw new \RuntimeException('Tipo não suportado'),
+        };
+
+        $filename = Str::uuid() . '.' . $extension;
         $path = $file->storeAs('page-builder', $filename, 'public');
 
         if (!$path) {
@@ -299,7 +317,24 @@ class ElementController extends Controller
         ]);
 
         $file = $request->file('video');
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file->getPathname());
+        finfo_close($finfo);
+
+        $allowedVideoMimes = ['video/mp4', 'video/webm', 'video/ogg'];
+        if (!in_array($mimeType, $allowedVideoMimes)) {
+            return response()->json(['error' => 'Tipo de arquivo de vídeo inválido.'], 422);
+        }
+
+        $extension = match ($mimeType) {
+            'video/mp4' => 'mp4',
+            'video/webm' => 'webm',
+            'video/ogg' => 'ogg',
+            default => throw new \RuntimeException('Tipo não suportado'),
+        };
+
+        $filename = Str::uuid() . '.' . $extension;
         $path = $file->storeAs('page-builder/videos', $filename, 'public');
 
         if (!$path) {

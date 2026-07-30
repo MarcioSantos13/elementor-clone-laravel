@@ -250,6 +250,151 @@ class TemplateManager
                     ]],
                 ],
             ],
+            'showcase-completo' => [
+                'name' => 'Showcase Completo',
+                'description' => 'Template completo com todos os widgets: hero com vídeo, galeria, seções, colunas, formulário, accordion, contadores, depoimentos, mapa, CTA',
+                'settings' => ['container_width' => '1140px', 'page_background' => '#ffffff', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#0f172a', 'padding_top' => '100px', 'padding_bottom' => '100px', 'min_height' => '90vh', 'align_items' => 'center'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'vertical_alignment' => 'center', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Bem-vindo ao Page Builder', 'tag' => 'h1', 'size' => 'xxl', 'color' => '#ffffff', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '16px', 'letter_spacing' => '-1px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="font-size:1.25rem;color:#94a3b8;max-width:640px;margin:0 auto;">Crie páginas incríveis com nosso construtor visual. Arraste, solte e publique. Sem precisar escrever código.</p>', 'alignment' => 'center', 'font_size' => '20px', 'line_height' => '1.7', 'margin_bottom' => '32px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Comece Agora', 'link' => '#', 'background_color' => '#3b82f6', 'text_color' => '#ffffff', 'size' => 'large', 'alignment' => 'center', 'border_radius' => '50px', 'padding_left_right' => '40px', 'font_weight' => '600', 'box_shadow' => '0 4px 20px rgba(59,130,246,.4)']],
+                            ['type' => 'divider', 'settings' => ['width' => '80px', 'height' => '3px', 'color' => '#3b82f6', 'alignment' => 'center', 'margin_top' => '32px', 'margin_bottom' => '32px']],
+                            ['type' => 'video', 'settings' => ['video_type' => 'youtube', 'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'aspect_ratio' => '16:9', 'width' => '70%', 'border_radius' => '12px', 'box_shadow' => '0 20px 60px rgba(0,0,0,.3)', 'alignment' => 'center', 'autoplay' => false, 'mute' => false, 'loop' => false]],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '80px', 'padding_bottom' => '40px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '40px'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Recursos Completos', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:540px;margin:0 auto;">Tudo que você precisa para construir páginas profissionais</p>', 'alignment' => 'center', 'font_size' => '17px']],
+                            ['type' => 'divider', 'settings' => ['width' => '60px', 'height' => '3px', 'color' => '#3b82f6', 'alignment' => 'center', 'margin_top' => '24px']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '0px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'padding_top' => '30px', 'padding_bottom' => '30px', 'padding_left' => '20px', 'padding_right' => '20px'], 'children' => [
+                            ['type' => 'icon', 'settings' => ['icon' => 'fas fa-bolt', 'size' => '48', 'color' => '#3b82f6', 'alignment' => 'center', 'margin_bottom' => '16px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Rápido & Leve', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Performance otimizada com cache inteligente e lazy loading.</p>', 'alignment' => 'center', 'font_size' => '15px', 'line_height' => '1.7']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'padding_top' => '30px', 'padding_bottom' => '30px', 'padding_left' => '20px', 'padding_right' => '20px'], 'children' => [
+                            ['type' => 'icon', 'settings' => ['icon' => 'fas fa-mobile-alt', 'size' => '48', 'color' => '#3b82f6', 'alignment' => 'center', 'margin_bottom' => '16px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Responsivo', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Layout adaptável para celular, tablet e desktop automaticamente.</p>', 'alignment' => 'center', 'font_size' => '15px', 'line_height' => '1.7']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'padding_top' => '30px', 'padding_bottom' => '30px', 'padding_left' => '20px', 'padding_right' => '20px'], 'children' => [
+                            ['type' => 'icon', 'settings' => ['icon' => 'fas fa-puzzle-piece', 'size' => '48', 'color' => '#3b82f6', 'alignment' => 'center', 'margin_bottom' => '16px']],
+                            ['type' => 'heading', 'settings' => ['title' => '30+ Widgets', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Biblioteca completa de widgets para qualquer tipo de conteúdo.</p>', 'alignment' => 'center', 'font_size' => '15px', 'line_height' => '1.7']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#1e293b', 'padding_top' => '60px', 'padding_bottom' => '60px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'counter', 'settings' => ['title' => 'Usuários Ativos', 'number' => '50000', 'suffix' => '+', 'color' => '#60a5fa', 'font_size' => '2.5rem', 'alignment' => 'center', 'duration' => '2000']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'counter', 'settings' => ['title' => 'Páginas Criadas', 'number' => '250000', 'suffix' => '+', 'color' => '#60a5fa', 'font_size' => '2.5rem', 'alignment' => 'center', 'duration' => '2000']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'counter', 'settings' => ['title' => 'Widgets', 'number' => '30', 'suffix' => '+', 'color' => '#60a5fa', 'font_size' => '2.5rem', 'alignment' => 'center', 'duration' => '2000']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'counter', 'settings' => ['title' => 'Países', 'number' => '85', 'suffix' => '+', 'color' => '#60a5fa', 'font_size' => '2.5rem', 'alignment' => 'center', 'duration' => '2000']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '80px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'vertical_alignment' => 'center'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Galeria de Imagens', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'left', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Veja exemplos do que você pode criar com nosso construtor visual.</p>', 'font_size' => '16px', 'margin_bottom' => '24px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Ver Projetos', 'link' => '#', 'background_color' => '#3b82f6', 'text_color' => '#ffffff', 'size' => 'medium', 'alignment' => 'left', 'border_radius' => '8px', 'padding_left_right' => '24px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'image', 'settings' => ['image' => ['url' => 'https://picsum.photos/seed/showcase-gallery/600/400', 'alt' => 'Gallery showcase', 'width' => '600', 'height' => '400'], 'width' => '100%', 'border_radius' => '12px', 'box_shadow' => '0 10px 40px rgba(0,0,0,.1)']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#f8fafc', 'padding_top' => '80px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '40px'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Layouts Flexíveis', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:540px;margin:0 auto;">Seções e colunas adaptáveis para qualquer layout</p>', 'alignment' => 'center', 'font_size' => '17px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'vertical_alignment' => 'center', 'padding_right' => '30px'], 'children' => [
+                            ['type' => 'icon_box', 'settings' => ['icon' => 'fas fa-layer-group', 'icon_size' => '32', 'icon_color' => '#3b82f6', 'title' => 'Seções Full Width & Boxed', 'title_color' => '#0f172a', 'title_size' => '1.1rem', 'description' => '<p style="color:#64748b;">Escolha entre largura total ou conteiner centralizado. Cada seção tem fundo, padding e bordas independentes.</p>', 'alignment' => 'left']],
+                            ['type' => 'divider', 'settings' => ['width' => '100%', 'height' => '1px', 'color' => '#e2e8f0', 'alignment' => 'left', 'margin_top' => '20px', 'margin_bottom' => '20px']],
+                            ['type' => 'icon_box', 'settings' => ['icon' => 'fas fa-columns', 'icon_size' => '32', 'icon_color' => '#3b82f6', 'title' => 'Colunas Flexíveis', 'title_color' => '#0f172a', 'title_size' => '1.1rem', 'description' => '<p style="color:#64748b;">Distribua widgets em colunas de 12, 6, 4, 3 ou 8. Redimensione com slider percentual.</p>', 'alignment' => 'left']],
+                            ['type' => 'divider', 'settings' => ['width' => '100%', 'height' => '1px', 'color' => '#e2e8f0', 'alignment' => 'left', 'margin_top' => '20px', 'margin_bottom' => '20px']],
+                            ['type' => 'icon_box', 'settings' => ['icon' => 'fas fa-arrows-alt', 'icon_size' => '32', 'icon_color' => '#3b82f6', 'title' => 'Drag & Drop', 'title_color' => '#0f172a', 'title_size' => '1.1rem', 'description' => '<p style="color:#64748b;">Arraste widgets entre seções e colunas. Reordene itens no navigator com SortableJS.</p>', 'alignment' => 'left']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'image', 'settings' => ['image' => ['url' => 'https://picsum.photos/seed/layout-demo/600/500', 'alt' => 'Layout demo', 'width' => '600', 'height' => '500'], 'width' => '100%', 'border_radius' => '12px', 'box_shadow' => '0 10px 40px rgba(0,0,0,.1)']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '80px', 'padding_bottom' => '40px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '40px'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Widgets Interativos', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:540px;margin:0 auto;">Accordion e Abas para organizar conteúdo</p>', 'alignment' => 'center', 'font_size' => '17px']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '0px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'padding_right' => '20px'], 'children' => [
+                            ['type' => 'tabs', 'settings' => ['tabs' => [
+                                ['label' => 'Descrição', 'content' => '<p style="color:#334155;">O Page Builder foi projetado para ser intuitivo. Com nossa interface drag-and-drop, você pode criar páginas complexas em minutos, não em horas.</p>'],
+                                ['label' => 'Funcionalidades', 'content' => '<ul style="color:#334155;"><li>30+ widgets</li><li>Estilos inline</li><li>Responsivo</li><li>Colaboração</li><li>Revisões</li></ul>'],
+                                ['label' => 'Preços', 'content' => '<p style="color:#334155;">Gratuito para uso pessoal. Planos premium a partir de R$29/mês com recursos avançados.</p>'],
+                            ], 'orientation' => 'horizontal', 'active_color' => '#3b82f6']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'padding_left' => '20px'], 'children' => [
+                            ['type' => 'accordion', 'settings' => ['items' => [
+                                ['label' => 'Como funciona o construtor?', 'content' => '<p style="color:#334155;">Arraste widgets do painel esquerdo para a tela. Cada widget tem configurações de conteúdo, estilo e avançado no painel direito.</p>', 'open' => true],
+                                ['label' => 'Preciso saber programar?', 'content' => '<p style="color:#334155;">Não! O Page Builder foi feito para não-programadores. Todo o desenvolvimento é visual, sem código.</p>'],
+                                ['label' => 'Posso exportar o HTML?', 'content' => '<p style="color:#334155;">Sim! Use o botão "Copy HTML" no editor para copiar o HTML renderizado. Ideal para usar no Moodle, WordPress ou qualquer CMS.</p>'],
+                            ], 'active_color' => '#3b82f6']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#f8fafc', 'padding_top' => '80px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '40px'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'O Que Nossos Usuários Dizem', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:540px;margin:0 auto;">Mais de 50 mil criadores confiam no Page Builder</p>', 'alignment' => 'center', 'font_size' => '17px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px', 'box_shadow' => '0 4px 20px rgba(0,0,0,.06)'], 'children' => [
+                            ['type' => 'testimonial', 'settings' => ['content' => '<p>"O Page Builder transformou a forma como criamos conteúdo. Intuitivo e poderoso."</p>', 'name' => 'Ana Silva', 'position' => 'CEO', 'company' => 'TechStart', 'rating' => '5', 'alignment' => 'center', 'text_color' => '#475569', 'name_color' => '#0f172a']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px', 'box_shadow' => '0 4px 20px rgba(0,0,0,.06)'], 'children' => [
+                            ['type' => 'testimonial', 'settings' => ['content' => '<p>"Finalmente um construtor que entrega qualidade profissional sem complicação."</p>', 'name' => 'Carlos Oliveira', 'position' => 'Marketing Director', 'company' => 'BrandLab', 'rating' => '5', 'alignment' => 'center', 'text_color' => '#475569', 'name_color' => '#0f172a']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'center', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px', 'padding_left' => '30px', 'padding_right' => '30px', 'border_radius' => '12px', 'box_shadow' => '0 4px 20px rgba(0,0,0,.06)'], 'children' => [
+                            ['type' => 'testimonial', 'settings' => ['content' => '<p>"Uso no Moodle para criar páginas educacionais. O Copy HTML é fantástico!"</p>', 'name' => 'Marina Costa', 'position' => 'Professora', 'company' => 'Universidade Federal', 'rating' => '5', 'alignment' => 'center', 'text_color' => '#475569', 'name_color' => '#0f172a']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '80px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center', 'padding_bottom' => '40px'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Entre em Contato', 'tag' => 'h2', 'size' => 'xl', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;max-width:540px;margin:0 auto;">Tem alguma dúvida? Mande uma mensagem para nós</p>', 'alignment' => 'center', 'font_size' => '17px']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '0px', 'padding_bottom' => '80px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'text_align' => 'left', 'padding_right' => '40px'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Formulário de Contato', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '24px']],
+                            ['type' => 'form', 'settings' => ['fields' => [['label' => 'Nome', 'placeholder' => 'Seu nome', 'type' => 'text', 'required' => true, 'width' => '100'], ['label' => 'Email', 'placeholder' => 'seu@email.com', 'type' => 'email', 'required' => true, 'width' => '100'], ['label' => 'Assunto', 'placeholder' => 'Assunto', 'type' => 'text', 'required' => true, 'width' => '100'], ['label' => 'Mensagem', 'placeholder' => 'Sua mensagem', 'type' => 'textarea', 'required' => true, 'width' => '100']], 'submit_text' => 'Enviar Mensagem', 'button_background' => '#3b82f6', 'button_text_color' => '#ffffff', 'button_border_radius' => '8px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-6', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Nossa Localização', 'tag' => 'h3', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '24px']],
+                            ['type' => 'callout', 'settings' => ['type' => 'info', 'title' => 'Informações', 'content' => '<p style="color:#475569;"><strong>Endereço:</strong> Av. Paulista, 1000<br><strong>Telefone:</strong> (11) 99999-9999<br><strong>Email:</strong> contato@pagebuilder.com<br><strong>Horário:</strong> Seg-Sex, 9h-18h</p>']],
+                            ['type' => 'google_maps', 'settings' => ['address' => 'Av. Paulista, 1000, São Paulo, SP', 'zoom' => '15', 'height' => '250px', 'border_radius' => '12px', 'margin_top' => '16px']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#0f172a', 'padding_top' => '60px', 'padding_bottom' => '60px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Pronto para Começar?', 'tag' => 'h2', 'size' => 'xl', 'color' => '#ffffff', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;max-width:560px;margin:0 auto 32px;font-size:1.1rem;">Junte-se a milhares de criadores e construa sua página agora.</p>', 'alignment' => 'center', 'font_size' => '17px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Criar Página Grátis', 'link' => '#', 'background_color' => '#3b82f6', 'text_color' => '#ffffff', 'size' => 'large', 'alignment' => 'center', 'border_radius' => '50px', 'padding_left_right' => '40px', 'font_weight' => '700', 'box_shadow' => '0 4px 16px rgba(59,130,246,.4)']],
+                            ['type' => 'divider', 'settings' => ['width' => '100%', 'height' => '1px', 'color' => '#1e293b', 'alignment' => 'center', 'margin_top' => '40px', 'margin_bottom' => '40px']],
+                            ['type' => 'social_icons', 'settings' => ['icons' => [['platform' => 'facebook', 'url' => '#', 'color' => '#1877F2'], ['platform' => 'twitter', 'url' => '#', 'color' => '#1DA1F2'], ['platform' => 'linkedin', 'url' => '#', 'color' => '#0A66C2'], ['platform' => 'instagram', 'url' => '#', 'color' => '#E4405F'], ['platform' => 'youtube', 'url' => '#', 'color' => '#FF0000']], 'columns' => '5', 'icon_size' => '40', 'gap' => '12', 'alignment' => 'center']],
+                            ['type' => 'divider', 'settings' => ['width' => '100%', 'height' => '1px', 'color' => '#1e293b', 'alignment' => 'center', 'margin_top' => '40px', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;font-size:0.85rem;">&copy; 2026 Page Builder. Todos os direitos reservados.</p>', 'alignment' => 'center', 'font_size' => '14px']],
+                        ]],
+                    ]],
+                ],
+            ],
             'blog-post' => [
                 'name' => 'Blog Post',
                 'description' => 'Single blog post with featured image, content, author box, and share buttons',

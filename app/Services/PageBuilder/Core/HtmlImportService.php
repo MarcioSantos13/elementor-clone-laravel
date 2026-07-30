@@ -2,6 +2,8 @@
 
 namespace App\Services\PageBuilder\Core;
 
+use Illuminate\Support\Facades\Http;
+
 class HtmlImportService
 {
     private int $maxSize = 512000;
@@ -24,24 +26,18 @@ class HtmlImportService
             throw new \InvalidArgumentException('URL inválida. Apenas http/https são permitidos.');
         }
 
-        $context = stream_context_create([
-            'http' => [
-                'timeout' => 15,
-                'follow_location' => true,
-                'max_redirects' => 3,
-                'user_agent' => 'Mozilla/5.0 (compatible; PageBuilder/1.0)',
-                'ignore_errors' => true,
-            ],
-            'ssl' => [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
-            ],
-        ]);
+        $response = Http::timeout(15)
+            ->withOptions([
+                'allow_redirects' => ['max' => 3],
+            ])
+            ->withUserAgent('Mozilla/5.0 (compatible; PageBuilder/1.0)')
+            ->get($url);
 
-        $html = @file_get_contents($url, false, $context);
-        if ($html === false) {
+        if ($response->failed()) {
             throw new \RuntimeException('Não foi possível acessar a URL fornecida.');
         }
+
+        $html = $response->body();
 
         if (strlen($html) > $this->maxSize) {
             throw new \RuntimeException('O conteúdo excede o tamanho máximo de 500KB.');

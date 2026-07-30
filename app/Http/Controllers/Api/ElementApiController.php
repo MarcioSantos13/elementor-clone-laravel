@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ElementResource;
 use App\Models\Page;
 use App\Models\Element;
 use App\Services\PageBuilder\Core\PageBuilderService;
@@ -22,10 +23,16 @@ class ElementApiController extends Controller
     public function index(Page $page): JsonResponse
     {
         $this->authorize('view', $page);
-        $elements = $page->allElements()->get();
+
+        $allElements = $page->allElements()->get()->keyBy('id');
+        $rootElements = $allElements->whereNull('parent_id')->sortBy('order')->values();
+        foreach ($allElements as $el) {
+            $children = $allElements->where('parent_id', $el->id)->sortBy('order')->values();
+            $el->setRelation('children', $children);
+        }
 
         return response()->json([
-            'elements' => $this->elementManager->buildTree($elements),
+            'elements' => ElementResource::collection($rootElements),
         ]);
     }
 
@@ -47,7 +54,7 @@ class ElementApiController extends Controller
 
         return response()->json([
             'message' => 'Element created',
-            'element' => $element->load('children'),
+            'element' => new ElementResource($element->load('children')),
         ], 201);
     }
 
@@ -56,7 +63,7 @@ class ElementApiController extends Controller
         $this->authorize('view', $element->page);
 
         return response()->json([
-            'element' => $element->load('children'),
+            'element' => new ElementResource($element->load('children')),
         ]);
     }
 
@@ -75,7 +82,7 @@ class ElementApiController extends Controller
 
         return response()->json([
             'message' => 'Element updated',
-            'element' => $element->load('children'),
+            'element' => new ElementResource($element->load('children')),
         ]);
     }
 

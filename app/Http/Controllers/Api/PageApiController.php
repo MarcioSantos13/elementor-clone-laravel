@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PageCollection;
+use App\Http\Resources\PageResource;
 use App\Models\Page;
 use App\Services\PageBuilder\Core\PageBuilderService;
 use App\Services\PageBuilder\Core\ElementManager;
@@ -18,13 +20,13 @@ class PageApiController extends Controller
         protected TemplateManager $templateManager,
     ) {}
 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): PageCollection
     {
         $pages = Page::where('user_id', $request->user()->id)
             ->latest()
             ->paginate($request->input('per_page', 20));
 
-        return response()->json($pages);
+        return new PageCollection($pages);
     }
 
     public function store(Request $request): JsonResponse
@@ -48,18 +50,24 @@ class PageApiController extends Controller
 
         return response()->json([
             'message' => 'Page created',
-            'page' => $page,
+            'page' => new PageResource($page),
         ], 201);
     }
 
     public function show(Page $page): JsonResponse
     {
         $this->authorize('view', $page);
-        $elements = $this->elementManager->buildTree($page->allElements()->get());
+
+        $allElements = $page->allElements()->get()->keyBy('id');
+        $rootElements = $allElements->whereNull('parent_id')->sortBy('order')->values();
+        foreach ($allElements as $el) {
+            $children = $allElements->where('parent_id', $el->id)->sortBy('order')->values();
+            $el->setRelation('children', $children);
+        }
+        $page->setRelation('elements', $rootElements);
 
         return response()->json([
-            'page' => $page,
-            'elements' => $elements,
+            'page' => new PageResource($page),
         ]);
     }
 
@@ -79,7 +87,7 @@ class PageApiController extends Controller
 
         return response()->json([
             'message' => 'Page updated',
-            'page' => $page,
+            'page' => new PageResource($page),
         ]);
     }
 

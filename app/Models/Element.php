@@ -79,7 +79,9 @@ class Element extends Model
 
     public function isContainer(): bool
     {
-        return $this->children()->exists();
+        return $this->relationLoaded('children')
+            ? $this->children->isNotEmpty()
+            : $this->children()->exists();
     }
 
     public function getDepth(): int

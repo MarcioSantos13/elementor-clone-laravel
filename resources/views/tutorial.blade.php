@@ -31,6 +31,8 @@
             <a href="#collaboration">Colaboração em Tempo Real</a>
             <a href="#html-import">Importação de HTML</a>
             <a href="#showcase">Template Showcase Completo</a>
+            <a href="#theme-builder">Theme Builder</a>
+            <a href="#popups">Popups</a>
             <a href="#architecture">Arquitetura do Projeto</a>
             <a href="#database">Banco de Dados</a>
             <a href="#routes">Rotas</a>
@@ -121,12 +123,12 @@ php artisan db:seed</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Números do Projeto</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th></tr>
-                    <tr><td>Widgets disponíveis</td><td>29 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel)</td></tr>
+                    <tr><td>Widgets disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
                     <tr><td>Templates prontos</td><td>5 (Blank, Landing, About, Contact, Showcase Completo)</td></tr>
-                    <tr><td>Rotas definidas</td><td>50+ (CRUD páginas, elementos, revisões, templates, colaboração, HTML import, API REST)</td></tr>
+                    <tr><td>Rotas definidas</td><td>100+ (CRUD páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find & replace, API REST)</td></tr>
                     <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
-                    <tr><td>Tabelas no banco</td><td>4 principais (pages, elements, revisions, form_submissions) + personal_access_tokens</td></tr>
-                    <tr><td>Views Blade</td><td>16 (login, register, tutorial, editor + 7 partials, pages)</td></tr>
+                    <tr><td>Tabelas no banco</td><td>8 principais (pages, elements, revisions, form_submissions, custom_fonts, global_widgets, popups, theme_templates) + personal_access_tokens</td></tr>
+                    <tr><td>Views Blade</td><td>22 (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
                     <tr><td>Linhas de JS do editor</td><td>~5000 (8 módulos ES em resources/js/editor/)</td></tr>
                     <tr><td>API REST</td><td>Sanctum (token-based) com CRUD páginas e elementos</td></tr>
                     <tr><td>Jobs (filas)</td><td>3 (ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob)</td></tr>
@@ -136,7 +138,7 @@ php artisan db:seed</code></pre>
                 <ul>
                     <li>Criar páginas com título e status (rascunho / publicado)</li>
                     <li>Abrir um <strong>editor visual</strong> em tela cheia com tema escuro</li>
-                    <li>Arrastar <strong>29 widgets</strong> (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel)</li>
+                    <li>Arrastar <strong>30 widgets</strong> (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</li>
                     <li>Selecionar qualquer elemento e editar suas <strong>configurações</strong> no painel direito</li>
                     <li><strong>Editor de texto rich-text (WYSIWYG)</strong> com toolbar: negrito, itálico, links, imagens, vídeos YouTube, listas, código fonte</li>
                     <li><strong>Inserir imagens</strong> no texto via upload ou colar (Ctrl+V) — imagem inline no conteúdo</li>
@@ -177,6 +179,12 @@ php artisan db:seed</code></pre>
                     <li><strong>Column Structure Picker</strong> — 6 opções de layout ao criar seção</li>
                     <li><strong>ARIA Accessibility</strong> — roles semânticos, navegação por Tab, focus-visible</li>
                     <li><strong>Colaboração em tempo real</strong> — presença de usuários, bloqueio de elementos, cursores</li>
+                    <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive) com condições de exibição</li>
+                    <li><strong>Popups</strong> — criação e edição de popups com gatilhos e condições de exibição</li>
+                    <li><strong>Global Widgets</strong> — widgets reutilizáveis em várias páginas</li>
+                    <li><strong>Custom Fonts</strong> — upload e gestão de fontes personalizadas (ttf, woff, woff2)</li>
+                    <li><strong>Dynamic Tags</strong> — conteúdo dinâmico a partir de dados do sistema</li>
+                    <li><strong>Find &amp; Replace</strong> — busca e substituição de conteúdo em toda a página</li>
                     <li><strong>API REST</strong> — autenticação via Sanctum tokens, CRUD completo de páginas e elementos</li>
                     <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
                 </ul>
@@ -199,7 +207,7 @@ php artisan db:seed</code></pre>
 │   TemplateManager │ ElementManager                │
 │   CollaborationService │ HtmlImportService        │
 ├──────────────────────────────────────────────────┤
-│                  WIDGETS (29)                     │
+│                  WIDGETS (30)                     │
 │   BaseWidget → Heading │ Text │ Image │ Button    │
 │              Section │ Column │ InnerSection       │
 │              Callout │ Table │ Math │ Video        │
@@ -208,7 +216,7 @@ php artisan db:seed</code></pre>
 │              Counter │ ProgressBar │ SocialIcons   │
 │              IconBox │ ImageBox │ Testimonial      │
 │              PriceTable │ Countdown │ GoogleMaps   │
-│              Carousel                             │
+│              Carousel │ MegaMenu │ Lottie         │
 ├──────────────────────────────────────────────────┤
 │              DATABASE (SQLite)                    │
 │   pages → elements (árvore) → revisions           │
@@ -241,9 +249,9 @@ php artisan db:seed</code></pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que está incluído (gratuito)</h3>
                 <ul>
-                    <li>29 widgets (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel)</li>
+                    <li>30 widgets (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</li>
                     <li>Editor visual completo com drag-and-drop (SortableJS), undo/redo, zoom, fullscreen</li>
-                    <li>6 templates prontos (Blank, Landing, About, Contact, Moodle Course, Showcase)</li>
+                    <li>5 templates prontos (Blank, Landing, About, Contact, Showcase)</li>
                     <li>Sistema de revisões com diff e restauração</li>
                     <li>Exportação/Importação de páginas (JSON)</li>
                     <li>Copiar HTML para uso em outros sistemas (Moodle, WordPress, etc.)</li>
@@ -668,7 +676,7 @@ php artisan db:seed</code></pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Esquerdo — Widgets</h3>
                 <ul>
-                    <li>Lista os 29 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel</li>
+                    <li>Lista os 30 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie</li>
                     <li><strong>Barra de busca</strong> — digite para filtrar widgets por nome (ex: "título", "imagem", "form")</li>
                     <li>Cada widget mostra um ícone (emoji) e nome</li>
                     <li>O painel começa colapsado — clique no ícone de widgets (☰) na barra superior para expandir</li>
@@ -2011,9 +2019,212 @@ php artisan db:seed</code></pre>
             </div>
         </section>
 
+        {{-- THEME BUILDER --}}
+        <section id="theme-builder" class="step">
+            <h2>17. Theme Builder</h2>
+            <div class="step-body">
+                <p>O <strong>Theme Builder</strong> permite criar templates de tema (cabeçalho, rodapé, single, archive) que são renderizados ao redor do conteúdo das páginas. Diferente de páginas normais, os templates de tema têm <strong>condições de exibição</strong> que determinam em quais páginas cada template aparece.</p>
+
+                <div class="tip">
+                    <strong>&#128161; Conceito:</strong> Theme Templates funcionam como <strong>layouts mestres</strong>. Você cria um header uma vez, define em quais páginas ele aparece, e o sistema o renderiza automaticamente ao redor do conteúdo de cada página.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tipos de Template</h3>
+                <table class="widget-table">
+                    <tr><th>Tipo</th><th>Onde aparece</th><th>Exemplo de uso</th></tr>
+                    <tr><td><code>header</code></td><td>No topo da página</td><td>Logo, menu de navegação, barra de busca</td></tr>
+                    <tr><td><code>footer</code></td><td>No final da página</td><td>Links de rodapé, copyright, redes sociais</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo a Passo — Criar um Header</h3>
+                <ol>
+                    <li><strong>Acesse a listagem:</strong> Vá em <strong>"Theme Templates"</strong> no menu lateral (<code>/page-builder/themes</code>).</li>
+                    <li><strong>Clique em "Criar Template":</strong> Preencha:
+                        <ul>
+                            <li><strong>Título:</strong> <code>"Header Principal"</code></li>
+                            <li><strong>Tipo:</strong> <code>header</code></li>
+                            <li><strong>Status:</strong> <code>draft</code> (você publicará depois)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Salve</strong> o template. Você será redirecionado à listagem.</li>
+                    <li><strong>Abra o editor visual</strong> clicando em <strong>"Editor"</strong> no template criado.</li>
+                    <li><strong>Construa o header</strong> dentro do editor:
+                        <ul>
+                            <li>Arraste uma <strong>Seção</strong> com layout <code>full_width</code> e fundo <code>#1e293b</code> (cinza escuro).</li>
+                            <li>Arraste uma <strong>Coluna</strong> com largura <code>col-6</code> (metade esquerda).</li>
+                            <li>Dentro dela, arraste um widget <strong>Ícone</strong> ou <strong>Texto</strong> com o nome da sua marca.</li>
+                            <li>Arraste outra <strong>Coluna</strong> com largura <code>col-6</code> (metade direita).</li>
+                            <li>Dentro dela, arraste botões ou texto para links de navegação.</li>
+                            <li>Ajuste padding vertical da seção para <code>16px</code> (aba <strong>Advanced</strong>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Salve</strong> o template no editor (botão Salvar).</li>
+                    <li><strong>Publique</strong> o template clicando em <strong>"Publicar"</strong> na listagem ou no editor.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo a Passo — Criar um Footer</h3>
+                <ol>
+                    <li>Repita os passos 1–3 acima com:
+                        <ul>
+                            <li><strong>Título:</strong> <code>"Footer Principal"</code></li>
+                            <li><strong>Tipo:</strong> <code>footer</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>No editor:</strong>
+                        <ul>
+                            <li>Arraste uma <strong>Seção</strong> com layout <code>boxed</code> e fundo <code>#0f172a</code> (quase preto).</li>
+                            <li>Arraste <strong>3 Colunas</strong> com largura <code>col-4</code> cada.</li>
+                            <li>Na primeira coluna: widget <strong>Texto</strong> com informações de copyright.</li>
+                            <li>Na segunda coluna: widget <strong>Título</strong> + links de navegação.</li>
+                            <li>Na terceira coluna: widget <strong>Social Icons</strong> com redes sociais.</li>
+                            <li>Padding superior/inferior: <code>60px</code> (aba <strong>Advanced</strong>).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Salve e publique</strong>.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Condições de Exibição</h3>
+                <p>Após criar e publicar, defina <strong>onde</strong> o template aparece. Acesse o template na listagem e clique em <strong>"Condições"</strong>.</p>
+                <table class="widget-table">
+                    <tr><th>Condição</th><th>Comportamento</th></tr>
+                    <tr><td><code>Entire Site</code></td><td>Aparece em todas as páginas (ideal para header/footer globais)</td></tr>
+                    <tr><td><code>Homepage</code></td><td>Aparece apenas na página inicial</td></tr>
+                    <tr><td><code>All Pages</code></td><td>Aparece em todas as páginas exceto a home</td></tr>
+                    <tr><td><code>All Singular</code></td><td>Aparece em páginas individuais</td></tr>
+                    <tr><td><code>Specific Page</code></td><td>Aparece em uma página específica (selecione no dropdown)</td></tr>
+                </table>
+                <p>Exemplo de configuração:</p>
+                <ul>
+                    <li><strong>Header Principal</strong> → condição <code>Entire Site</code> (aparece em todas as páginas)</li>
+                    <li><strong>Footer Principal</strong> → condição <code>Entire Site</code> (aparece em todas as páginas)</li>
+                </ul>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Você pode criar múltiplos headers com condições diferentes. Ex: um header para a homepage (com menu completo) e outro para páginas internas (com menu simplificado). O primeiro template que satisfizer a condição é usado.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Visualizar o Resultado</h3>
+                <p>Para ver os templates aplicados:</p>
+                <ol>
+                    <li>Vá até a <strong>lista de páginas</strong> (<code>/page-builder/pages</code>).</li>
+                    <li>Na coluna <strong>"Ações"</strong> de qualquer página, clique em <strong>"Visualizar"</strong> (ícone de olho).</li>
+                    <li>O header e footer serão renderizados automaticamente ao redor do conteúdo da página.</li>
+                </ol>
+                <p>Você também pode acessar diretamente a URL pública da página (<code>http://localhost:8000/p/{slug}</code>) para ver o tema completo aplicado.</p>
+
+                <div class="warning">
+                    <strong>&#9888;&#65039; Importante:</strong> O Theme Builder só funciona em páginas com <strong>status "published"</strong>. Páginas em draft usam o editor visual normal sem templates de tema.
+                </div>
+            </div>
+        </section>
+
+        {{-- POPUPS --}}
+        <section id="popups" class="step">
+            <h2>18. Popups</h2>
+            <div class="step-body">
+                <p>O sistema de <strong>Popups</strong> permite criar janelas modais que aparecem sobre o conteúdo da página. Cada popup tem <strong>gatilhos</strong> (quando aparece) e <strong>condições</strong> (em quais páginas aparece).</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo a Passo — Criar um Popup</h3>
+                <ol>
+                    <li><strong>Acesse Popups:</strong> Vá em <strong>"Popups"</strong> no menu lateral (<code>/page-builder/popups</code>).</li>
+                    <li><strong>Clique em "Criar Popup":</strong> Preencha:
+                        <ul>
+                            <li><strong>Título:</strong> <code>"Newsletter"</code></li>
+                            <li><strong>Status:</strong> <code>draft</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Salve</strong> o popup. Você será redirecionado à listagem.</li>
+                    <li><strong>Abra o editor visual</strong> clicando em <strong>"Editor"</strong> no popup criado.</li>
+                    <li><strong>Construa o conteúdo</strong> do popup dentro do editor:
+                        <ul>
+                            <li>Arraste uma <strong>Seção</strong> com fundo <code>#ffffff</code> e padding <code>40px</code>.</li>
+                            <li>Arraste uma <strong>Coluna</strong> com largura <code>col-12</code>.</li>
+                            <li>Dentro da coluna, arraste:
+                                <ul>
+                                    <li><strong>Título:</strong> <code>"Receba Nossas Novidades"</code>, tag <code>H2</code>, centralizado.</li>
+                                    <li><strong>Texto:</strong> <code>"Inscreva-se para receber dicas e ofertas exclusivas."</code>, centralizado.</li>
+                                    <li><strong>Formulário</strong> (ou botão) para capturar email.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>Salve</strong> o popup no editor.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Configurar Gatilhos (Triggers)</h3>
+                <p>Na listagem de popups, clique em <strong>"Gatilhos"</strong> no popup desejado. Os gatilhos definem <strong>quando</strong> o popup aparece:</p>
+                <table class="widget-table">
+                    <tr><th>Gatilho</th><th>Comportamento</th></tr>
+                    <tr><td><code>On Load</code></td><td>Aparece assim que a página carrega</td></tr>
+                    <tr><td><code>On Timer</code></td><td>Aparece após X segundos (configurável, ex: 5s)</td></tr>
+                    <tr><td><code>On Scroll</code></td><td>Aparece quando o usuário rola X% da página</td></tr>
+                    <tr><td><code>On Exit Intent</code></td><td>Aparece quando o mouse sai da janela (intenção de sair)</td></tr>
+                    <tr><td><code>On Click</code></td><td>Aparece quando o usuário clica em um seletor CSS específico</td></tr>
+                </table>
+                <p>Exemplo — popup que aparece 5 segundos após carregar a página:</p>
+                <ol>
+                    <li>Clique em <strong>"Adicionar Gatilho"</strong>.</li>
+                    <li>Selecione <strong>Tipo:</strong> <code>On Timer</code>.</li>
+                    <li>Defina <strong>Valor:</strong> <code>5</code> (segundos).</li>
+                    <li><strong>Salve</strong> os gatilhos.</li>
+                </ol>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Você pode combinar múltiplos gatilhos. Ex: <code>On Timer</code> (3s) + <code>On Exit Intent</code> — o popup aparece após 3s ou quando o usuário tenta sair, o que acontecer primeiro. O popup também respeita o limite de <strong>uma vez por sessão</strong> (não reaparece até recarregar a página).
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Configurar Condições</h3>
+                <p>Na listagem, clique em <strong>"Condições"</strong> para definir em <strong>quais páginas</strong> o popup aparece:</p>
+                <table class="widget-table">
+                    <tr><th>Condição</th><th>Comportamento</th></tr>
+                    <tr><td><code>All Pages</code></td><td>Aparece em todas as páginas</td></tr>
+                    <tr><td><code>Homepage</code></td><td>Aparece apenas na página inicial</td></tr>
+                    <tr><td><code>Specific Page</code></td><td>Aparece em uma página específica (selecione no dropdown)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Configurações do Popup</h3>
+                <p>No formulário de edição do popup, você pode ajustar:</p>
+                <table class="widget-table">
+                    <tr><th>Configuração</th><th>Opções</th><th>Descrição</th></tr>
+                    <tr><td><strong>Largura</strong></td><td><code>300px</code> a <code>1200px</code></td><td>Largura máxima do popup (ex: <code>500px</code>)</td></tr>
+                    <tr><td><strong>Posição</strong></td><td><code>center</code>, <code>top_left</code>, <code>top_right</code>, <code>bottom_left</code>, <code>bottom_right</code></td><td>Onde o popup aparece na tela</td></tr>
+                    <tr><td><strong>Overlay</strong></td><td>Sim / Não</td><td>Se o fundo escuro atrás do popup aparece</td></tr>
+                    <tr><td><strong>Botão Fechar</strong></td><td>Sim / Não</td><td>Exibe o botão X para fechar o popup</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Publicar e Testar</h3>
+                <ol>
+                    <li>Na listagem de popups, clique em <strong>"Publicar"</strong> no popup.</li>
+                    <li>Acesse a página onde o popup deve aparecer (precisa ser uma página publicada).</li>
+                    <li>O popup será exibido conforme os gatilhos configurados.</li>
+                    <li>Para testar sem publicar, abra a página no editor e clique em <strong>"Visualizar"</strong>.</li>
+                </ol>
+
+                <div class="warning">
+                    <strong>&#9888;&#65039; Atenção:</strong> Popups só funcionam em páginas com <strong>status "published"</strong>. Popups em draft não são exibidos. O popup é renderizado junto com a página, então você precisa salvar a página para que as alterações no popup apareçam.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Exemplo Completo — Popup de Newsletter</h3>
+                <p>Siga estes passos para criar um popup funcional do zero:</p>
+                <ol>
+                    <li>Crie um popup com título <code>"Newsletter"</code>.</li>
+                    <li>No editor, adicione: Seção (fundo branco) → Coluna → Título (<code>"Fique por Dentro"</code>, H2) → Texto (<code>"Receba novidades toda semana"</code>) → Formulário (campos: Nome, Email).</li>
+                    <li>Salve o popup.</li>
+                    <li>Configure os gatilhos: <code>On Timer</code> (3 segundos).</li>
+                    <li>Configure as condições: <code>All Pages</code>.</li>
+                    <li>Publique o popup.</li>
+                    <li>Acesse qualquer página publicada — o popup aparecerá após 3 segundos.</li>
+                </ol>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Popups são úteis para: captura de leads (newsletter), avisos importantes (manutenção), promoções (cupom de desconto), e cookies (aviso de cookies). Cada popup pode ter gatilhos e condições diferentes.
+                </div>
+            </div>
+        </section>
+
         {{-- PROJECT STRUCTURE --}}
         <section id="architecture" class="step">
-            <h2>17. Arquitetura do Projeto</h2>
+            <h2>19. Arquitetura do Projeto</h2>
             <div class="step-body">
                 <p>O projeto segue o padrão MVC do Laravel com uma camada adicional de <strong>Serviços</strong> e <strong>Widgets</strong> para isolar a lógica do page builder.</p>
 
@@ -2024,17 +2235,23 @@ php artisan db:seed</code></pre>
 │  resources/js/editor/ ← editor.blade.php (7 partials)            │
 │  state, utils, canvas, history, navigator, dragdrop (SortableJS), html-import, css │
 ├─────────────────────────────────────────────────────────────────┤
-│                     CONTROLLERS (8 classes)                       │
-│  PageController       — CRUD páginas, templates, export/import  │
-│  ElementController    — CRUD elementos, controles, upload       │
-│  RevisionController   — revisões, diff, restore, auto-save      │
-│  FormController       — processamento de formulários            │
+│                    CONTROLLERS (14 classes)                       │
+│  PageController        — CRUD páginas, templates, globals       │
+│  ElementController     — CRUD elementos, controles, upload      │
+│  RevisionController    — revisões, diff, restore, auto-save     │
+│  FormController        — processamento de formulários           │
 │  CollaborationController — presença, bloqueio, cursores         │
-│  HtmlImportController — importação de HTML via URL ou textarea  │
-│  PageApiController    — API REST (Sanctum) para páginas         │
-│  ElementApiController — API REST (Sanctum) para elementos       │
+│  HtmlImportController  — importação de HTML via URL ou textarea │
+│  ThemeTemplateController — CRUD templates de tema               │
+│  CustomFontController  — upload e gestão de fontes              │
+│  GlobalWidgetController — CRUD widgets globais                  │
+│  PopupController       — CRUD popups, triggers, condições       │
+│  DynamicTagController  — lista de dynamic tags disponíveis      │
+│  FindReplaceController — busca e substituição em páginas        │
+│  PageApiController     — API REST (Sanctum) para páginas        │
+│  ElementApiController  — API REST (Sanctum) para elementos      │
 ├─────────────────────────────────────────────────────────────────┤
-│                     SERVICES (8 classes)                         │
+│                     SERVICES (10 classes)                         │
 │  PageBuilderService   — orquestra tudo (create, update, render) │
 │  ElementManager       — CRUD elementos, árvore, reordenação     │
 │  WidgetManager        — registra e gerencia widgets dinamicamente│
@@ -2042,13 +2259,26 @@ php artisan db:seed</code></pre>
 │  TemplateManager      — 5 templates predefinidos                │
 │  CollaborationService — presença, bloqueio, cursores (Cache)    │
 │  HtmlImportService    — converte HTML externo em widgets        │
+│  DynamicTagService    — substitui {{ tags }} por valores        │
+│  HtmlSanitizer        — sanitiza CSS, JS e URLs contra XSS     │
+│  PopupService         — gerencia popups publicados com cache    │
 ├─────────────────────────────────────────────────────────────────┤
-│                     JOBS (3 classes)                              │
+│                    REPOSITORIES (2 interfaces + 2 impl)           │
+│  PageRepository      — PageRepositoryInterface                  │
+│  ElementRepository   — ElementRepositoryInterface               │
+├─────────────────────────────────────────────────────────────────┤
+│                    API RESOURCES (3 classes)                      │
+│  PageResource        — transforma Page para API REST            │
+│  PageCollection      — coleção paginada de páginas              │
+│  ElementResource     — transforma Element com árvore recursiva  │
+├─────────────────────────────────────────────────────────────────┤
+│                     JOBS (4 classes)                              │
 │  ImportHtmlJob        — importa HTML em background via Queue    │
-│  ClearPageCacheJob    — limpa cache renderizado da página       │
+│  ClearPageCacheJob    — limpa cache ($page->touch() + tags)     │
 │  AutoSaveRevisionJob  — cria revisão automática a cada 60s     │
+│  ProcessFormSubmissionJob — notificações de formulário async    │
 ├─────────────────────────────────────────────────────────────────┤
-│                     WIDGETS (29 classes)                          │
+│                     WIDGETS (30 classes)                          │
 │  BaseWidget (abstract) → Heading, Text, Image, Button           │
 │                        → Section, Column, InnerSection           │
 │                        → Callout, Table, Math, Video             │
@@ -2057,44 +2287,62 @@ php artisan db:seed</code></pre>
 │                        → Counter, ProgressBar, SocialIcons       │
 │                        → IconBox, ImageBox, Testimonial          │
 │                        → PriceTable, Countdown, GoogleMaps       │
-│                        → Carousel                                │
+│                        → Carousel, MegaMenu, Lottie               │
 ├─────────────────────────────────────────────────────────────────┤
 │                     DATABASE (SQLite)                             │
 │  pages → elements (árvore via parent_id) → revisions            │
-│  form_submissions → personal_access_tokens (Sanctum)            │
+│  form_submissions → custom_fonts → global_widgets               │
+│  popups → theme_templates → personal_access_tokens (Sanctum)    │
 └─────────────────────────────────────────────────────────────────┘</pre>
                 </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Árvore de Diretórios do Page Builder</h3>
                 <table class="widget-table">
                     <tr><th>Caminho</th><th>Arquivos</th><th>Descrição</th></tr>
-                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>6</td><td>PageController, ElementController, RevisionController, FormController, CollaborationController, HtmlImportController</td></tr>
+                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>12</td><td>PageController, ElementController, RevisionController, FormController, CollaborationController, HtmlImportController, ThemeTemplateController, CustomFontController, GlobalWidgetController, PopupController, DynamicTagController, FindReplaceController</td></tr>
                     <tr><td><code>app/Http/Controllers/Api/</code></td><td>2</td><td>PageApiController, ElementApiController (REST API)</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>7</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager, CollaborationService, HtmlImportService</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>30</td><td>BaseWidget + 29 widgets concretos</td></tr>
-                    <tr><td><code>app/Jobs/</code></td><td>3</td><td>ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob</td></tr>
-                    <tr><td><code>app/Providers/</code></td><td>1</td><td>PageBuilderServiceProvider (registra singletons e rotas)</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>8</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager, CollaborationService, HtmlImportService, HtmlSanitizer</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>31</td><td>BaseWidget + 30 widgets concretos</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/DynamicTags/</code></td><td>1+</td><td>DynamicTagService</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/GlobalWidget/</code></td><td>1+</td><td>GlobalWidgetService</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Popup/</code></td><td>1+</td><td>PopupService</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Theme/</code></td><td>1+</td><td>ThemeService</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Security/</code></td><td>1+</td><td>HtmlSanitizer</td></tr>
+                    <tr><td><code>app/Contracts/Repositories/</code></td><td>2</td><td>PageRepositoryInterface, ElementRepositoryInterface</td></tr>
+                    <tr><td><code>app/Repositories/</code></td><td>2</td><td>PageRepository, ElementRepository</td></tr>
+                    <tr><td><code>app/Http/Resources/</code></td><td>3</td><td>PageResource, PageCollection, ElementResource</td></tr>
+                    <tr><td><code>app/Jobs/</code></td><td>4</td><td>ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob, ProcessFormSubmissionJob</td></tr>
+                    <tr><td><code>app/Providers/</code></td><td>PageBuilderServiceProvider</td><td>Registra singletons, rotas, views e config</td></tr>
                     <tr><td><code>config/page-builder.php</code></td><td>1</td><td>Configuração: lista de widgets habilitados, config de cache</td></tr>
-                    <tr><td><code>database/migrations/</code></td><td>5</td><td>pages, elements, revisions, form_submissions, add_role_to_users</td></tr>
-                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>50+ rotas (pages, elements, revisions, collab, html-import)</td></tr>
+                    <tr><td><code>database/migrations/</code></td><td>13</td><td>users, cache, jobs, pages, elements, revisions, form_submissions, add_role_to_users, personal_access_tokens, custom_fonts, global_widgets, popups, theme_templates</td></tr>
+                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>100+ rotas (pages, elements, revisions, themes, popups, global-widgets, fonts, collab, html-import, find-replace, dynamic-tags)</td></tr>
                     <tr><td><code>routes/api.php</code></td><td>1</td><td>API REST com Sanctum (tokens, pages, elements)</td></tr>
-                    <tr><td><code>resources/views/</code></td><td>16</td><td>Blade views (editor, pages, auth, tutorial + 7 partials editor/)</td></tr>
+                    <tr><td><code>resources/views/</code></td><td>22</td><td>Blade views (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
                     <tr><td><code>resources/js/editor/</code></td><td>8</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop (SortableJS), html-import, css</td></tr>
                     <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
                     <tr><td><code>tests/Feature/</code></td><td>4</td><td>PageControllerTest, ElementControllerTest, RevisionControllerTest, ExampleTest</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Injeção de Dependências (Provider)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Injeção de Dependências (Providers)</h3>
                 <p>O <code>PageBuilderServiceProvider</code> registra todos os serviços como <strong>singletons</strong> (uma instância compartilhada):</p>
                 <ul>
-                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 29 widgets</li>
+                    <li><code>WidgetManager</code> — lê <code>config/page-builder.php</code> e registra os 30 widgets</li>
                     <li><code>ElementManager</code> — CRUD elementos, buildTree() para construir árvore a partir do banco</li>
                     <li><code>Renderer</code> — recebe WidgetManager, renderiza árvore de elementos → HTML</li>
                     <li><code>PageBuilderService</code> — orquestra os três serviços acima</li>
                     <li><code>TemplateManager</code> — singleton independente, sem dependências</li>
                     <li><code>CollaborationService</code> — usa Cache para presença e bloqueio de elementos</li>
                 </ul>
-                <p>O provider também carrega rotas, views e config publicável.</p>
+                <p>O <code>AppServiceProvider</code> registra os repositórios com binding de interface para implementação:</p>
+                <ul>
+                    <li><code>PageRepositoryInterface → PageRepository</code></li>
+                    <li><code>ElementRepositoryInterface → ElementRepository</code></li>
+                </ul>
+                <p>O <code>bootstrap/app.php</code> registra middlewares customizados:</p>
+                <ul>
+                    <li><code>InjectThemeTemplates</code> — middleware global</li>
+                    <li><code>ContentSecurityPolicy</code> — middleware do grupo <code>web</code></li>
+                </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Fluxo de Dados Principal</h3>
                 <ol>
@@ -2103,7 +2351,8 @@ php artisan db:seed</code></pre>
                     <li><strong>Arrastar widget</strong> → JS envia <code>POST /elements</code> → <code>ElementController::store()</code> → insere na tabela <code>elements</code></li>
                     <li><strong>Editar configuração</strong> → JS envia <code>PUT /elements/{id}/settings</code> → atualiza JSON <code>settings</code></li>
                     <li><strong>Salvar</strong> → <code>PUT /pages/{id}</code> → <code>PageBuilderService::updatePage()</code> → cria <code>Revision</code></li>
-                    <li><strong>Renderizar</strong> → <code>Renderer::render()</code> → percorre árvore recursivamente → gera HTML com estilos inline</li>
+                    <li><strong>Renderizar</strong> → <code>Renderer::render()</code> → <code>loadElementTree()</code> carrega todos elementos em <strong>1 query</strong>, monta árvore em memória → gera HTML com estilos inline</li>
+                    <li><strong>Cache</strong> → ao alterar página/elemento, <code>clearPageCache()</code> faz <code>$page->touch()</code> (nova chave de cache) + <code>Cache::tags()</code> flush</li>
                     <li><strong>Importar HTML</strong> → <code>HtmlImportController::import()</code> → <code>ImportHtmlJob</code> (Queue) → converte HTML em widgets</li>
                     <li><strong>Colaboração</strong> → <code>CollaborationController::join()</code> → <code>CollaborationService</code> → Cache para presença</li>
                 </ol>
@@ -2122,9 +2371,9 @@ php artisan db:seed</code></pre>
 
         {{-- DATABASE --}}
         <section id="database" class="step">
-            <h2>18. Banco de Dados</h2>
+            <h2>20. Banco de Dados</h2>
             <div class="step-body">
-                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 4 tabelas principais além das padrão do Laravel (users, cache, jobs, personal_access_tokens):</p>
+                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 8 tabelas principais além das padrão do Laravel (users, cache, jobs, personal_access_tokens):</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Tabela <code>pages</code></h3>
                 <table class="widget-table">
@@ -2212,12 +2461,65 @@ php artisan db:seed</code></pre>
                     <tr><td><code>last_used_at</code></td><td>timestamp (nullable)</td><td>Último uso</td></tr>
                     <tr><td><code>expires_at</code></td><td>timestamp (nullable)</td><td>Data de expiração</td></tr>
                 </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>custom_fonts</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono da fonte</td></tr>
+                    <tr><td><code>name</code></td><td>string</td><td>Nome da fonte</td></tr>
+                    <tr><td><code>family</code></td><td>string</td><td>Família tipográfica</td></tr>
+                    <tr><td><code>weight</code></td><td>string</td><td>Peso (normal, bold, etc.)</td></tr>
+                    <tr><td><code>style</code></td><td>string</td><td>Estilo (normal, italic)</td></tr>
+                    <tr><td><code>files</code></td><td>json</td><td>Arquivos da fonte (ttf, woff, woff2)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>global_widgets</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do widget</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>Tipo do widget (heading, text, etc.)</td></tr>
+                    <tr><td><code>name</code></td><td>string</td><td>Nome do widget global</td></tr>
+                    <tr><td><code>settings</code></td><td>json</td><td>Configurações do widget</td></tr>
+                    <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do widget</td></tr>
+                    <tr><td><code>styles</code></td><td>json (nullable)</td><td>Estilos do widget</td></tr>
+                    <tr><td><code>activity</code></td><td>json (nullable)</td><td>Dados de atividade</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>popups</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do popup</td></tr>
+                    <tr><td><code>title</code></td><td>string</td><td>Título do popup</td></tr>
+                    <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
+                    <tr><td><code>status</code></td><td>string</td><td>draft / published</td></tr>
+                    <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do popup</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações visuais</td></tr>
+                    <tr><td><code>triggers</code></td><td>json (nullable)</td><td>Gatilhos de exibição</td></tr>
+                    <tr><td><code>conditions</code></td><td>json (nullable)</td><td>Condições de exibição</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>theme_templates</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do template</td></tr>
+                    <tr><td><code>title</code></td><td>string</td><td>Título do template</td></tr>
+                    <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>Tipo (header, footer, single, archive)</td></tr>
+                    <tr><td><code>status</code></td><td>string</td><td>draft / published</td></tr>
+                    <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do template</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações</td></tr>
+                    <tr><td><code>conditions</code></td><td>json (nullable)</td><td>Condições de exibição</td></tr>
+                </table>
             </div>
         </section>
 
         {{-- ROUTES --}}
         <section id="routes" class="step">
-            <h2>19. Rotas</h2>
+            <h2>21. Rotas</h2>
             <div class="step-body">
                 <p>Todas as rotas do page builder ficam em <code>routes/page-builder.php</code>, protegidas pelo middleware <code>web</code> + <code>auth</code>, com prefixo <code>/page-builder</code>.</p>
 
@@ -2298,12 +2600,79 @@ php artisan db:seed</code></pre>
                     <tr><td>POST</td><td><code>/page-builder/pages/{id}/form/submit</code></td><td>FormController@submit</td><td>Enviar formulário</td></tr>
                     <tr><td>GET</td><td><code>/page-builder/pages/{id}/form/submissions</code></td><td>FormController@submissions</td><td>Listar envios</td></tr>
                 </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Dynamic Tags</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/dynamic-tags</code></td><td>DynamicTagController@index</td><td>Listar dynamic tags disponíveis</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Find &amp; Replace</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>POST</td><td><code>/page-builder/find-replace/search</code></td><td>FindReplaceController@search</td><td>Buscar conteúdo nas páginas</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/find-replace/replace</code></td><td>FindReplaceController@replace</td><td>Substituir conteúdo nas páginas</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Custom Fonts</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/fonts</code></td><td>CustomFontController@index</td><td>Listar fontes</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/fonts</code></td><td>CustomFontController@store</td><td>Upload de nova fonte</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/fonts/{id}</code></td><td>CustomFontController@update</td><td>Atualizar fonte</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/fonts/{id}</code></td><td>CustomFontController@destroy</td><td>Excluir fonte</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/fonts/{id}/download/{format}</code></td><td>CustomFontController@download</td><td>Download da fonte (ttf/woff/woff2)</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Theme Templates</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/themes</code></td><td>ThemeTemplateController@index</td><td>Listar templates de tema</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/themes/create</code></td><td>ThemeTemplateController@create</td><td>Formulário de criação</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/themes</code></td><td>ThemeTemplateController@store</td><td>Criar template de tema</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/themes/{id}/edit</code></td><td>ThemeTemplateController@edit</td><td>Formulário de edição</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/themes/{id}</code></td><td>ThemeTemplateController@update</td><td>Atualizar template</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/themes/{id}</code></td><td>ThemeTemplateController@destroy</td><td>Excluir template</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/themes/{id}/editor</code></td><td>ThemeTemplateController@editor</td><td>Abrir editor visual do tema</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/themes/{id}/render</code></td><td>ThemeTemplateController@render</td><td>Renderizar template</td></tr>
+                    <tr><td>GET/PUT</td><td><code>/page-builder/themes/{id}/conditions</code></td><td>ThemeTemplateController@editConditions</td><td>Gerenciar condições</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/themes/{id}/publish</code></td><td>ThemeTemplateController@publish</td><td>Publicar template</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/themes/{id}/unpublish</code></td><td>ThemeTemplateController@unpublish</td><td>Despublicar template</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Global Widgets</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/global-widgets</code></td><td>GlobalWidgetController@index</td><td>Listar widgets globais</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/global-widgets</code></td><td>GlobalWidgetController@store</td><td>Criar widget global</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/global-widgets/{id}</code></td><td>GlobalWidgetController@show</td><td>Ver widget global</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/global-widgets/{id}</code></td><td>GlobalWidgetController@update</td><td>Atualizar widget global</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/global-widgets/{id}</code></td><td>GlobalWidgetController@destroy</td><td>Excluir widget global</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/global-widgets/{id}/render</code></td><td>GlobalWidgetController@render</td><td>Renderizar widget global</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Popups</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/popups</code></td><td>PopupController@index</td><td>Listar popups</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/popups/create</code></td><td>PopupController@create</td><td>Formulário de criação</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/popups</code></td><td>PopupController@store</td><td>Criar popup</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/popups/{id}/edit</code></td><td>PopupController@edit</td><td>Formulário de edição</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/popups/{id}</code></td><td>PopupController@update</td><td>Atualizar popup</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/popups/{id}</code></td><td>PopupController@destroy</td><td>Excluir popup</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/popups/{id}/editor</code></td><td>PopupController@editor</td><td>Abrir editor do popup</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/popups/{id}/render</code></td><td>PopupController@render</td><td>Renderizar popup</td></tr>
+                    <tr><td>GET/PUT</td><td><code>/page-builder/popups/{id}/triggers</code></td><td>PopupController@getTriggers</td><td>Gerenciar gatilhos</td></tr>
+                    <tr><td>GET/PUT</td><td><code>/page-builder/popups/{id}/conditions</code></td><td>PopupController@getConditions</td><td>Gerenciar condições</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/popups/{id}/publish</code></td><td>PopupController@publish</td><td>Publicar popup</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/popups/{id}/unpublish</code></td><td>PopupController@unpublish</td><td>Despublicar popup</td></tr>
+                </table>
             </div>
         </section>
 
         {{-- API REST --}}
         <section id="api" class="step">
-            <h2>20. API REST (Sanctum)</h2>
+            <h2>22. API REST (Sanctum)</h2>
             <div class="step-body">
                 <p>O Page Builder expõe uma <strong>API REST</strong> completa com autenticação via <strong>Laravel Sanctum</strong>. Isso permite integração com aplicativos móveis, SPAs externas e automações.</p>
 
@@ -2362,12 +2731,47 @@ curl -X POST -H "Authorization: Bearer 1|abc123..." \
                 <div class="tip">
                     <strong>&#128161; Dica:</strong> A API filtra páginas pelo <code>user_id</code> do token — cada usuário só vê suas próprias páginas. Use <code>?per_page=50</code> para ajustar a paginação.
                 </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">API Resources (Transformers)</h3>
+                <p>As respostas da API usam <strong>Laravel API Resources</strong> para transformar os modelos em JSON estruturado:</p>
+                <ul>
+                    <li><code>PageResource</code> — expõe id, title, slug, status, settings, meta_data, timestamps. Inclui <code>elements</code> (árvore recursiva via <code>ElementResource</code>) quando a relação está carregada.</li>
+                    <li><code>PageCollection</code> — wrapper para coleções paginadas de <code>PageResource</code>.</li>
+                    <li><code>ElementResource</code> — expõe uuid, type, name, settings, content, styles, children recursivos.</li>
+                </ul>
+                <p>Exemplo de resposta <code>GET /api/pages/{id}</code>:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0"><code>{
+    "page": {
+        "id": 1,
+        "title": "Minha Página",
+        "slug": "minha-pagina",
+        "status": "draft",
+        "settings": { "container_width": "1140px" },
+        "elements": [
+            {
+                "id": "uuid-1234",
+                "type": "section",
+                "name": "Section",
+                "settings": {},
+                "children": [
+                    {
+                        "id": "uuid-5678",
+                        "type": "heading",
+                        "name": "Heading",
+                        "settings": { "title": "Olá Mundo" },
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+}</code></pre>
             </div>
         </section>
 
         {{-- JOBS --}}
         <section id="jobs" class="step">
-            <h2>21. Jobs &amp; Filas</h2>
+            <h2>23. Jobs &amp; Filas</h2>
             <div class="step-body">
                 <p>O projeto usa o sistema de <strong>Jobs do Laravel</strong> para processar tarefas pesadas em segundo plano via Queue.</p>
 
@@ -2375,8 +2779,9 @@ curl -X POST -H "Authorization: Bearer 1|abc123..." \
                 <table class="widget-table">
                     <tr><th>Job</th><th>Descrição</th><th>Timeout</th><th>Tentativas</th></tr>
                     <tr><td><code>ImportHtmlJob</code></td><td>Converte HTML externo em elementos do page builder e cria a página. Processado via <code>HtmlImportController::import()</code>.</td><td>60s</td><td>3</td></tr>
-                    <tr><td><code>ClearPageCacheJob</code></td><td>Limpa o cache renderizado de uma página (key <code>page.{id}.render.{hash}</code>). Chamado após atualizar elementos.</td><td>10s</td><td>3</td></tr>
+                    <tr><td><code>ClearPageCacheJob</code></td><td>Invalida o cache da página via <code>$page->touch()</code> (nova chave de cache) + <code>Cache::tags()</code> flush. Pode ser dispatchado manualmente.</td><td>10s</td><td>1</td></tr>
                     <tr><td><code>AutoSaveRevisionJob</code></td><td>Cria uma revisão automática (<code>type: auto_save</code>) com snapshot do conteúdo e configurações da página.</td><td>30s</td><td>3</td></tr>
+                    <tr><td><code>ProcessFormSubmissionJob</code></td><td>Processa notificações de formulário em background (email para admin). Dispatchado após <code>FormController::submit()</code>.</td><td>30s</td><td>3</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Configuração da Queue</h3>
@@ -2400,7 +2805,7 @@ php artisan queue:listen --timeout=60</code></pre>
 
         {{-- QUALITY --}}
         <section id="quality" class="step">
-            <h2>22. Qualidade &amp; Testes</h2>
+            <h2>24. Qualidade &amp; Testes</h2>
             <div class="step-body">
                 <p>O projeto tem uma suíte completa de testes automatizados com <strong>93 testes</strong> rodando em SQLite em memória.</p>
 
@@ -2458,48 +2863,48 @@ php artisan test --verbose</pre>
                     <strong>&#128161; Importante:</strong> Por padrão, o cache está <strong>desligado</strong>. Cada visualização re-renderiza a página do banco de dados. Se você não adicionou <code>PAGE_BUILDER_CACHE=true</code> no <code>.env</code>, não existe cache para limpar.
                 </div>
 
-                <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Quando o cache é limpo automaticamente</h4>
-                <p>O <code>ClearPageCacheJob</code> é disparado automaticamente ao:</p>
+                <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Como funciona a invalidação de cache</h4>
+                <p>A chave de cache inclui o timestamp de <code>updated_at</code> da página. Ao modificar a página ou seus elementos, o método <code>clearPageCache()</code> executa:</p>
+                <ol>
+                    <li><code>$page->touch()</code> — atualiza <code>updated_at</code>, fazendo a próxima renderização usar uma chave de cache diferente (invalidação implícita)</li>
+                    <li><code>Cache::tags("page:{id}")->flush()</code> — limpa entradas por tag quando o driver suporta (Redis, Memcached)</li>
+                </ol>
+                <p>A invalidação acontece automaticamente ao:</p>
                 <ul>
                     <li>Salvar/atualizar uma página (<code>PageBuilderService::updatePage()</code>)</li>
                     <li>Adicionar, atualizar, remover ou duplicar um widget</li>
                     <li>Restaurar uma revisão</li>
                 </ul>
 
-                <div class="warning">
-                    <strong>&#9888;&#65039; Atenção:</strong> O botão <strong>"Publicar"</strong> <strong>NÃO</strong> limpa o cache. Se a cache estiver ativa, publique <strong>depois</strong> de salvar para garantir que a visualização mostre o conteúdo atualizado.
-                </div>
-
                 <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Como limpar o cache manualmente</h4>
                 <div style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0">
 <pre style="margin:0"># Limpar TODO o cache do Laravel (inclui páginas)
 php artisan cache:clear
 
-# Limpar só o cache de uma página específica (via Tinker)
+# Limpar cache de página específica com tags (Redis)
 php artisan tinker
-# Digite:
-Cache::forget("page.1.render." . md5(json_encode(['with_container' => true])));
-Cache::forget("page.1.render." . md5(json_encode(['with_container' => false])));
-Cache::forget("page.1.render." . md5(json_encode([])));
-Cache::forget("page.1.json");</pre>
+Cache::tags("page:1")->flush();
+
+# Alternativa: forçar nova renderização
+$page = App\Models\Page::find(1);
+$page->touch();</pre>
                 </div>
 
                 <h4 style="font-size:.95rem;margin-top:1rem;margin-bottom:.5rem">Resumo do fluxo de cache</h4>
                 <table class="widget-table">
-                    <tr><th>Ação</th><th>Cache limpo?</th><th>Re-renderiza?</th></tr>
-                    <tr><td>Salvar (botão Salvar)</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
-                    <tr><td>Publicar</td><td style="color:red">❌ Não</td><td>Usa cache antigo se existir</td></tr>
-                    <tr><td>Editar widget</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
-                    <tr><td>Remover widget</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
-                    <tr><td>Restaurar revisão</td><td style="color:green">✅ Sim (via Job)</td><td>Próxima visualização</td></tr>
-                    <tr><td><code>php artisan cache:clear</code></td><td style="color:green">✅ Tudo</td><td>Próxima visualização</td></tr>
+                    <tr><th>Ação</th><th>Cache invalidado?</th><th>Mecanismo</th></tr>
+                    <tr><td>Salvar página</td><td style="color:green">✅ Sim</td><td><code>$page->touch()</code> + tags flush</td></tr>
+                    <tr><td>Editar widget</td><td style="color:green">✅ Sim</td><td><code>$page->touch()</code> + tags flush</td></tr>
+                    <tr><td>Remover widget</td><td style="color:green">✅ Sim</td><td><code>$page->touch()</code> + tags flush</td></tr>
+                    <tr><td>Restaurar revisão</td><td style="color:green">✅ Sim</td><td><code>$page->touch()</code> + tags flush</td></tr>
+                    <tr><td><code>php artisan cache:clear</code></td><td style="color:green">✅ Tudo</td><td>Limpa todo o cache</td></tr>
                 </table>
             </div>
         </section>
 
         {{-- IMPROVEMENTS --}}
         <section id="improvements" class="step">
-            <h2>23. Melhorias Propostas</h2>
+            <h2>25. Melhorias Propostas</h2>
             <div class="step-body">
                 <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
 
@@ -2522,8 +2927,14 @@ Cache::forget("page.1.json");</pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades Adicionais Implementadas (fora do IMPROVEMENTS.md)</h3>
                 <ul>
-                    <li><strong>29 widgets</strong> — Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel</li>
+                    <li><strong>30 widgets</strong> — Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie</li>
                     <li><strong>27 tipos de controles</strong> — text, number, textarea, select, color, boolean, url, image, video, wysiwyg, icon, gallery, repeater, typography, background, border, box_shadow, dimensions, hover, custom_css, animation, visibility, gradient, scroll_animation, text_shadow, text_stroke, column_width</li>
+                    <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive) com condições</li>
+                    <li><strong>Popups</strong> — criação e edição com gatilhos e condições de exibição</li>
+                    <li><strong>Global Widgets</strong> — widgets reutilizáveis em várias páginas</li>
+                    <li><strong>Custom Fonts</strong> — upload de fontes (ttf, woff, woff2)</li>
+                    <li><strong>Dynamic Tags</strong> — conteúdo dinâmico do sistema</li>
+                    <li><strong>Find &amp; Replace</strong> — busca e substituição</li>
                     <li><strong>Colaboração em tempo real</strong> — presença, bloqueio de elementos, cursores (via Cache)</li>
                     <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou textarea, processamento via Job</li>
                     <li><strong>API REST com Sanctum</strong> — autenticação token-based, CRUD completo de páginas e elementos</li>
@@ -2531,6 +2942,14 @@ Cache::forget("page.1.json");</pre>
                     <li><strong>PagePolicy</strong> — autorização por dono da página</li>
                     <li><strong>Sanitização XSS</strong> — <code>sanitizeContent()</code> e <code>sanitizeSettings()</code></li>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
+                    <li><strong>Content Security Policy (CSP)</strong> — middleware <code>ContentSecurityPolicy</code> no grupo <code>web</code></li>
+                    <li><strong>HtmlSanitizer</strong> — serviço dedicado para sanitizar CSS, JS e URLs</li>
+                    <li><strong>Repository Pattern</strong> — <code>PageRepository</code> e <code>ElementRepository</code> com interfaces injetáveis</li>
+                    <li><strong>API Resources</strong> — <code>PageResource</code>, <code>PageCollection</code>, <code>ElementResource</code> para respostas REST estruturadas</li>
+                    <li><strong>N+1 eliminado no Renderer</strong> — <code>loadElementTree()</code> carrega todos elementos em 1 query</li>
+                    <li><strong>Cache invalidation robusta</strong> — <code>$page->touch()</code> + <code>Cache::tags()</code> ao invés de key registry quebrado</li>
+                    <li><strong>Cache no GlobalWidgetService</strong> — <code>getAll()</code> cacheado com <code>clearCache()</code> nas mutações</li>
+                    <li><strong>ProcessFormSubmissionJob</strong> — notificações de formulário em background</li>
                     <li><strong>93 testes automatizados</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Editor WYSIWYG</strong> — toolbar rich-text com imagens, vídeos, listas</li>
                     <li><strong>Edição inline</strong> — preserva HTML (innerHTML) ao invés de textContent</li>
@@ -2584,11 +3003,11 @@ Cache::forget("page.1.json");</pre>
 
         {{-- MOODLE --}}
         <section id="moodle" class="step">
-            <h2>24. Uso com Moodle 4.5+</h2>
+            <h2>26. Uso com Moodle 4.5+</h2>
             <div class="step-body">
                 <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções detalhadas.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.1 Copiar HTML para o Moodle (recomendado)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.1 Copiar HTML para o Moodle (recomendado)</h3>
                 <ol>
                     <li>Crie sua página no Page Builder normalmente (use um modelo pronto ou comece do zero). Os modelos são fixos e nunca são alterados ao criar uma nova página — o sistema faz uma cópia dos dados para a página nova.</li>
                     <li>No editor visual, clique no botão <strong>"Copy HTML"</strong> (ícone de clipboard) na barra de ferramentas. Uma notificação "HTML copiado!" será exibida.</li>
@@ -2598,21 +3017,21 @@ Cache::forget("page.1.json");</pre>
                     <li>Salve a página. O conteúdo será exibido com todos os estilos preservados.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.2 Exportar como JSON (backup ou transferência entre instalações)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.2 Exportar como JSON (backup ou transferência entre instalações)</h3>
                 <ol>
                     <li>Na lista de páginas do Page Builder, clique em <strong>"Export"</strong> na página desejada. Um arquivo <code>.json</code> será baixado com toda a estrutura da página.</li>
                     <li>Para importar em outra instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, faça upload do arquivo <code>.json</code> e a página será recriada.</li>
-                    <li>Após importar, abra a página no editor e use o <strong>"Copy HTML"</strong> (passo 20.1) para colar o conteúdo no Moodle.</li>
+                    <li>Após importar, abra a página no editor e use o <strong>"Copy HTML"</strong> (passo 26.1) para colar o conteúdo no Moodle.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.3 Renderização como Página Moodle (iframe)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.3 Renderização como Página Moodle (iframe)</h3>
                 <ol>
                     <li>O Page Builder pode ser incorporado ao Moodle como um <strong>recurso externo</strong> ou via <strong>iframe</strong>, apontando para a URL pública da página renderizada.</li>
                     <li>Use o parâmetro <code>?format=inner</code> na URL de renderização (<code>/page-builder/pages/{id}/render?format=inner</code>) para obter apenas o HTML do conteúdo, sem a estrutura completa da página.</li>
                     <li>Você também pode usar <code>?format=inner&theme=none</code> para um HTML ainda mais limpo, apenas com os elementos e estilos inline.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.4 Widgets Educacionais no Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.4 Widgets Educacionais no Moodle</h3>
                 <p>Os widgets educacionais (Callout, Table, Math) são especialmente úteis para criar conteúdo de cursos no Moodle:</p>
                 <ul>
                     <li><strong>Callout:</strong> Caixas de destaque para definições, teoremas, exercícios, avisos e dicas. Cada tipo tem cores e ícones automáticos. O HTML renderizado mantém todos os estilos inline, compatível com o Moodle.</li>
@@ -2623,7 +3042,7 @@ Cache::forget("page.1.json");</pre>
                     <strong>&#128161; Dica:</strong> Para cursos de matemática, combine os três widgets: use <strong>Callout (type=theorem)</strong> para enunciar teoremas, <strong>Math</strong> para as fórmulas em destaque, e <strong>Callout (type=exercise)</strong> para propostas de exercícios. Insira tabelas com <strong>Table</strong> para organizar dados e comparativos.
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">20.5 Dicas para Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.5 Dicas para Moodle</h3>
                 <ul>
                     <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), garantindo compatibilidade máxima com o editor do Moodle — nenhum plugin adicional é necessário.</li>
                     <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens enviadas para <code>storage/app/public/</code> no Page Builder não serão acessíveis pelo Moodle.</li>

@@ -5,6 +5,7 @@ namespace App\Services\PageBuilder\Core;
 use App\Models\Page;
 use App\Models\Element;
 use App\Services\PageBuilder\DynamicTags\DynamicTagService;
+use App\Services\PageBuilder\Security\HtmlSanitizer;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -24,6 +25,8 @@ class Renderer
     public function render(Page $page, array $options = []): string
     {
         $this->theme = $options['theme'] ?? 'default';
+
+        $this->loadElementTree($page);
 
         $pageSettings = $page->settings ?? [];
 
@@ -47,17 +50,30 @@ HTML;
 
         if ($options['with_container'] ?? true) {
             $lang = $options['lang'] ?? 'en';
-            $hasMath = $page->elements()->where('type', 'math')->exists()
-                || $page->elements()->where('type', 'text')->where('settings->content', 'LIKE', '%pb-math%')->exists();
+            $hasMath = $this->hasMathElements($page);
             $renderStyles = $this->renderStyles($page, $hasMath);
             $renderScripts = $this->renderScripts($page, $hasMath);
             $title = htmlspecialchars($page->title, ENT_QUOTES, 'UTF-8');
+            $csp = implode('; ', [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com",
+                "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com",
+                "img-src 'self' data: blob: https: http:",
+                "font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com https://fonts.googleapis.com",
+                "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+                "connect-src 'self'",
+                "media-src 'self' https:",
+                "object-src 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+            ]);
             $content = <<<HTML
 <!DOCTYPE html>
 <html lang="{$lang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="{$csp}">
     <title>{$title}</title>
     <style>
         body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -159,6 +175,8 @@ HTML;
 
     public function renderEditor(Page $page): string
     {
+        $this->loadElementTree($page);
+
         $html = '';
 
         foreach ($page->elements as $element) {
@@ -216,9 +234,12 @@ HTML;
         $customCss = $settings['custom_css'] ?? '';
         $customStyle = '';
         if ($customCss) {
-            $selector = $cssId ? "#{$element->css_id}" : ".pb-editor-element[data-element-id=\"{$element->id}\"]";
-            $customStyle = "<style>{$selector} { {$customCss} }</style>";
+            $sanitizedCss = HtmlSanitizer::sanitizeCustomCss($customCss);
+            $selector = $cssId ? "#{$element->css_id}" : ".pb-element[data-element-id=\"{$element->id}\"]";
+            $customStyle = "<style>{$selector} { {$sanitizedCss} }</style>";
         }
+
+        $visStyle = $visCss ? "<style>{$visCss}</style>" : '';
 
         return $visStyle . $customStyle . <<<HTML
 <div{$cssId} class="{$classes}" data-element-id="{$element->id}" data-element-type="{$element->type}" draggable="true">
@@ -353,8 +374,9 @@ HTML;
 
     protected function renderStyles(Page $page, bool $hasMath = false): string
     {
-        $hasAnimations = $page->elements()->where('settings->animation', '!=', 'none')
-            ->whereNotNull('settings->animation')->exists();
+        $hasAnimations = $page->elements
+            ->filter(fn($e) => !empty($e->settings['animation']) && $e->settings['animation'] !== 'none')
+            ->isNotEmpty();
 
         $css = "\n<style>\n.pb-drop-cap:first-letter { font-size: 3em; float: left; line-height: 1; margin-right: 10px; }\n";
 
@@ -388,7 +410,8 @@ HTML;
         }
 
         if ($page->settings['custom_css'] ?? false) {
-            $css .= "\n<style>\n{$page->settings['custom_css']}\n</style>\n";
+            $sanitizedCss = HtmlSanitizer::sanitizeCustomCss($page->settings['custom_css']);
+            $css .= "\n<style>\n{$sanitizedCss}\n</style>\n";
         }
 
         if ($page->settings['google_fonts'] ?? false) {
@@ -412,11 +435,11 @@ HTML;
         $scripts = '';
 
         if ($page->settings['custom_js'] ?? false) {
-            $scripts .= "\n<script>\n{$page->settings['custom_js']}\n</script>\n";
+            $scripts .= "\n<script>\n" . HtmlSanitizer::sanitizeCustomJs($page->settings['custom_js']) . "\n</script>\n";
         }
 
         if ($page->settings['custom_js_footer'] ?? false) {
-            $scripts .= "\n<script>\n{$page->settings['custom_js_footer']}\n</script>\n";
+            $scripts .= "\n<script>\n" . HtmlSanitizer::sanitizeCustomJs($page->settings['custom_js_footer']) . "\n</script>\n";
         }
 
         if ($hasMath) {
@@ -483,8 +506,9 @@ HTML;
         $customCss = $settings['custom_css'] ?? '';
         $customStyle = '';
         if ($customCss) {
+            $sanitizedCss = HtmlSanitizer::sanitizeCustomCss($customCss);
             $selector = $cssId ? "#{$element->css_id}" : ".pb-element[data-element-id=\"{$element->id}\"]";
-            $customStyle = "<style>{$selector} { {$customCss} }</style>";
+            $customStyle = "<style>{$selector} { {$sanitizedCss} }</style>";
         }
 
         $visStyle = $visCss ? "<style>{$visCss}</style>" : '';
@@ -498,6 +522,38 @@ HTML;
     <div class="pb-el-content">{$innerHtml}</div>
 </div>
 HTML;
+    }
+
+    protected function loadElementTree(Page $page): void
+    {
+        $allElements = $page->allElements()->get()->keyBy('id');
+
+        $rootElements = $allElements->whereNull('parent_id')->sortBy('order')->values();
+
+        foreach ($allElements as $element) {
+            $children = $allElements->where('parent_id', $element->id)->sortBy('order')->values();
+            $element->setRelation('children', $children);
+        }
+
+        $page->setRelation('elements', $rootElements);
+    }
+
+    protected function hasMathElements(Page $page): bool
+    {
+        $all = collect();
+        $flatten = function ($elements) use (&$all, &$flatten) {
+            foreach ($elements as $e) {
+                $all->push($e);
+                if ($e->children->isNotEmpty()) {
+                    $flatten($e->children);
+                }
+            }
+        };
+        $flatten($page->elements);
+
+        return $all->contains(fn($e) => $e->type === 'math')
+            || $all->filter(fn($e) => $e->type === 'text')
+                ->contains(fn($e) => str_contains($e->settings['content'] ?? '', 'pb-math'));
     }
 
     public function getWidgetControls(string $type): ?array
@@ -518,6 +574,8 @@ HTML;
 
     public function renderJson(Page $page): array
     {
+        $this->loadElementTree($page);
+
         return [
             'id' => $page->id,
             'title' => $page->title,

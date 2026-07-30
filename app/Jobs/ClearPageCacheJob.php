@@ -14,7 +14,7 @@ class ClearPageCacheJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    public int $tries = 1;
     public int $timeout = 10;
 
     public function __construct(
@@ -23,17 +23,11 @@ class ClearPageCacheJob implements ShouldQueue
 
     public function handle(): void
     {
-        $combinations = [
-            ['with_container' => true],
-            ['with_container' => false],
-            [],
-        ];
+        $this->page->touch();
 
-        foreach ($combinations as $options) {
-            $cacheKey = "page.{$this->page->id}.render." . md5(json_encode($options));
-            Cache::forget($cacheKey);
+        try {
+            Cache::tags("page:{$this->page->id}")->flush();
+        } catch (\Throwable) {
         }
-
-        Cache::forget("page.{$this->page->id}.json");
     }
 }

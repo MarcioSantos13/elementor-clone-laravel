@@ -6,6 +6,7 @@ use App\Models\Element;
 use App\Models\GlobalWidget;
 use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\WidgetManager;
+use Illuminate\Support\Facades\Cache;
 
 class GlobalWidgetService
 {
@@ -20,11 +21,20 @@ class GlobalWidgetService
 
     public function getAll(): array
     {
-        return GlobalWidget::orderBy('title')->with('user')->get()->all();
+        return Cache::remember('global_widgets_all', 300, function () {
+            return GlobalWidget::orderBy('title')->with('user')->get()->all();
+        });
+    }
+
+    public function clearCache(): void
+    {
+        Cache::forget('global_widgets_all');
     }
 
     public function create(array $data): GlobalWidget
     {
+        $this->clearCache();
+
         $data['user_id'] ??= auth()->id();
 
         return GlobalWidget::create([
@@ -41,6 +51,8 @@ class GlobalWidgetService
 
     public function update(GlobalWidget $globalWidget, array $data): GlobalWidget
     {
+        $this->clearCache();
+
         $globalWidget->update([
             'title' => $data['title'] ?? $globalWidget->title,
             'type' => $data['type'] ?? $globalWidget->type,
@@ -56,6 +68,7 @@ class GlobalWidgetService
 
     public function delete(GlobalWidget $globalWidget): void
     {
+        $this->clearCache();
         $globalWidget->delete();
     }
 
