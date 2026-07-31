@@ -16,5 +16,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', \App\Http\Middleware\ContentSecurityPolicy::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function ($request, \Throwable $e) {
+            return $request->expectsJson() || $request->is('api/*');
+        });
+
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['error' => 'Resource not found'], 404);
+            }
+        });
+
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
+        });
     })->create();

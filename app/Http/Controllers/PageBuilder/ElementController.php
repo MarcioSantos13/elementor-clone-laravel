@@ -11,9 +11,9 @@ use App\Services\PageBuilder\Core\Renderer;
 use App\Services\PageBuilder\Core\WidgetManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
 class ElementController extends Controller
@@ -164,11 +164,30 @@ class ElementController extends Controller
     {
         $this->authorize('update', $element->page);
         $validated = $request->validate([
-            'parent_id' => 'nullable|exists:elements,id',
+            'parent_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('elements', 'id')->where('page_id', $element->page_id),
+            ],
             'order' => 'required|integer|min:0',
         ]);
 
-        $element->parent_id = $validated['parent_id'] ?? null;
+        $parentId = $validated['parent_id'] ?? null;
+
+        if ($parentId) {
+            $parent = Element::find($parentId);
+            $parentWidget = $parent ? $this->widgetManager->getWidget($parent->type) : null;
+            if (!$parentWidget || !$parentWidget->isContainer()) {
+                return response()->json(['error' => 'Parent element must be a container'], 422);
+            }
+
+            $descendantIds = $this->getAllDescendantIds($element->id);
+            if (in_array($parentId, $descendantIds)) {
+                return response()->json(['error' => 'Cannot move element into its own descendant'], 422);
+            }
+        }
+
+        $element->parent_id = $parentId;
         $element->order = $validated['order'];
         $element->save();
 
@@ -176,6 +195,17 @@ class ElementController extends Controller
             'message' => 'Element moved successfully',
             'element' => $element->fresh()->load('children'),
         ]);
+    }
+
+    private function getAllDescendantIds(int $elementId): array
+    {
+        $ids = [];
+        $children = Element::where('parent_id', $elementId)->pluck('id');
+        foreach ($children as $childId) {
+            $ids[] = $childId;
+            $ids = array_merge($ids, $this->getAllDescendantIds($childId));
+        }
+        return $ids;
     }
 
     public function updateSettings(Request $request, Element $element): JsonResponse
@@ -273,7 +303,7 @@ class ElementController extends Controller
     public function uploadImage(Request $request): JsonResponse
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp,svg|max:10240',
         ]);
 
         $file = $request->file('image');
@@ -282,7 +312,7 @@ class ElementController extends Controller
         $mimeType = finfo_file($finfo, $file->getPathname());
         finfo_close($finfo);
 
-        $allowedImageMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $allowedImageMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
         if (!in_array($mimeType, $allowedImageMimes)) {
             return response()->json(['error' => 'Tipo de arquivo inválido.'], 422);
         }
@@ -292,6 +322,7 @@ class ElementController extends Controller
             'image/png' => 'png',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
+            'image/svg+xml' => 'svg',
             default => throw new \RuntimeException('Tipo não suportado'),
         };
 
@@ -356,7 +387,7 @@ class ElementController extends Controller
             'elements' => 'required|array',
         ]);
 
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        DB::beginTransaction();
 
         try {
             $snapshotIds = $this->collectSnapshotIds($validated['elements']);
@@ -366,7 +397,7 @@ class ElementController extends Controller
 
             $page->touch();
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
 
             $elements = $page->allElements()->get();
 
@@ -375,7 +406,7 @@ class ElementController extends Controller
                 'elements' => $this->elementManager->buildTree($elements),
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            DB::rollBack();
             return response()->json(['error' => 'Failed to restore snapshot: ' . $e->getMessage()], 500);
         }
     }

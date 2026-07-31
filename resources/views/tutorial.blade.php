@@ -93,8 +93,40 @@ php artisan db:seed</code></pre>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 5: Iniciar o servidor</h3>
-                <pre style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.85rem;overflow-x:auto"><code>php artisan serve</code></pre>
-                <p>O Page Builder estará disponível em <strong><a href="http://localhost:8000" target="_blank">http://localhost:8000</a></strong>.</p>
+                <p>O Page Builder usa dois servidores que trabalham juntos. É importante entender o papel de cada um:</p>
+                <table class="widget-table">
+                    <tr><th>Servidor</th><th>Comando</th><th>Porta</th><th>Função</th></tr>
+                    <tr><td><strong>Laravel</strong></td><td><code>php artisan serve</code></td><td>8000</td><td>Aplicação (rotas, banco, autenticação). <strong>É a URL que você abre no navegador.</strong></td></tr>
+                    <tr><td><strong>Vite (dev)</strong></td><td><code>npm run dev</code></td><td>5173</td><td>Serve os arquivos JS/CSS do editor e recarrega automaticamente ao editar. <strong>Não é para abrir no navegador</strong> — apenas fornece os assets para a aplicação.</td></tr>
+                    <tr><td><strong>Vite (build)</strong></td><td><code>npm run build</code></td><td>—</td><td>Empacota e minifica os assets em <code>public/build/</code> (usado quando o <code>npm run dev</code> NÃO está rodando).</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Modo de Desenvolvimento (com hot reload) — recomendado</h3>
+                <p>Abra <strong>dois terminais</strong> na pasta do projeto e rode:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.85rem;overflow-x:auto"><code># Terminal 1: servidor da aplicação
+php artisan serve</code></pre>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.85rem;overflow-x:auto"><code># Terminal 2: servidor de assets do Vite (fica rodando em segundo plano)
+npm run dev</code></pre>
+                <ol>
+                    <li>Acesse no navegador: <strong><a href="http://localhost:8000" target="_blank">http://localhost:8000</a></strong>.</li>
+                    <li>Se ao abrir o editor os widgets <strong>não arrastarem</strong>, dê um <strong>Ctrl+F5</strong> (recarregar ignorando cache).</li>
+                    <li>Enquanto o <code>npm run dev</code> estiver rodando, qualquer alteração em <code>resources/js/**</code> ou <code>resources/css/**</code> é refletida no navegador automaticamente, sem recarregar a página.</li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Importante:</strong> O Vite cria um arquivo <code>public/hot</code> para avisar o Laravel de que o servidor de dev está ativo. Ao parar o <code>npm run dev</code>, esse arquivo é removido. Se você trocar o <code>npm run dev</code> de terminal e o arquivo <code>public/hot</code> não for apagado, o Laravel continuará procurando os assets na porta 5173 e o editor pode "travar". Nesse caso, exclua manualmente o <code>public/hot</code> e reinicie o <code>npm run dev</code>.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Modo de Produção (sem npm run dev)</h3>
+                <p>Se você quiser rodar <strong>apenas</strong> o servidor Laravel (ex.: em um servidor compartilhado), é preciso compilar os assets primeiro:</p>
+                <pre style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.85rem;overflow-x:auto"><code># 1. Empacote os arquivos JS/CSS em public/build/
+npm run build
+
+# 2. Rode somente o servidor da aplicação
+php artisan serve</code></pre>
+                <ol>
+                    <li>Acesse no navegador: <strong><a href="http://localhost:8000" target="_blank">http://localhost:8000</a></strong>. A aplicação usará os arquivos compilados de <code>public/build/</code>.</li>
+                    <li><strong>Atenção:</strong> neste modo, alterações feitas nos arquivos JS/CSS <strong>não</strong> aparecem até você rodar <code>npm run build</code> novamente. Para desenvolvimento com atualização automática, use o modo de desenvolvimento acima.</li>
+                </ol>
 
                 <div class="tip">
                     <strong>&#128161; Dica:</strong> Se encontrar algum erro durante a instalação, verifique se todas as extensões PHP necessárias estão habilitadas (pdo_sqlite, mbstring, xml, curl, bcmath). O comando <code>php artisan about</code> mostra informações sobre o ambiente.
@@ -2259,7 +2291,7 @@ php artisan db:seed</code></pre>
 │  TemplateManager      — 5 templates predefinidos                │
 │  CollaborationService — presença, bloqueio, cursores (Cache)    │
 │  HtmlImportService    — converte HTML externo em widgets        │
-│  DynamicTagService    — substitui {{ tags }} por valores        │
+│  DynamicTagService    — substitui @{{ tags }} por valores        │
 │  HtmlSanitizer        — sanitiza CSS, JS e URLs contra XSS     │
 │  PopupService         — gerencia popups publicados com cache    │
 ├─────────────────────────────────────────────────────────────────┤

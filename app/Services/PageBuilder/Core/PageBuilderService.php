@@ -30,7 +30,7 @@ class PageBuilderService
     }
 
     /**
-     * Criar uma nova pÃ¡gina
+     * Criar uma nova página
      */
     public function createPage(array $data): Page
     {
@@ -44,7 +44,7 @@ class PageBuilderService
             $page->slug = $this->generateUniqueSlug($data['title']);
             $page->save();
 
-            // Criar revisÃ£o inicial
+            // Criar revisão inicial
             $this->createRevision($page, 'Initial creation');
 
             DB::commit();
@@ -73,14 +73,14 @@ class PageBuilderService
     }
 
     /**
-     * Atualizar pÃ¡gina
+     * Atualizar página
      */
     public function updatePage(Page $page, array $data): Page
     {
         DB::beginTransaction();
 
         try {
-            // Salvar conteÃºdo atual antes de modificar
+            // Salvar conteúdo atual antes de modificar
             $oldContent = $page->content;
 
             $page->fill($data);
@@ -91,7 +91,7 @@ class PageBuilderService
 
             $page->save();
 
-            // Criar revisÃ£o se conteÃºdo mudou
+            // Criar revisão se conteúdo mudou
             if ($oldContent != $page->content) {
                 $this->createRevision($page, 'Content updated');
             }
@@ -165,7 +165,7 @@ class PageBuilderService
     }
 
     /**
-     * Adicionar elemento Ã  pÃ¡gina
+     * Adicionar elemento à página
      */
     public function addElement(Page $page, string $widgetType, array $settings = []): Element
     {
@@ -221,7 +221,7 @@ class PageBuilderService
 
             DB::commit();
 
-            // Limpar cache da pÃ¡gina
+            // Limpar cache da página
             $this->clearPageCache($element->page);
 
             Event::dispatch('element.updated', $element);
@@ -302,7 +302,7 @@ class PageBuilderService
     }
 
     /**
-     * Criar revisÃ£o
+     * Criar revisão
      */
     protected function createRevision(Page $page, string $label = null): Revision
     {
@@ -317,7 +317,7 @@ class PageBuilderService
         $revision->type = 'manual';
         $revision->save();
 
-        // Limitar nÃºmero de revisÃµes
+        // Limitar número de revisões
         $limit = $this->config['revisions']['max_per_page'] ?? 50;
         if ($limit) {
             $page->revisions()
@@ -331,7 +331,7 @@ class PageBuilderService
     }
 
     /**
-     * Restaurar revisÃ£o
+     * Restaurar revisão
      */
     public function restoreRevision(Page $page, Revision $revision): Page
     {
@@ -360,7 +360,7 @@ class PageBuilderService
     }
 
     /**
-     * Gerar nÃºmero de versÃ£o
+     * Gerar número de versão
      */
     protected function generateVersionNumber(Page $page): string
     {
@@ -377,7 +377,7 @@ class PageBuilderService
     }
 
     /**
-     * Sanitizar conteÃºdo
+     * Sanitizar conteúdo
      */
     protected function sanitizeContent(array $content): array
     {
@@ -460,7 +460,7 @@ class PageBuilderService
     }
 
     /**
-     * Verificar se contÃ©m HTML
+     * Verificar se contém HTML
      */
     protected function containsHtml(string $string): bool
     {
@@ -537,7 +537,7 @@ class PageBuilderService
     }
 
     /**
-     * Importar pÃ¡gina de JSON
+     * Importar página de JSON
      */
     public function importPage(array $data, Page $page = null): Page
     {

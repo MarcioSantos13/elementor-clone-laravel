@@ -11,7 +11,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 @include('page-builder.editor.css')
 </head>
-<body>
+<body data-page-id="{{ $page->id }}" data-csrf="{{ csrf_token() }}">
 @include('page-builder.editor.toolbar')
 
 <div class="pb-layout">
