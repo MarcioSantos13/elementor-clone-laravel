@@ -66,7 +66,7 @@
                                         @if($key === 'landing')Hero section with CTA
                                         @elseif($key === 'about')Company presentation
                                         @elseif($key === 'contact')Contact form layout
-                                        @elseif($key === 'showcase')Hero, features, stats, gallery, team, CTA, footer
+                                        @elseif($key === 'showcase')Futuristic dark theme: hero with video, gallery & carousel, images with lightbox, pricing, testimonials, Lottie, form, map, footer
                                         @elseif($key === 'moodle-course')Curso educacional completo para Moodle
                                         @else&#8205;@endif
                                     </span>

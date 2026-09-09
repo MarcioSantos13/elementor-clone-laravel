@@ -322,7 +322,7 @@ HTML;
         return $processed;
     }
 
-    protected function renderStyles(Page $page, bool $hasMath = false): string
+    public function renderStyles(Page $page, bool $hasMath = false): string
     {
         $hasAnimations = $page->elements
             ->filter(fn($e) => !empty($e->settings['animation']) && $e->settings['animation'] !== 'none')
@@ -380,7 +380,7 @@ HTML;
         return $css;
     }
 
-    protected function renderScripts(Page $page, bool $hasMath = false): string
+    public function renderScripts(Page $page, bool $hasMath = false): string
     {
         $scripts = '';
 

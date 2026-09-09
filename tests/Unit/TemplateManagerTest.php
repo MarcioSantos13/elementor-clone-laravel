@@ -127,9 +127,10 @@ class TemplateManagerTest extends TestCase
     {
         $template = $this->manager->get('landing');
 
-        $this->assertCount(2, $template['elements']);
+        $this->assertCount(3, $template['elements']);
         $this->assertEquals('section', $template['elements'][0]['type']);
         $this->assertArrayHasKey('children', $template['elements'][0]);
         $this->assertEquals('section', $template['elements'][1]['type']);
+        $this->assertEquals('section', $template['elements'][2]['type']);
     }
 }

@@ -22,6 +22,14 @@
                     </button>
                 </div>
             </div>
+            <div class="pb-account">
+                <span class="pb-account-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                <div class="pb-account-meta">
+                    <span class="pb-account-name">{{ auth()->user()->name }}</span>
+                    <span class="pb-account-email">{{ auth()->user()->email }}</span>
+                </div>
+                <span class="pb-account-role pb-account-role-{{ auth()->user()->role }}">{{ auth()->user()->role }}</span>
+            </div>
             <div class="pb-stats">
                 <div class="pb-stat">
                     <span class="pb-stat-number">{{ $pages->total() }}</span>
@@ -331,6 +339,27 @@
         .pb-stat-divider { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
         .pb-stat-published { color: #86efac; }
         .pb-stat-draft { color: #fcd34d; }
+        .pb-account {
+            display: flex; align-items: center; gap: .6rem; margin-top: 1rem;
+            background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+            padding: .5rem .8rem; border-radius: 10px; width: fit-content; position: relative; z-index: 1;
+        }
+        .pb-account-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: linear-gradient(135deg,#a78bfa,#818cf8);
+            display: flex; align-items: center; justify-content: center;
+            font-size: .8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .pb-account-meta { display: flex; flex-direction: column; line-height: 1.25; }
+        .pb-account-name { font-size: .85rem; font-weight: 600; color: #fff; }
+        .pb-account-email { font-size: .72rem; color: rgba(255,255,255,.55); }
+        .pb-account-role {
+            font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+            padding: .2rem .6rem; border-radius: 20px; margin-left: .35rem;
+        }
+        .pb-account-role-admin { background: rgba(134,239,172,.15); color: #86efac; border: 1px solid rgba(134,239,172,.3); }
+        .pb-account-role-editor { background: rgba(129,140,248,.15); color: #c7d2fe; border: 1px solid rgba(129,140,248,.3); }
+        .pb-account-role-viewer { background: rgba(253,224,71,.12); color: #fde047; border: 1px solid rgba(253,224,71,.25); }
 
         .pb-toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.25rem; }
         .pb-search { position: relative; flex: 1; max-width: 360px; }

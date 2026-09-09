@@ -34,6 +34,26 @@
         }
         .nav-link-primary:hover { background: linear-gradient(135deg,#4f46e5,#7c3aed) !important; box-shadow: 0 4px 12px rgba(99,102,241,.4) !important; transform: translateY(-1px); }
 
+        .account-chip {
+            display: flex; align-items: center; gap: .5rem; margin-right: .25rem;
+            padding: .3rem .6rem; border-radius: 8px;
+            background: #f8fafc; border: 1px solid #e2e8f0;
+        }
+        .account-chip-avatar {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: .7rem; font-weight: 700;
+        }
+        .account-chip-name { font-size: .82rem; font-weight: 600; color: #0f172a; }
+        .account-chip-role {
+            font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+            padding: .15rem .5rem; border-radius: 20px;
+        }
+        .account-chip-role-admin { background: #dcfce7; color: #166534; }
+        .account-chip-role-editor { background: #e0e7ff; color: #3730a3; }
+        .account-chip-role-viewer { background: #fef9c3; color: #854d0e; }
+
         .main-content { padding: 2rem; }
         .container { max-width: 1200px; margin: 0 auto; }
 
@@ -205,6 +225,13 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Nova Página
             </a>
+            @if(auth()->check())
+                <div class="account-chip" title="{{ auth()->user()->email }}">
+                    <span class="account-chip-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                    <span class="account-chip-name">{{ auth()->user()->name }}</span>
+                    <span class="account-chip-role account-chip-role-{{ auth()->user()->role }}">{{ auth()->user()->role }}</span>
+                </div>
+            @endif
             <form action="{{ route('logout') }}" method="POST" style="display:inline">
                 @csrf
                 <button type="submit" class="nav-link" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-weight:500">Sair</button>

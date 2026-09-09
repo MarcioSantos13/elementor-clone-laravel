@@ -1313,7 +1313,7 @@ php artisan serve</code></pre>
                             <li><strong>Landing Page</strong> — seção hero + grade de recursos com títulos, textos e botões</li>
                             <li><strong>Sobre (About)</strong> — introdução da empresa com seções de missão/equipe</li>
                             <li><strong>Contato (Contact)</strong> — layout de formulário de contato com informações e área de formulário</li>
-                            <li><strong>Showcase Completo</strong> — página de marketing multi-seção com hero, recursos, estatísticas, galeria e equipe</li>
+                            <li><strong>Showcase Completo</strong> — página marketing futurista (tema dark) com hero em gradiente + vídeo, galeria e carousel de imagens, imagens com lightbox e links, contadores, progress bars, countdown, tabs, accordion, preços, depoimentos, animação Lottie, formulário, mapa e redes sociais</li>
                         </ul>
                     </li>
                     <li>Clique em <strong>"Criar &amp; Abrir Editor"</strong> para ver o template carregado no editor</li>
@@ -1541,9 +1541,9 @@ php artisan serve</code></pre>
         <section id="showcase" class="step">
             <h2>16. Template Showcase Completo</h2>
             <div class="step-body">
-                <p>O template <strong>Showcase Completo</strong> é uma landing page de marketing completa construída inteiramente com o page builder. Ele demonstra técnicas avançadas de layout usando <strong>Seções com layout full_width e boxed</strong>, <strong>Colunas com larguras variadas</strong> e widgets estilizados.</p>
+                <p>O template <strong>Showcase Completo</strong> é uma landing page futurista completa construída inteiramente com o page builder. Ele foi redesenhado com uma paleta <strong>dark sci-fi</strong> (fundo <code>#0b1120</code>, acentos neon <code>#22d3ee</code>, <code>#a78bfa</code>, <code>#34d399</code> e <code>#f0abfc</code>) e demonstra o máximo de funcionalidade possível: <strong>seções com gradiente</strong>, <strong>vídeos</strong> (YouTube e Vimeo), <strong>imagens com links e lightbox</strong>, <strong>galeria e carousel</strong>, <strong>contadores, progress bars e countdown</strong>, <strong>preços, depoimentos, animação Lottie, formulário, mapa e redes sociais</strong> — tudo isso mantendo a estrutura simples de arrastar e soltar.</p>
 
-                <p>Este passo a passo reproduz <strong>exatamente</strong> o template que é aplicado automaticamente quando você seleciona "Showcase Completo" ao criar uma página. Cada cor, texto e configuração abaixo corresponde ao código-fonte do template.</p>
+                <p>Este passo a passo mostra as técnicas de construção usadas no template e descreve sua estrutura atual. Cada cor, texto e configuração abaixo corresponde à versão redesenhada do template. Para ver a configuração exata de cada elemento, crie uma página com o template "Showcase Completo" e clique em cada widget no editor para inspecionar o painel direito.</p>
 
                 <div class="tip">
                     <strong>&#128161; Dica Rápida:</strong> Você não precisa construir tudo manualmente! Basta criar uma página e selecionar o template <strong>"Showcase Completo"</strong> na hora da criação. O passo a passo abaixo é para quem quer entender como cada seção foi construída e personalizar depois.
@@ -1553,346 +1553,256 @@ php artisan serve</code></pre>
                 </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Visão Geral das Seções</h3>
-                <p>O template possui <strong>6 seções</strong> que, de cima para baixo, formam a landing page completa:</p>
+                <p>O template possui <strong>19 seções</strong> que, de cima para baixo, formam a landing page completa:</p>
                 <table class="widget-table">
-                    <tr><th>#</th><th>Seção</th><th>Fundo</th><th>Layout</th><th>Colunas</th><th>Widgets</th></tr>
-                    <tr><td>1</td><td><strong>Hero</strong></td><td><code>#0f172a</code> (escuro)</td><td>full_width, 90vh</td><td>1 (100%)</td><td>Título H1, Texto, Botão</td></tr>
-                    <tr><td>2</td><td><strong>Serviços</strong></td><td><code>#ffffff</code> (branco)</td><td>boxed</td><td>1 + 3 (33% cada)</td><td>Título H2, Texto, 3 cards com Título H3 + Texto</td></tr>
-                    <tr><td>3</td><td><strong>Estatísticas</strong></td><td><code>#1e293b</code> (escuro)</td><td>full_width</td><td>4 (25% cada)</td><td>4x Título H2 + Texto</td></tr>
-                    <tr><td>4</td><td><strong>Equipe</strong></td><td><code>#ffffff</code> (branco)</td><td>boxed</td><td>1 + 4 (25% cada)</td><td>Título H2, Texto, 4x Título H4 + Texto</td></tr>
-                    <tr><td>5</td><td><strong>Depoimentos</strong></td><td><code>#f8fafc</code> (cinza claro)</td><td>boxed</td><td>1 + 3 (33% cada)</td><td>Título H2, Texto, 3x cards com Texto + H4 + Texto</td></tr>
-                    <tr><td>6</td><td><strong>CTA</strong></td><td><code>#3b82f6</code> (azul)</td><td>boxed</td><td>1 (100%)</td><td>Título H2, Texto, Botão</td></tr>
+                    <tr><th>#</th><th>Seção</th><th>Fundo / Layout</th><th>Widgets em destaque</th></tr>
+                    <tr><td>1</td><td><strong>Hero</strong></td><td>Gradiente escuro <code>#020617 → #312e81</code>, full_width, 90vh</td><td>Callout, Título H1, Texto, 2 Botões com link (<code>#precos</code>, <code>#video</code>), Divider, Social Icons, <strong>Vídeo YouTube</strong></td></tr>
+                    <tr><td>2</td><td>Números (cabeçalho)</td><td><code>#0b1120</code> (escuro)</td><td>Título H2, Texto, Divider</td></tr>
+                    <tr><td>3</td><td><strong>Contadores</strong></td><td><code>#0b1120</code>, full_width</td><td>4x Counter com prefixo/sufixo e cores neon</td></tr>
+                    <tr><td>4</td><td>Recursos (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto, Divider</td></tr>
+                    <tr><td>5</td><td><strong>Recursos Futuristas</strong></td><td>3 cards <code>#111827</code> com radius e shadow</td><td>Icon + Título H3 + Texto + <strong>Progress Bar</strong> em cada card</td></tr>
+                    <tr><td>6</td><td>Galeria (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto, Divider</td></tr>
+                    <tr><td>7</td><td><strong>Galeria de Imagens</strong></td><td><code>#0b1120</code>, boxed</td><td><strong>Gallery</strong> em grade 3 colunas com legendas + <strong>Carousel</strong> com autoplay, dots e setas</td></tr>
+                    <tr><td>8</td><td>Imagens com Links (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto</td></tr>
+                    <tr><td>9</td><td><strong>Imagens com Links</strong></td><td><code>#0b1120</code>, boxed</td><td>Imagem com <strong>lightbox</strong>, Imagem com <strong>link externo</strong>, Título com link, Botão link + <strong>Vídeo Vimeo</strong></td></tr>
+                    <tr><td>10</td><td>Widgets Interativos (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto</td></tr>
+                    <tr><td>11</td><td><strong>Widgets Interativos</strong></td><td><code>#0b1120</code>, 2 colunas</td><td><strong>Tabs</strong> + <strong>Countdown</strong> em uma coluna; <strong>Accordion</strong> na outra</td></tr>
+                    <tr><td>12</td><td>Preços (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto</td></tr>
+                    <tr><td>13</td><td><strong>Tabelas de Preço</strong></td><td>3 cards, plano Pro destacado (<code>#a855f7</code>)</td><td>3x <strong>Price Table</strong> com features e botão de link (<code>#contato</code>)</td></tr>
+                    <tr><td>14</td><td>Depoimentos (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto</td></tr>
+                    <tr><td>15</td><td><strong>Depoimentos</strong></td><td>3 cards <code>#1e293b</code></td><td>3x <strong>Testimonial</strong> com avatar, cargo e nota 5 estrelas</td></tr>
+                    <tr><td>16</td><td><strong>CTA + Lottie</strong></td><td>Gradiente radial <code>#1e1b4b → #0b1120</code></td><td><strong>Animação Lottie</strong>, Título H2, Texto, Botão link (<code>#contato</code>)</td></tr>
+                    <tr><td>17</td><td>Contato (cabeçalho)</td><td><code>#0b1120</code>, boxed</td><td>Título H2, Texto</td></tr>
+                    <tr><td>18</td><td><strong>Contato</strong></td><td>card <code>#111827</code> + coluna de info</td><td><strong>Form</strong> (nome, email, assunto, mensagem), Callout + <strong>Google Maps</strong></td></tr>
+                    <tr><td>19</td><td><strong>Rodapé</strong></td><td><code>#020617</code> (escuro), full_width</td><td><strong>Social Icons</strong>, Divider, Texto com links (Termos, Privacidade)</td></tr>
                 </table>
 
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.1 Seção Hero (Cabeçalho Principal)</h3>
-                <p>Esta é a primeira coisa que o visitante vê. Ocupa quase toda a tela com fundo escuro e conteúdo centralizado.</p>
-                <ol>
-                    <li><strong>Arraste uma Seção</strong> da lista de widgets para a área da página (canvas).</li>
-                    <li><strong>Selecione a Seção</strong> clicando nela. No painel direito, configure:
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.1 Funcionalidades em Destaque — Links, Vídeos e Imagens</h3>
+                <p>A versão redesenhada do <strong>Showcase Completo</strong> foi pensada para demonstrar, de forma simples, os principais recursos de <strong>links</strong>, <strong>vídeos</strong> e <strong>imagens</strong>:</p>
+                <ul>
+                    <li><strong>Links:</strong> botões com âncoras da própria página (<code>#precos</code>, <code>#video</code>, <code>#contato</code>), imagens com link externo que abrem em nova aba (<em>target="_blank"</em>), títulos com link, botões das tabelas de preço e ícones de redes sociais — tudo configurado no campo <strong>Link</strong> de cada widget (aba Content).</li>
+                    <li><strong>Vídeos:</strong> um vídeo <strong>YouTube</strong> no Hero e um vídeo <strong>Vimeo</strong> na seção "Imagens com Links". Basta colar a URL no widget <strong>Vídeo</strong> (campo <em>Video URL</em>) — a prévia de incorporação (embed) é gerada automaticamente. Opções: autoplay, loop, controles, mudo, tempo de início/fim e proporção (16:9, 4:3, 1:1, 21:9).</li>
+                    <li><strong>Imagens:</strong>
                         <ul>
-                            <li><strong>Layout:</strong> <code>full_width</code> (largura total da tela)</li>
-                            <li><strong>Cor de fundo:</strong> <code>#0f172a</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>120px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>120px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Altura mínima:</strong> <code>90vh</code> (90% da altura da tela)</li>
-                            <li><strong>Alinhar itens:</strong> <code>center</code> (centralizar verticalmente)</li>
-                            <li><strong>Justificar conteúdo:</strong> <code>center</code></li>
+                            <li><strong>Lightbox:</strong> ative <em>Enable Lightbox</em> no widget Imagem para abrir a foto ampliada ao clicar (Hero de imagens com links);</li>
+                            <li><strong>Galeria:</strong> layout em grade com 3 colunas, legendas e canto arredondado;</li>
+                            <li><strong>Carousel:</strong> com autoplay, loop, dots, setas e velocidade configuráveis;</li>
+                            <li><strong>Filtros e hover:</strong> efeitos como zoom no hover e filtros (grayscale, sepia, brilho) na aba Style do widget Imagem.</li>
                         </ul>
                     </li>
-                    <li><strong>Arraste uma Coluna</strong> para dentro da Seção.</li>
-                    <li><strong>Selecione a Coluna</strong> e configure:
-                        <ul>
-                            <li><strong>Largura:</strong> <code>col-12</code> (largura total)</li>
-                            <li><strong>Alinhamento vertical:</strong> <code>center</code></li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                        </ul>
-                    </li>
-                    <li><strong>Arraste um widget Título</strong> para dentro da Coluna. Configure:
-                        <ul>
-                            <li><strong>Texto:</strong> <code>"Transforme Suas Ideias em Experiências Digitais"</code></li>
-                            <li><strong>Tag:</strong> <code>H1</code></li>
-                            <li><strong>Tamanho:</strong> <code>xxl</code></li>
-                            <li><strong>Cor:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
-                            <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Peso da fonte:</strong> <code>800</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Margem inferior:</strong> <code>24px</code> (aba <strong>Advanced</strong>, campo <em>Bottom Margin</em>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Arraste um widget Texto</strong> para dentro da Coluna (abaixo do título). Configure:
-                        <ul>
-                            <li><strong>Conteúdo:</strong> <code>"Criamos soluções inovadoras que combinam design moderno, tecnologia de ponta e performance excepcional para impulsionar o seu negócio."</code></li>
-                            <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Tamanho da fonte:</strong> <code>20px</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Altura da linha:</strong> <code>1.8</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Margem inferior:</strong> <code>40px</code> (aba <strong>Advanced</strong>, campo <em>Bottom Margin</em>)</li>
-                        </ul>
-                        <div class="tip">
-                            <strong>&#128161; Dica de estilo:</strong> Para o estilo exato como no template real, adicione no conteúdo HTML: <code>&lt;p style="font-size:1.25rem;color:#94a3b8;max-width:700px;margin:0 auto;"&gt;...&lt;/p&gt;</code>
-                        </div>
-                    </li>
-                    <li><strong>Arraste um widget Botão</strong> para dentro da Coluna (abaixo do texto). Configure:
-                        <ul>
-                            <li><strong>Texto:</strong> <code>"Comece Agora"</code></li>
-                            <li><strong>Link:</strong> <code>#</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#3b82f6</code> (azul) (aba <strong>Style</strong>)</li>
-                            <li><strong>Cor do texto:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
-                            <li><strong>Tamanho:</strong> <code>large</code></li>
-                            <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula) (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding esquerda/direita:</strong> <code>40px</code> (aba <strong>Advanced</strong>, grupo <em>Padding &amp; Margin</em>)</li>
-                            <li><strong>Peso da fonte:</strong> <code>600</code> (aba <strong>Style</strong>, grupo <em>Typography</em>)</li>
-                        </ul>
-                    </li>
-                </ol>
-
-                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.2 Seção de Serviços (Features)</h3>
-                <p>Três cards de serviço centralizados com fundo branco. Esta seção usa o layout <strong>boxed</strong> (largura contida) e uma coluna de cabeçalho separada das colunas de conteúdo.</p>
-                <ol>
-                    <li><strong>Arraste uma nova Seção</strong> para a página (abaixo da Hero). Configure:
-                        <ul>
-                            <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
-                        <ul>
-                            <li><strong>Largura:</strong> <code>col-12</code> (largura total)</li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Padding inferior:</strong> <code>20px</code> (aba <strong>Advanced</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Dentro desta Coluna</strong>, arraste um <strong>Título</strong> e um <strong>Texto</strong>:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Nossos Serviços"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>16px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Oferecemos um conjunto completo de soluções para transformar sua presença digital"</code>, tamanho <code>18px</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                        <div class="tip">
-                            <strong>&#128161; Dica:</strong> Para o texto ficar cinza e centralizado, use no HTML: <code>&lt;p style="color:#64748b;max-width:600px;margin:0 auto;"&gt;...&lt;/p&gt;</code>
-                        </div>
-                    </li>
-                    <li><strong>Arraste uma nova Coluna</strong> para dentro da mesma Seção (abaixo da coluna de cabeçalho). Configure:
-                        <ul>
-                            <li><strong>Largura:</strong> <code>col-4</code> (um terço da largura)</li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#f8fafc</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Border Radius:</strong> <code>12px</code> (aba <strong>Style</strong>, grupo <em>Border</em>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Dentro desta Coluna</strong>, arraste um <strong>Título</strong> e um <strong>Texto</strong>:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Design Moderno"</code>, tag <code>H3</code>, tamanho <code>medium</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>600</code> (aba <strong>Style</strong>), margem inferior <code>12px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Interfaces elegantes e intuitivas criadas com as melhores práticas de UX/UI."</code>, tamanho <code>15px</code> (aba <strong>Style</strong>), altura da linha <code>1.7</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Repita o passo 4 e 5</strong> para criar mais duas colunas idênticas ao lado:
-                        <ul>
-                            <li><strong>Coluna 2:</strong> fundo <code>#f8fafc</code>, título <code>"Performance"</code>, texto <code>"Otimizado para velocidade e desempenho máximo em qualquer dispositivo."</code></li>
-                            <li><strong>Coluna 3:</strong> fundo <code>#f8fafc</code>, título <code>"Suporte Dedicado"</code>, texto <code>"Equipe especializada pronta para ajudar em cada etapa do seu projeto."</code></li>
-                        </ul>
-                    </li>
-                </ol>
+                </ul>
                 <div class="tip">
-                    <strong>&#128161; Dica importante:</strong> O page builder coloca colunas adicionadas à mesma seção lado a lado automaticamente. Ao adicionar 3 colunas com <code>col-4</code>, elas se distribuem em 33% cada. Não precisa de uma "Seção linha" extra — basta adicionar colunas direto na seção.
+                    <strong>&#128161; Como testar:</strong> crie uma página com o template "Showcase Completo", clique em <strong>Visualizar</strong> (olho na barra de ferramentas) e teste os links, o lightbox das imagens, o carousel e o player de vídeo. Para trocar uma imagem, vídeo ou link, selecione o widget no editor e edite o painel direito.
                 </div>
 
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.3 Seção de Estatísticas (Stats)</h3>
-                <p>Quatro números grandes com fundo escuro, criando destaque visual.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2 Construindo o Template — Roteiro Completo</h3>
+                <p>O template segue um padrão de construção repetido: primeiro uma <strong>seção-cabeçalho</strong> (coluna <code>col-12</code> com Título H2, Texto descritivo e Divider neon), depois uma <strong>seção de conteúdo</strong> com colunas em grade. O fluxo geral em qualquer peça é: <strong>arraste uma Seção → arraste Colunas → arraste os Widgets</strong> (na ordem correta) → configure no painel direito.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.1 Hero em 2 Colunas (Seção 1)</h3>
+                <p>O Hero moderno usa <strong>duas colunas 50/50</strong>: à esquerda o texto com botões e links; à direita um <strong>vídeo</strong>. Fundo em gradiente, não cor sólida.</p>
                 <ol>
-                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
+                    <li><strong>Seção:</strong> arraste uma Seção e configure (aba Content):
                         <ul>
                             <li><strong>Layout:</strong> <code>full_width</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#1e293b</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Background Type:</strong> <code>gradient</code> → <strong>Linear</strong>, ângulo <code>160</code>, <strong>Cor 1:</strong> <code>#020617</code>, <strong>Cor 2:</strong> <code>#312e81</code></li>
+                            <li><strong>Padding vertical:</strong> <code>100px</code> (aba Advanced)</li>
+                            <li><strong>Altura mínima:</strong> <code>90vh</code>, <strong>Alinhar itens:</strong> <code>center</code></li>
                         </ul>
                     </li>
-                    <li><strong>Arraste quatro Colunas</strong> para dentro da Seção (uma de cada vez). Configure cada uma:
+                    <li><strong>Coluna esquerda</strong> (<code>col-6</code>, alinhamento vertical <code>center</code>, padding direita <code>40px</code>). Widgets, em ordem:
                         <ul>
-                            <li><strong>Largura:</strong> <code>col-3</code> (25% cada)</li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
+                            <li><strong>Callout</strong> (type <code>tip</code>): título <code>"Nova versão 3.0"</code>, conteúdo <code>"Interface mais rápida, inteligente e futurista."</code>, <strong>border radius</strong> <code>50px</code>, margem inferior <code>24px</code>.</li>
+                            <li><strong>Título</strong> H1: <code>"Construa o Futuro com o Page Builder"</code>, tamanho <code>xxl</code>, cor <code>#f8fafc</code>, peso <code>800</code>, <strong>text shadow</strong> <code>0 0 24px rgba(129,140,248,.55)</code> (efeito de brilho neon).</li>
+                            <li><strong>Texto:</strong> descrição com palavras em <code>&lt;strong&gt;</code> destacadas (vídeos, imagens, animações, links).</li>
+                            <li><strong>Botão 1:</strong> <code>"Começar Agora"</code>, <strong>Link:</strong> <code>#precos</code>, <strong>Background Type:</strong> <code>gradient</code> <code>#6366f1 → #a855f7</code>, radius <code>50px</code>, sombra roxa.</li>
+                            <li><strong>Botão 2:</strong> <code>"▶ Ver Demonstração"</code>, <strong>Link:</strong> <code>#video</code>, <strong>classic transparente</strong> com borda <code>2px #6366f1</code>.</li>
+                            <li><strong>Divider:</strong> largura <code>100</code>%, espessura <code>1</code>, cor <code>#1e293b</code>.</li>
+                            <li><strong>Social Icons:</strong> github, linkedin, twitter, youtube (4 colunas, ícones <code>36px</code>).</li>
                         </ul>
                     </li>
-                    <li><strong>Na primeira Coluna</strong>, arraste:
+                    <li><strong>Coluna direita</strong> (<code>col-6</code>, centralizada). Widget:
                         <ul>
-                            <li><strong>Título:</strong> <code>"500+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (azul, aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Projetos Entregues"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Vídeo:</strong> <strong>Video Type:</strong> <code>youtube</code>, <strong>Video URL:</strong> <code>https://www.youtube.com/watch?v=ScMzIvxBSi4</code>, <strong>Aspect Ratio:</strong> <code>16:9</code>, largura <code>100%</code>. (O campo correto é <em>Video URL</em>, não "URL" — sem ele o vídeo não aparece.)</li>
                         </ul>
                     </li>
-                    <li><strong>Na segunda Coluna</strong>, arraste:
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Âncoras:</strong> os links dos botões apontam para âncoras da própria página (<code>#precos</code>, <code>#video</code>, <code>#contato</code>). Como as seções não possuem ID próprio, as âncoras são uma demonstração didática de links internos.
+                </div>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.2 Contadores Neon (Seções 2 e 3)</h3>
+                <p>Números animados com cores neon criam impacto visual. A seção 2 é o cabeçalho e a seção 3 é a grade com os contadores.</p>
+                <ol>
+                    <li><strong>Seção 2 (cabeçalho):</strong> layout <code>boxed</code>, fundo <code>#0b1120</code>, padding <code>100px</code>. Coluna <code>col-12</code> centralizada com:
                         <ul>
-                            <li><strong>Título:</strong> <code>"98%"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Satisfação dos Clientes"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Título:</strong> <code>"O Poder em Números"</code>, H2, tamanho <code>xl</code>, cor <code>#f8fafc</code>, peso <code>700</code>.</li>
+                            <li><strong>Texto:</strong> descrição em <code>#94a3b8</code>, máximo <code>600px</code>.</li>
+                            <li><strong>Divider:</strong> largura <code>60</code>%, espessura <code>3</code>, cor <code>#22d3ee</code> (ciano), margens <code>16px</code>.</li>
                         </ul>
                     </li>
-                    <li><strong>Na terceira Coluna</strong>, arraste:
+                    <li><strong>Seção 3 (conteúdo):</strong> layout <code>boxed</code>, fundo <code>#0b1120</code>, padding inferior <code>100px</code>. <strong>Quatro colunas <code>col-3</code></strong> com texto centralizado.</li>
+                    <li><strong>Em cada coluna use o widget Contador (Counter)</strong> — não um Título:
                         <ul>
-                            <li><strong>Título:</strong> <code>"50+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Profissionais"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
+                            <li><code>"500+"</code> com <strong>Title:</strong> <code>"Projetos Entregues"</code>, <strong>Suffix:</strong> <code>+</code>, duração <code>2000</code>, cor do número <code>#22d3ee</code>.</li>
+                            <li><code>"98%"</code> com <strong>Suffix:</strong> <code>%</code>, cor <code>#a78bfa</code>, título <code>"Satisfação dos Clientes"</code>.</li>
+                            <li><code>"50+"</code> com <strong>Suffix:</strong> <code>+</code>, cor <code>#34d399</code>, título <code>"Profissionais"</code>.</li>
+                            <li><code>"12+"</code> com <strong>Suffix:</strong> <code>+</code>, cor <code>#f0abfc</code>, título <code>"Anos de Experiência"</code>.</li>
                         </ul>
                     </li>
-                    <li><strong>Na quarta Coluna</strong>, arraste:
+                    <li>Configure em cada Counter: <strong>Font Size do número:</strong> <code>2.6rem</code>, peso <code>800</code>; título em <code>#94a3b8</code>.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.3 Cards de Recursos com Barras de Progresso (Seções 4 e 5)</h3>
+                <ol>
+                    <li><strong>Seção 4 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>, padding <code>100px</code>. Coluna <code>col-12</code> centralizada: Título <code>"Recursos Poderosos"</code> + Texto descritivo + Divider ciano.</li>
+                    <li><strong>Seção 5 (conteúdo):</strong> boxed, fundo <code>#0b1120</code>, padding inferior <code>100px</code>. <strong>Três colunas <code>col-4</code></strong>, cada uma estilo <strong>card escuro</strong>: fundo <code>#111827</code>, radius <code>16px</code>, box shadow <code>0 8px 32px rgba(0,0,0,.35)</code>, padding <code>32px</code>. Dentro de cada card, em ordem:
                         <ul>
-                            <li><strong>Título:</strong> <code>"12+"</code>, tag <code>H2</code>, tamanho <code>xxl</code>, cor <code>#3b82f6</code> (aba <strong>Style</strong>), peso <code>800</code> (aba <strong>Style</strong>), margem inferior <code>8px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Anos de Experiência"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Ícone:</strong> Font Awesome neon, ex.: <code>fas fa-bolt</code> cor <code>#22d3ee</code>, tamanho <code>2.5rem</code>.</li>
+                            <li><strong>Título:</strong> H3 <code>"Aprendizado Rápido"</code>, cor <code>#f8fafc</code>, peso <code>600</code>.</li>
+                            <li><strong>Texto:</strong> descrição em <code>#94a3b8</code>.</li>
+                            <li><strong>Barra de Progresso:</strong> <strong>Title:</strong> <code>"Interatividade"</code>, <strong>Percentage:</strong> <code>98</code>, <strong>Bar Color:</strong> <code>#22d3ee</code>, <strong>Track Color:</strong> <code>#1e293b</code>.</li>
+                        </ul>
+                    </li>
+                    <li>Card 2: ícone <code>fas fa-mobile-alt</code> cor <code>#a78bfa</code>, título <code>"Fácil de Usar"</code>, progresso <code>100</code>% (bar color <code>#a78bfa</code>).</li>
+                    <li>Card 3: ícone <code>fas fa-puzzle-piece</code> cor <code>#34d399</code>, título <code>"Ferramentas Profissionais"</code>, progresso <code>85</code>% (bar color <code>#34d399</code>).</li>
+                </ol>
+
+                <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.4 Galeria e Carousel (Seções 6 e 7)</h3>
+                <p>Dois widgets de apresentação de imagens: uma <strong>galeria em grade</strong> e um <strong>carousel com autoplay</strong>. A seção 6 é o cabeçalho; as seções 7 carregam o conteúdo.</p>
+                <ol>
+                    <li><strong>Seção 6 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>. Coluna <code>col-12</code> centralizada: Título <code>"Nossas Criações"</code> + Texto + Divider ciano.</li>
+                    <li><strong>Seção 7 — coluna <code>col-12</code>:</strong> arraste o widget <strong>Galeria</strong> e configure:
+                        <ul>
+                            <li><strong>Images:</strong> adicione 6 imagens (ex.: <code>https://picsum.photos/seed/g1/600/400</code> … <code>g6</code>).</li>
+                            <li><strong>Layout:</strong> <code>grid</code>, <strong>Columns:</strong> <code>3</code>, <strong>Gap:</strong> <code>16px</code>, <strong>Show Caption:</strong> <code>yes</code>, <strong>Enable Lightbox:</strong> <code>yes</code>.</li>
+                            <li><strong>Border Radius:</strong> <code>12px</code>, objeto <code>cover</code>, altura <code>260px</code>.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Outra Seção 7 — coluna <code>col-12</code>:</strong> arraste o widget <strong>Carousel</strong>:
+                        <ul>
+                            <li><strong>Images:</strong> 3 imagens (picsum <code>c1</code> … <code>c3</code>, 800×500).</li>
+                            <li><strong>Columns:</strong> <code>2</code>, <strong>Autoplay:</strong> <code>true</code>, <strong>Loop:</strong> <code>true</code>, <strong>Show Dots:</strong> <code>true</code>, <strong>Show Arrows:</strong> <code>true</code>, <strong>Speed:</strong> <code>3000</code>.</li>
+                            <li><strong>Border Radius:</strong> <code>16px</code>, altura <code>300px</code>.</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.5 Imagens com Links, Lightbox e Vimeo (Seções 8 e 9)</h3>
+                <ol>
+                    <li><strong>Seção 8 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>. Título <code>"Imagens, Links e Vídeo"</code> + Texto + Divider ciano.</li>
+                    <li><strong>Seção 9 — coluna esquerda <code>col-6</code>, widgets em ordem:</strong>
+                        <ul>
+                            <li><strong>Imagem</strong> (destaque): <strong>Lightbox:</strong> <code>yes</code>, caption <code>"Clique para abrir no lightbox"</code>, radius <code>16px</code>, hover <code>zoom</code>.</li>
+                            <li><strong>Título</strong> H3 com <strong>Link:</strong> <code>https://example.com</code>, target <code>_blank</code> (título clicável).</li>
+                            <li><strong>Texto</strong> descritivo em <code>#94a3b8</code>.</li>
+                            <li><strong>Botão:</strong> gradiente <code>#06b6d4 → #6366f1</code>, <code>"Visitar Site"</code>, link <code>https://example.com</code>, target <code>_blank</code> — mostra como abrir conteúdo externo em nova aba.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Coluna direita <code>col-6</code>, widgets em ordem:</strong>
+                        <ul>
+                            <li><strong>Imagem</strong>: <strong>Link:</strong> <code>https://example.com</code>, <strong>Link Target:</strong> <code>_blank</code>, caption <code>"Abre em uma nova aba"</code>, hover <code>zoom</code>, radius <code>16px</code>. (Toda a imagem vira um link ao clicar.)</li>
+                            <li><strong>Vídeo Vimeo:</strong> <strong>Video Type:</strong> <code>vimeo</code>, <strong>Video URL:</strong> <code>https://vimeo.com/76979871</code>, largura <code>100%</code>.</li>
                         </ul>
                     </li>
                 </ol>
 
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.4 Seção de Equipe (Team)</h3>
-                <p>Apresentação dos quatro membros da equipe em colunas com fundo branco.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.6 Tabs, Countdown e Accordion (Seções 10 e 11)</h3>
+                <p>Widgets interativos: <strong>Tabs</strong> e <strong>Countdown</strong> à esquerda, <strong>Accordion</strong> à direita. A seção 10 é o cabeçalho.</p>
                 <ol>
-                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
+                    <li><strong>Seção 10 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>. Título <code>"Interatividade"</code> + Texto + Divider ciano.</li>
+                    <li><strong>Seção 11 — coluna esquerda <code>col-6</code>:</strong>
                         <ul>
-                            <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Tabs:</strong> adicione 3 abas — <code>"Descrição"</code>, <code>"Funcionalidades"</code>, <code>"Preços"</code> — cada uma com <strong>Title</strong> e <strong>Content</strong> (HTML). <strong>Orientation:</strong> <code>horizontal</code>, <strong>Active Tab:</strong> primeira, <strong>Tab Color ativa:</strong> <code>#22d3ee</code>, <strong>Border:</strong> <code>#1e293b</code>, padding <code>20px</code>.</li>
+                            <li><strong>Countdown:</strong> <strong>Target Date:</strong> <code>2027-12-31</code> (datetime-local), rótulos <code>Dias</code>/<code>Horas</code>/<code>Min</code>/<code>Seg</code>, cor dos dígitos <code>#f0abfc</code>, fundo do bloco <code>#1e293b</code>, radius <code>12px</code>.</li>
                         </ul>
                     </li>
-                    <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
+                    <li><strong>Seção 11 — coluna direita <code>col-6</code>:</strong>
                         <ul>
-                            <li><strong>Largura:</strong> <code>col-12</code></li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Padding inferior:</strong> <code>30px</code> (aba <strong>Advanced</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Dentro desta Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Nossa Equipe"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>16px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Conheça os profissionais que tornam tudo possível"</code></li>
-                        </ul>
-                    </li>
-                    <li><strong>Arraste quatro Colunas</strong> para dentro da mesma Seção (abaixo da coluna de cabeçalho). Configure cada uma:
-                        <ul>
-                            <li><strong>Largura:</strong> <code>col-3</code> (25% cada)</li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                        </ul>
-                    </li>
-                    <li><strong>Na primeira Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Ana Silva"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"CEO & Fundadora"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Na segunda Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Carlos Oliveira"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"CTO"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Na terceira Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Marina Costa"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Head de Design"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Na quarta Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"Rafael Santos"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>4px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Lead Developer"</code>, cor <code>#64748b</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Accordion:</strong> 3 itens com <strong>Title</strong> e <strong>Content</strong>: <code>"É realmente gratuito?"</code>, <code>"Posso usar em múltiplos projetos?"</code>, <code>"Existe suporte para iniciantes?"</code>. Primeiro item <strong>Open:</strong> <code>true</code>. <strong>Active Color:</strong> <code>#22d3ee</code>, <strong>Border:</strong> <code>#1e293b</code>.</li>
                         </ul>
                     </li>
                 </ol>
 
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.5 Seção de Depoimentos (Testimonials)</h3>
-                <p>Três cards de depoimentos de clientes com fundo cinza claro, criando contraste visual com as seções vizinhas.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.7 Tabelas de Preço (Seções 12 e 13)</h3>
+                <p>A seção 12 é o cabeçalho; a seção 13 traz três planos em cards escuros, com o plano <strong>Professional</strong> em destaque roxo.</p>
                 <ol>
-                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
+                    <li><strong>Seção 12 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>. Título <code>"Preços"</code> + Texto + Divider ciano.</li>
+                    <li><strong>Seção 13:</strong> três colunas <code>col-4</code> como cards (fundo <code>#111827</code>, radius <code>16px</code>, padding <code>32px</code>, <strong>border top</strong> <code>3px solid #22d3ee</code> no plano central). Widget <strong>Price Table</strong> em cada:
                         <ul>
-                            <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#f8fafc</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>100px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Plano 1 (Starter):</strong> <strong>Plan Name:</strong> <code>"Starter"</code>, <strong>Price:</strong> <code>29</code>, moeda <code>R$</code>, período <code>/mês</code>, botão <code>"Começar"</code> link <code>#contato</code>.</li>
+                            <li><strong>Plano 2 (Professional) — destaque:</strong> <strong>Price:</strong> <code>79</code>, fundo/borda do card em gradiente roxo <code>#a855f7</code>, badge <code>"Mais Popular"</code>.</li>
+                            <li><strong>Plano 3 (Enterprise):</strong> <strong>Price:</strong> <code>199</code>, texto "Sob consulta para grandes equipes".</li>
+                            <li>Em todos: use o repeater <strong>Features</strong> para listar itens (ex.: <code>"1 site"</code>, <code>"5 GB de armazenamento"</code>…) — cada feature entra como item com <strong>Text</strong> (e opcionalmente <strong>Icon</strong>/<strong>Included</strong>).</li>
                         </ul>
                     </li>
-                    <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.8 Depoimentos com Avatar (Seções 14 e 15)</h3>
+                <p>A seção 14 é o cabeçalho; a seção 15 tem três cards com o widget <strong>Testimonial</strong> (mais completo que Título+Texto).</p>
+                <ol>
+                    <li><strong>Seção 14 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>. Título <code>"O Que Nossos Clientes Dizem"</code> + Texto + Divider ciano.</li>
+                    <li><strong>Seção 15:</strong> três colunas <code>col-4</code> (fundo <code>#1e293b</code>, radius <code>16px</code>, padding <code>32px</code>). Widget <strong>Testimonial</strong> em cada:
                         <ul>
-                            <li><strong>Largura:</strong> <code>col-12</code></li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Padding inferior:</strong> <code>20px</code> (aba <strong>Advanced</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Dentro desta Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Título:</strong> <code>"O Que Nossos Clientes Dizem"</code>, tag <code>H2</code>, tamanho <code>xl</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>), margem inferior <code>16px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"A satisfação dos nossos clientes é a nossa maior recompensa"</code></li>
-                        </ul>
-                    </li>
-                    <li><strong>Arraste três Colunas</strong> para dentro da mesma Seção (abaixo da coluna de cabeçalho). Configure cada uma:
-                        <ul>
-                            <li><strong>Largura:</strong> <code>col-4</code> (33% cada)</li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>40px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Border Radius:</strong> <code>12px</code> (aba <strong>Style</strong>, grupo <em>Border</em>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Na primeira Coluna</strong>, arraste (nesta ordem):
-                        <ul>
-                            <li><strong>Texto:</strong> <code>"A equipe transformou completamente nossa presença online."</code>, cor <code>#475569</code> (aba <strong>Style</strong>), estilo <em>itálico</em></li>
-                            <li><strong>Título:</strong> <code>"João Mendes"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"CEO, TechStart"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Na segunda Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Texto:</strong> <code>"Profissionalismo e qualidade excepcionais."</code>, cor <code>#475569</code> (aba <strong>Style</strong>), estilo <em>itálico</em></li>
-                            <li><strong>Título:</strong> <code>"Fernanda Lima"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Diretora, InnovateLab"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
-                        </ul>
-                    </li>
-                    <li><strong>Na terceira Coluna</strong>, arraste:
-                        <ul>
-                            <li><strong>Texto:</strong> <code>"Resultados incríveis em tempo recorde."</code>, cor <code>#475569</code> (aba <strong>Style</strong>), estilo <em>itálico</em></li>
-                            <li><strong>Título:</strong> <code>"Pedro Alves"</code>, tag <code>H4</code>, tamanho <code>small</code>, cor <code>#0f172a</code> (aba <strong>Style</strong>), peso <code>700</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Texto:</strong> <code>"Fundador, WebPlus"</code>, cor <code>#94a3b8</code> (aba <strong>Style</strong>)</li>
+                            <li><strong>Content:</strong> o depoimento em texto cinza <code>#cbd5e1</code>.</li>
+                            <li><strong>Avatar:</strong> imagem (ex.: <code>https://picsum.photos/seed/t1/150/150</code>), <strong>Avatar Shape:</strong> <code>circle</code>. (Avatar vem do campo <em>Avatar</em>, não de um widget Imagem separado.)</li>
+                            <li><strong>Name:</strong> <code>"João Mendes"</code> em <code>#f8fafc</code>; <strong>Position:</strong> <code>"CEO, TechStart"</code>; <strong>Company:</strong> <code>"TechStart"</code>.</li>
+                            <li><strong>Rating:</strong> <code>5</code> estrelas (cor amarela).</li>
+                            <li>Repita com <code>"Fernanda Lima"</code> (InnovateLab) e <code>"Pedro Alves"</code> (WebPlus).</li>
                         </ul>
                     </li>
                 </ol>
 
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.6 Seção CTA (Chamada para Ação)</h3>
-                <p>A seção final com fundo azul brilhante que convida o visitante a entrar em contato. Centralizada com um botão grande.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.9 CTA Futurista com Lottie (Seção 16)</h3>
                 <ol>
-                    <li><strong>Arraste uma nova Seção</strong> para a página. Configure:
+                    <li><strong>Seção:</strong> layout <code>full_width</code>, <strong>fundo em gradiente radial</strong> <code>#1e1b4b → #0b1120</code>, padding <code>100px</code>. Coluna <code>col-12</code> centralizada.</li>
+                    <li><strong>Widgets em ordem:</strong>
                         <ul>
-                            <li><strong>Layout:</strong> <code>boxed</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#3b82f6</code> (azul) (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding superior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
-                            <li><strong>Padding inferior:</strong> <code>80px</code> (aba <strong>Advanced</strong>)</li>
+                            <li><strong>Lottie:</strong> <strong>Lottie URL:</strong> <code>https://lottie.host/lf20_g1al0rje.json</code> (ou outro arquivo Lottie), <strong>Loop:</strong> <code>true</code>, <strong>Autoplay:</strong> <code>true</code>, <strong>Speed:</strong> <code>1</code>, largura/altura <code>220px</code>. (Animações Lottie substituem GIFs com vectores leves.)</li>
+                            <li><strong>Título:</strong> <code>"Pronto para Começar?"</code>, H2, tamanho <code>xxl</code>, cor <code>#f8fafc</code>, peso <code>800</code>.</li>
+                            <li><strong>Texto:</strong> descrição em <code>#94a3b8</code>.</li>
+                            <li><strong>Botão:</strong> <code>"Criar Página Grátis"</code>, <strong>Link:</strong> <code>#contato</code>, <strong>gradiente</strong> <code>#6366f1 → #ec4899</code>, radius <code>50px</code>.</li>
                         </ul>
                     </li>
-                    <li><strong>Arraste uma Coluna</strong> para dentro da Seção. Configure:
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.10 Contato e Mapa (Seções 17 e 18)</h3>
+                <ol>
+                    <li><strong>Seção 17 (cabeçalho):</strong> boxed, fundo <code>#0b1120</code>, padding superior <code>100px</code>. Título <code>"Fale Conosco"</code> + Texto + Divider ciano (padding inferior <code>0px</code> nesta seção).</li>
+                    <li><strong>Seção 18 — coluna esquerda <code>col-6</code> (card escuro):</strong> fundo <code>#111827</code>, radius <code>16px</code>, padding <code>32px</code>:
                         <ul>
-                            <li><strong>Largura:</strong> <code>col-12</code> (largura total)</li>
-                            <li><strong>Alinhamento do texto:</strong> <code>center</code></li>
+                            <li><strong>Título:</strong> <code>"Formulário de Contato"</code>, H3, cor <code>#f1f5f9</code>.</li>
+                            <li><strong>Formulário (Form):</strong> <strong>Form Name:</strong> <code>"Contato Showcase"</code>, campos Nome/Email (text/email, obrigatórios), Assunto (select), Mensagem (textarea, largura 100). <strong>Button Text:</strong> <code>"Enviar Mensagem"</code>, <strong>Button Color:</strong> <code>#a855f7</code>, texto <code>#ffffff</code>, botão <code>full</code>, <strong>Field Spacing:</strong> <code>14</code>, <strong>Field Radius:</strong> <code>8</code>, <strong>Success Message:</strong> <code>"Recebemos sua mensagem! Obrigado pelo contato."</code></li>
                         </ul>
                     </li>
-                    <li><strong>Dentro da Coluna</strong>, arraste um <strong>Título</strong>:
+                    <li><strong>Coluna direita <code>col-6</code>:</strong>
                         <ul>
-                            <li><strong>Texto:</strong> <code>"Pronto para Transformar seu Negócio?"</code></li>
-                            <li><strong>Tag:</strong> <code>H2</code></li>
-                            <li><strong>Tamanho:</strong> <code>xl</code></li>
-                            <li><strong>Cor:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
-                            <li><strong>Peso:</strong> <code>700</code> (aba <strong>Style</strong>)</li>
-                            <li><strong>Margem inferior:</strong> <code>16px</code> (aba <strong>Advanced</strong>, campo <em>Bottom Margin</em>)</li>
+                            <li><strong>Callout</strong> (type <code>info</code>): título <code>"Informações de Contato"</code>, conteúdo em <code>#cbd5e1</code> com Endereço, Telefone, Email e Horário (destaques em <code>#f1f5f9</code>), radius <code>12px</code>.</li>
+                            <li><strong>Google Maps:</strong> <strong>Address:</strong> <code>"Av. Paulista, 1000, São Paulo, SP"</code>, latitude <code>-23.5632</code>, longitude <code>-46.6542</code>, <strong>Zoom:</strong> <code>15</code>, <strong>Height:</strong> <code>280px</code>, tipo <code>roadmap</code>, radius <code>16px</code>.</li>
                         </ul>
                     </li>
-                    <li><strong>Abaixo do título</strong>, arraste um <strong>Texto</strong>:
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.2.11 Rodapé (Seção 19)</h3>
+                <ol>
+                    <li><strong>Seção:</strong> layout <code>full_width</code>, fundo <code>#020617</code> (quase preto), padding <code>60px</code>. Coluna <code>col-12</code> centralizada, widgets em ordem:
                         <ul>
-                            <li><strong>Conteúdo:</strong> <code>"Entre em contato conosco hoje e descubra como podemos ajudar sua empresa a alcançar novos patamares."</code></li>
-                        </ul>
-                        <div class="tip">
-                            <strong>&#128161; Dica:</strong> Para o estilo exato, use no HTML: <code>&lt;p style="color:#bfdbfe;max-width:600px;margin:0 auto 30px;font-size:1.15rem;"&gt;...&lt;/p&gt;</code>
-                        </div>
-                    </li>
-                    <li><strong>Abaixo do texto</strong>, arraste um <strong>Botão</strong>:
-                        <ul>
-                            <li><strong>Texto:</strong> <code>"Fale Conosco"</code></li>
-                            <li><strong>Link:</strong> <code>#</code></li>
-                            <li><strong>Cor de fundo:</strong> <code>#ffffff</code> (branco) (aba <strong>Style</strong>)</li>
-                            <li><strong>Cor do texto:</strong> <code>#3b82f6</code> (azul — mesma cor do fundo da seção) (aba <strong>Style</strong>)</li>
-                            <li><strong>Tamanho:</strong> <code>large</code></li>
-                            <li><strong>Alinhamento:</strong> <code>center</code></li>
-                            <li><strong>Border Radius:</strong> <code>50px</code> (formato pílula) (aba <strong>Style</strong>)</li>
-                            <li><strong>Padding esquerda/direita:</strong> <code>40px</code> (aba <strong>Advanced</strong>, grupo <em>Padding &amp; Margin</em>)</li>
-                            <li><strong>Peso da fonte:</strong> <code>700</code> (aba <strong>Style</strong>, grupo <em>Typography</em>)</li>
+                            <li><strong>Social Icons:</strong> 6 redes (facebook <code>#1877F2</code>, twitter <code>#1DA1F2</code>, linkedin <code>#0A66C2</code>, instagram <code>#E4405F</code>, youtube <code>#FF0000</code>, github <code>#94a3b8</code>), <strong>Columns:</strong> <code>6</code>, tamanho <code>40px</code>, gap <code>12</code>, centralizado.</li>
+                            <li><strong>Divider:</strong> largura <code>100</code>%, espessura <code>1</code>, cor <code>#1e293b</code>.</li>
+                            <li><strong>Texto:</strong> copyright <code>"© 2026 Page Builder. Todos os direitos reservados."</code> em <code>#64748b</code>, com links <code>Termos</code> e <code>Privacidade</code> em <code>#a5b4fc</code>.</li>
                         </ul>
                     </li>
                 </ol>
@@ -1900,7 +1810,7 @@ php artisan serve</code></pre>
                 <hr style="margin:1.5rem 0;border:none;border-top:1px solid #eee">
 
                 <div class="tip">
-                    <strong>&#128161; Dica Final:</strong> O template Showcase Completo é o melhor exemplo de construção avançada de páginas. Ele demonstra: <strong>layouts full_width e boxed</strong>, <strong>colunas com larguras variadas</strong> (col-3, col-4, col-12), <strong>cores escuras e claras alternadas</strong> para ritmo visual, e <strong>todos os tipos de widget</strong> (Título, Texto, Botão). Para ver exatamente como cada elemento está configurado, crie uma página com o template e abra no editor — clique em cada elemento para inspecionar suas configurações no painel direito.
+                    <strong>&#128161; Dica Final:</strong> O template Showcase Completo é o melhor exemplo de construção avançada de páginas. Ele demonstra: <strong>seções com fundo em gradiente</strong>, <strong>layout full_width e boxed</strong>, <strong>colunas com larguras variadas</strong>, uma <strong>paleta futurista dark</strong> com acentos neon, e uma enorme variedade de widgets — <strong>Título, Texto, Botão, Vídeo, Imagem, Galeria, Carousel, Contador, Progress Bar, Countdown, Tabs, Accordion, Tabela de Preço, Depoimento, Lottie, Formulário, Mapa e Redes Sociais</strong>. Para ver exatamente como cada elemento está configurado, crie uma página com o template e abra no editor — clique em cada elemento para inspecionar suas configurações no painel direito.
                 </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.7 Usando os Novos Recursos no Showcase</h3>
