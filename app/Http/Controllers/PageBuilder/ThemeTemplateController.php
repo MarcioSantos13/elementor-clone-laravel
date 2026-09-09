@@ -47,7 +47,8 @@ class ThemeTemplateController extends Controller
     {
         $types = ThemeTemplate::typeOptions();
         $pages = Page::select('id', 'title')->orderBy('title')->get();
-        return view('page-builder.theme-templates.create', compact('types', 'pages'));
+        $themeTemplates = $this->templateManager->themeTemplateList();
+        return view('page-builder.theme-templates.create', compact('types', 'pages', 'themeTemplates'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -57,6 +58,7 @@ class ThemeTemplateController extends Controller
             'type' => 'required|string|in:' . implode(',', ThemeTemplate::types()),
             'page_id' => 'nullable|exists:pages,id',
             'status' => 'nullable|in:draft,published',
+            'template' => 'nullable|string|max:255',
         ]);
 
         $user = Auth::user();
@@ -72,6 +74,11 @@ class ThemeTemplateController extends Controller
                     'status' => 'draft',
                 ];
                 $page = $this->pageBuilder->createPage($pageData);
+            }
+
+            $templateKey = $request->input('template');
+            if ($templateKey && empty($validated['page_id']) && $this->templateManager->hasThemeTemplate($templateKey)) {
+                $this->templateManager->applyThemeTemplate($page, $templateKey);
             }
 
             $slug = Str::slug($validated['title']) . '-' . Str::random(6);

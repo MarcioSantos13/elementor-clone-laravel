@@ -1813,151 +1813,89 @@ php artisan serve</code></pre>
                     <strong>&#128161; Dica Final:</strong> O template Showcase Completo é o melhor exemplo de construção avançada de páginas. Ele demonstra: <strong>seções com fundo em gradiente</strong>, <strong>layout full_width e boxed</strong>, <strong>colunas com larguras variadas</strong>, uma <strong>paleta futurista dark</strong> com acentos neon, e uma enorme variedade de widgets — <strong>Título, Texto, Botão, Vídeo, Imagem, Galeria, Carousel, Contador, Progress Bar, Countdown, Tabs, Accordion, Tabela de Preço, Depoimento, Lottie, Formulário, Mapa e Redes Sociais</strong>. Para ver exatamente como cada elemento está configurado, crie uma página com o template e abra no editor — clique em cada elemento para inspecionar suas configurações no painel direito.
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">14.7 Usando os Novos Recursos no Showcase</h3>
-                <p>Com as melhorias implementadas (Fases 1–3), o showcase agora suporta muito mais do que o básico. Veja como aplicar os novos recursos em cada seção:</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.3 Referência Rápida — Configurações-Chave dos Widgets</h3>
+                <p>Estas são as configurações que mais geram dúvida e as que o template usa de verdade. Para inspecionar os valores exatos de cada elemento, basta abrir o editor de uma página criada com o template e clicar em cada elemento.</p>
 
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Background na Seção Hero</h4>
-                <p>Selecione a Seção Hero → aba <strong>Style</strong> → grupo <strong>Background</strong>:</p>
-                <ul>
-                    <li><strong>Background Color:</strong> <code>#0f172a</code> (aplica <code>background-color</code> via styles)</li>
-                    <li><strong>Background Image:</strong> adicione uma imagem de fundo (URL pública)</li>
-                    <li><strong>Size:</strong> <code>cover</code> para preencher toda a seção</li>
-                    <li><strong>Repeat:</strong> <code>no-repeat</code></li>
-                </ul>
+                <table class="widget-table">
+                    <tr><th>Widget</th><th>Configurações-chave</th></tr>
+                    <tr><td><strong>Vídeo</strong></td><td><strong>Video Type:</strong> <code>youtube</code> ou <code>vimeo</code>; <strong>Video URL</strong> (o campo é <em>Video URL</em>, não "URL"); <strong>Aspect Ratio:</strong> <code>16:9</code>. Sem <em>Video URL</em> o vídeo não é renderizado.</td></tr>
+                    <tr><td><strong>Imagem</strong></td><td><strong>URL</strong>, <strong>Caption</strong>, <strong>Enable Lightbox:</strong> <code>yes</code>; <strong>Link</strong> + <strong>Link Target:</strong> <code>_blank</code> (imagem clicável); <strong>Hover Animation:</strong> <code>zoom</code>.</td></tr>
+                    <tr><td><strong>Galeria</strong></td><td>repeater <strong>Images</strong>; <strong>Layout:</strong> <code>grid</code>; <strong>Columns:</strong> <code>3</code>; <strong>Gap</strong>, <strong>Show Caption</strong>, <strong>Enable Lightbox</strong>.</td></tr>
+                    <tr><td><strong>Carousel</strong></td><td>repeater <strong>Images</strong>; <strong>Columns</strong>, <strong>Autoplay:</strong> <code>true</code>, <strong>Loop</strong>, <strong>Show Dots</strong>, <strong>Show Arrows</strong>, <strong>Speed:</strong> <code>3000</code> ms.</td></tr>
+                    <tr><td><strong>Contador</strong></td><td><strong>Number</strong>, <strong>Suffix</strong> (<code>+</code>, <code>%</code>), <strong>Title</strong>, <strong>Duration</strong>; cor do número na aba Style.</td></tr>
+                    <tr><td><strong>Progress Bar</strong></td><td><strong>Title</strong>, <strong>Percentage</strong> (0–100), <strong>Bar Color</strong>, <strong>Track Color</strong>.</td></tr>
+                    <tr><td><strong>Tabs</strong></td><td>repeater com <strong>Title</strong> e <strong>Content</strong>; <strong>Orientation:</strong> <code>horizontal</code>, <strong>Active Tab</strong>. (Os campos repeater são <em>Title</em>/<em>Content</em> — não "label".)</td></tr>
+                    <tr><td><strong>Accordion</strong></td><td>repeater com <strong>Title</strong>/<strong>Content</strong>; <strong>Open by Default</strong>, <strong>Active Color</strong>, <strong>Border</strong>.</td></tr>
+                    <tr><td><strong>Countdown</strong></td><td><strong>Target Date</strong> (datetime-local, ex.: <code>2027-12-31</code>); rótulos <strong>Dias/Horas/Min/Seg</strong>; cores dos dígitos e do bloco.</td></tr>
+                    <tr><td><strong>Price Table</strong></td><td><strong>Plan Name</strong>, <strong>Price</strong>, <strong>Currency</strong>, <strong>Period</strong>; repeater <strong>Features</strong> (itens da lista); <strong>Button Text/Link</strong>.</td></tr>
+                    <tr><td><strong>Testimonial</strong></td><td><strong>Content</strong>, <strong>Avatar</strong> (imagem + shape <code>circle</code>), <strong>Name</strong>, <strong>Position</strong>, <strong>Company</strong>, <strong>Rating</strong> (1–5).</td></tr>
+                    <tr><td><strong>Lottie</strong></td><td><strong>Lottie URL</strong> (arquivo <code>.json</code>), <strong>Loop</strong>, <strong>Autoplay</strong>, <strong>Speed</strong>, largura/altura.</td></tr>
+                    <tr><td><strong>Icon Box</strong></td><td><strong>Icon Class</strong> (Font Awesome, ex.: <code>fas fa-bolt</code>), cor e tamanho na aba Style.</td></tr>
+                    <tr><td><strong>Callout</strong></td><td><strong>Type</strong>: <code>tip</code>, <code>info</code>, <code>success</code> ou <code>warning</code>; <strong>Title</strong>, <strong>Content</strong>, <strong>Show Icon</strong>.</td></tr>
+                    <tr><td><strong>Form</strong></td><td><strong>Form Name</strong>; repeater <strong>Fields</strong> com <strong>Label</strong>, <strong>Placeholder</strong>, <strong>Type</strong> (text/email/select/textarea), <strong>Required</strong>; <strong>Button Text</strong>, <strong>Button Color</strong>, <strong>Success Message</strong>, <strong>Field Spacing</strong>, <strong>Field Radius</strong>.</td></tr>
+                    <tr><td><strong>Google Maps</strong></td><td><strong>Address</strong>, <strong>Latitude</strong>, <strong>Longitude</strong>, <strong>Zoom</strong>, <strong>Height</strong>, <strong>Map Type</strong>.</td></tr>
+                    <tr><td><strong>Social Icons</strong></td><td>repeater <strong>Icons</strong> (platform, url, cor); <strong>Columns</strong>, <strong>Icon Size</strong>, <strong>Gap</strong>, <strong>Alignment</strong>.</td></tr>
+                    <tr><td><strong>Divider</strong></td><td><strong>Width</strong> (%), <strong>Thickness</strong> (px), <strong>Color</strong>, <strong>Space Before/After</strong>.</td></tr>
+                </table>
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> O Style Tab aplica estilos via <code>PUT /elements/{id}/styles</code>, que gera CSS inline no wrapper do elemento. Assim, a imagem de fundo funciona mesmo no Moodle.
+                    <strong>&#128161; Como o fundo em gradiente é aplicado:</strong> Seções e botões usam <strong>Background Type: gradient</strong> (com <strong>Cor 1</strong>, <strong>Cor 2</strong> e ângulo) ou <strong>radial gradient</strong> no Content Tab — o gradiente é armazenado nas configurações do elemento e renderizado como CSS. Para espaçamentos use sempre a aba <strong>Advanced</strong> (Padding &amp; Margin); para bordas, sombras e tipografia, a aba <strong>Style</strong>.
                 </div>
 
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Border e Box Shadow nos Cards de Serviços</h4>
-                <p>Selecione uma Coluna de serviço → aba <strong>Style</strong> → grupo <strong>Border</strong>:</p>
-                <ul>
-                    <li><strong>Border Width:</strong> <code>1px</code></li>
-                    <li><strong>Border Color:</strong> <code>#e2e8f0</code></li>
-                    <li><strong>Border Radius:</strong> <code>12px</code></li>
-                    <li><strong>Border Style:</strong> <code>solid</code></li>
-                </ul>
-                <p>No grupo <strong>Box Shadow</strong>:</p>
-                <ul>
-                    <li><strong>Horizontal:</strong> <code>0</code>, <strong>Vertical:</strong> <code>4</code>, <strong>Blur:</strong> <code>12</code>, <strong>Spread:</strong> <code>0</code></li>
-                    <li><strong>Color:</strong> <code>rgba(0,0,0,0.1)</code></li>
-                </ul>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Hover Effects no Botão CTA</h4>
-                <p>Selecione o Botão "Fale Conosco" → aba <strong>Style</strong> → grupo <strong>Hover Effects</strong>:</p>
-                <ul>
-                    <li><strong>Background Color:</strong> <code>#2563eb</code> (azul mais escuro no hover)</li>
-                    <li><strong>Transform:</strong> <code>scale(1.05)</code> (botão cresce 5%)</li>
-                    <li><strong>Transition:</strong> <code>300</code> ms (animação suave)</li>
-                </ul>
-                <p>O editor gera automaticamente uma tag <code>&lt;style&gt;</code> inline com <code>.pb-button:hover</code> — compatível com Moodle.</p>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Typography nos Títulos</h4>
-                <p>Selecione qualquer Título → aba <strong>Style</strong> → grupo <strong>Typography</strong>:</p>
-                <ul>
-                    <li><strong>Font Family:</strong> <code>'Inter', sans-serif</code></li>
-                    <li><strong>Font Size:</strong> <code>2.5rem</code></li>
-                    <li><strong>Font Weight:</strong> <code>800</code></li>
-                    <li><strong>Line Height:</strong> <code>1.2</code></li>
-                    <li><strong>Letter Spacing:</strong> <code>-0.02em</code></li>
-                    <li><strong>Text Transform:</strong> <code>uppercase</code></li>
-                </ul>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Style Tab — Tabs e Accordion no Showcase</h4>
-                <p>Para demonstrar os novos widgets de <strong>Abas</strong> e <strong>Accordion</strong>, adicione uma nova seção ao showcase:</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Navigator — Gerenciando Elementos</h3>
                 <ol>
-                    <li><strong>Arraste um widget Tabs</strong> para uma coluna. Configure no painel Content:
-                        <ul>
-                            <li>Adicione 3 abas: "Visão Geral", "Funcionalidades", "Preços"</li>
-                            <li>Orientação: <code>horizontal</code></li>
-                        </ul>
-                    </li>
-                    <li>Na aba <strong>Style</strong>:
-                        <ul>
-                            <li><strong>Active Tab Color:</strong> <code>#3b82f6</code></li>
-                            <li><strong>Border Color:</strong> <code>#e2e8f0</code></li>
-                            <li><strong>Content Padding:</strong> <code>20</code>px</li>
-                        </ul>
-                    </li>
-                    <li><strong>Arraste um widget Accordion</strong> abaixo das tabs. Configure:
-                        <ul>
-                            <li>3 itens: "O que está incluído?", "Como funciona?", "Posso cancelar?"</li>
-                            <li>Abra o primeiro item (<em>Open by Default</em>)</li>
-                        </ul>
-                    </li>
-                    <li>Na aba <strong>Style</strong> do Accordion:
-                        <ul>
-                            <li><strong>Active Color:</strong> <code>#3b82f6</code></li>
-                            <li><strong>Border Color:</strong> <code>#e2e8f0</code></li>
-                            <li><strong>Content Padding:</strong> <code>16</code>px</li>
-                        </ul>
-                    </li>
-                </ol>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Navigator — Gerenciando Elementos</h4>
-                <p>O <strong>Navigator</strong> (botão ☰ no canto inferior direito) mostra a árvore completa de elementos. Veja como usá-lo no showcase:</p>
-                <ol>
-                    <li><strong>Abrir Navigator:</strong> clique no botão flutuante ☰ → painel aparece com a árvore</li>
-                    <li><strong>Navegar:</strong> clique em qualquer item para selecioná-lo no canvas</li>
-                    <li><strong>Reordenar (SortableJS):</strong> arraste um item para cima/baixo na árvore → a ordem muda no canvas</li>
-                    <li><strong>Mover entre colunas (SortableJS):</strong> arraste um widget de uma coluna para outra</li>
-                    <li><strong>Renomear:</strong> duplo clique no nome → digite novo nome → Enter para salvar</li>
-                    <li><strong>Context menu:</strong> clique direito → Duplicate, Delete, Copy, Paste, Move Up/Down</li>
-                </ol>
-                <div class="tip">
-                    <strong>&#128161; Dica:</strong> O Navigator é especialmente útil quando a página tem muitos elementos empilhados. Em vez de clicar no canvas para achar um widget específico, use o Navigator para localizá-lo instantaneamente.
-                </div>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Advanced Tab — Padding e Margin</h4>
-                <p>Selecione qualquer elemento → aba <strong>Advanced</strong> → grupo <strong>Padding &amp; Margin</strong>:</p>
-                <ul>
-                    <li><strong>Padding Top:</strong> <code>20px</code></li>
-                    <li><strong>Padding Bottom:</strong> <code>20px</code></li>
-                    <li><strong>Margin Top:</strong> <code>40px</code></li>
-                    <li><strong>Margin Bottom:</strong> <code>0</code></li>
-                </ul>
-                <p>No grupo abaixo, você pode adicionar <strong>CSS Classes</strong> (ex: <code>meu-estilo-custom</code>) e <strong>CSS ID</strong> (ex: <code>hero-titulo</code>) para referenciar em stylesheets externos.</p>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Widget de Vídeo na Seção Hero</h4>
-                <p>Para transformar a Hero em uma seção com vídeo de fundo:</p>
-                <ol>
-                    <li><strong>Arraste o widget Vídeo</strong> para dentro da Seção Hero</li>
-                    <li>Configure: <strong>Video Type:</strong> <code>youtube</code>, <strong>URL:</strong> <code>https://youtube.com/watch?v=...</code></li>
-                    <li><strong>Aspect Ratio:</strong> <code>16:9</code>, <strong>Mute:</strong> ligado, <strong>Loop:</strong> ligado</li>
-                    <li>No Style Tab → <strong>Border Radius:</strong> <code>0</code> para preencher toda a seção</li>
-                </ol>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Widget de Galeria na Seção de Equipe</h4>
-                <p>Substitua os cards de equipe por fotos usando o widget Galeria:</p>
-                <ol>
-                    <li><strong>Arraste o widget Galeria</strong> para a coluna de um membro da equipe</li>
-                    <li>Configure: <strong>Columns:</strong> <code>1</code>, <strong>Image Fit:</strong> <code>cover</code></li>
-                    <li>No Style Tab → <strong>Border Radius:</strong> <code>50%</code> (formato circular para fotos)</li>
-                    <li><strong>Box Shadow:</strong> <code>0 4px 12px rgba(0,0,0,0.1)</code></li>
-                </ol>
-
-                <h4 style="font-size:.9rem;margin-top:1rem;margin-bottom:.5rem">Widget de Formulário no CTA</h4>
-                <p>Adicione um formulário de contato na seção CTA:</p>
-                <ol>
-                    <li><strong>Arraste o widget Formulário</strong> para a coluna CTA</li>
-                    <li>Configure os campos: Nome (text), Email (email), Mensagem (textarea)</li>
-                    <li><strong>Button Text:</strong> <code>"Enviar Mensagem"</code></li>
-                    <li>No Style Tab → <strong>Button Color:</strong> <code>#ffffff</code>, <strong>Button Text Color:</strong> <code>#3b82f6</code></li>
-                    <li><strong>Field Border Radius:</strong> <code>8</code>px</li>
+                    <li><strong>Abrir Navigator:</strong> clique no botão flutuante ☰ (canto inferior direito) → painel com a árvore completa de elementos.</li>
+                    <li><strong>Reordenar (SortableJS):</strong> arraste um item para cima/baixo na árvore → a ordem muda no canvas.</li>
+                    <li><strong>Mover entre colunas:</strong> arraste um widget de uma coluna para outra.</li>
+                    <li><strong>Renomear:</strong> duplo clique no nome → digite o novo nome → Enter.</li>
+                    <li><strong>Context menu:</strong> clique direito → Duplicate, Delete, Copy, Paste, Move Up/Down.</li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Paleta de Cores Utilizada</h3>
                 <table class="widget-table">
                     <tr><th>Cor</th><th>Código</th><th>Uso</th></tr>
-                    <tr><td style="background:#0f172a;color:#fff;padding:4px 8px;border-radius:4px">Azul muito escuro</td><td><code>#0f172a</code></td><td>Fundo do Hero, cor dos títulos da seção</td></tr>
-                    <tr><td style="background:#1e293b;color:#fff;padding:4px 8px;border-radius:4px">Cinza escuro</td><td><code>#1e293b</code></td><td>Fundo da seção de Estatísticas</td></tr>
-                    <tr><td style="background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px">Azul vibrante</td><td><code>#3b82f6</code></td><td>Botão Hero, números das estatísticas, fundo do CTA</td></tr>
-                    <tr><td style="background:#f8fafc;padding:4px 8px;border-radius:4px;border:1px solid #ddd">Cinza muito claro</td><td><code>#f8fafc</code></td><td>Fundo dos cards de Serviços e Depoimentos</td></tr>
-                    <tr><td style="background:#ffffff;padding:4px 8px;border-radius:4px;border:1px solid #ddd">Branco</td><td><code>#ffffff</code></td><td>Fundo de Serviços, Equipe e cards de Depoimentos</td></tr>
-                    <tr><td style="background:#94a3b8;color:#fff;padding:4px 8px;border-radius:4px">Cinza médio</td><td><code>#94a3b8</code></td><td>Textos secundários (descrições, estatísticas)</td></tr>
-                    <tr><td style="background:#64748b;color:#fff;padding:4px 8px;border-radius:4px">Cinza texto</td><td><code>#64748b</code></td><td>Textos descritivos (serviços, equipe)</td></tr>
-                    <tr><td style="background:#475569;color:#fff;padding:4px 8px;border-radius:4px">Cinza itálico</td><td><code>#475569</code></td><td>Textos de depoimento (itálico)</td></tr>
-                    <tr><td style="background:#bfdbfe;padding:4px 8px;border-radius:4px">Azul claro</td><td><code>#bfdbfe</code></td><td>Texto descritivo do CTA</td></tr>
+                    <tr><td style="background:#020617;color:#fff;padding:4px 8px;border-radius:4px">Quase preto</td><td><code>#020617</code></td><td>Fundo do rodapé / cor 1 do gradiente do Hero</td></tr>
+                    <tr><td style="background:#0b1120;color:#fff;padding:4px 8px;border-radius:4px">Preto azulado</td><td><code>#0b1120</code></td><td>Fundo principal das seções</td></tr>
+                    <tr><td style="background:#111827;color:#fff;padding:4px 8px;border-radius:4px">Card escuro</td><td><code>#111827</code></td><td>Cards de recursos e do formulário</td></tr>
+                    <tr><td style="background:#1e293b;color:#fff;padding:4px 8px;border-radius:4px">Cinza escuro</td><td><code>#1e293b</code></td><td>Bordas, tracks de progresso, cards de depoimentos</td></tr>
+                    <tr><td style="background:#312e81;color:#fff;padding:4px 8px;border-radius:4px">Índigo escuro</td><td><code>#312e81</code></td><td>Cor 2 do gradiente do Hero</td></tr>
+                    <tr><td style="background:#1e1b4b;color:#fff;padding:4px 8px;border-radius:4px">Púrpura profundo</td><td><code>#1e1b4b</code></td><td>Gradiente radial do CTA</td></tr>
+                    <tr><td style="background:#22d3ee;color:#01303a;padding:4px 8px;border-radius:4px">Ciano neon</td><td><code>#22d3ee</code></td><td>Dividers, abas ativas, contador, progress bar</td></tr>
+                    <tr><td style="background:#a78bfa;color:#fff;padding:4px 8px;border-radius:4px">Violeta neon</td><td><code>#a78bfa</code></td><td>Contador "98%", ícones de recursos</td></tr>
+                    <tr><td style="background:#34d399;color:#fff;padding:4px 8px;border-radius:4px">Verde neon</td><td><code>#34d399</code></td><td>Contador "50+", ícones</td></tr>
+                    <tr><td style="background:#f0abfc;color:#fff;padding:4px 8px;border-radius:4px">Rosa neon</td><td><code>#f0abfc</code></td><td>Contador "12+", countdown</td></tr>
+                    <tr><td style="background:#a855f7;color:#fff;padding:4px 8px;border-radius:4px">Roxo</td><td><code>#a855f7</code></td><td>Plano em destaque, botão do formulário</td></tr>
+                    <tr><td style="background:#6366f1;color:#fff;padding:4px 8px;border-radius:4px">Índigo</td><td><code>#6366f1</code></td><td>Gradientes de botões (<code>#6366f1 → #a855f7</code> e <code>#6366f1 → #ec4899</code>)</td></tr>
+                    <tr><td style="background:#94a3b8;color:#fff;padding:4px 8px;border-radius:4px">Cinza médio</td><td><code>#94a3b8</code></td><td>Textos secundários e descrições</td></tr>
+                    <tr><td style="background:#cbd5e1;color:#0f172a;padding:4px 8px;border-radius:4px">Cinza claro</td><td><code>#cbd5e1</code></td><td>Textos de depoimentos e contato</td></tr>
+                    <tr><td style="background:#f8fafc;color:#0f172a;padding:4px 8px;border-radius:4px;border:1px solid #ddd">Branco azulado</td><td><code>#f8fafc</code></td><td>Títulos e textos principais</td></tr>
                 </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.4 Templates Básicos para Temas (Theme Builder)</h3>
+                <p>Além das páginas, o <strong>Theme Builder</strong> ganhou <strong>starter templates</strong>: o formulário de criação de Theme Template agora tem o campo <strong>"Starter Template"</strong>, que pre-preenche o editor com um conteúdo básico pronto para cada tipo de tema. Ele só é aplicado quando o tema usa uma <strong>página nova</strong> (se você associar uma página existente, o conteúdo dela não é alterado).</p>
+                <table class="widget-table">
+                    <tr><th>Starter</th><th>Nome</th><th>Conteúdo criado no editor</th></tr>
+                    <tr><td><code>header</code></td><td>Header Básico</td><td>Seção <code>full_width</code> fundo <code>#0b1120</code> com 3 colunas: logo (ícone + marca), navegação em texto e botão CTA em gradiente <code>#6366f1 → #a855f7</code></td></tr>
+                    <tr><td><code>footer</code></td><td>Rodapé Básico</td><td>Seção <code>full_width</code> fundo <code>#020617</code> com 3 colunas: marca/copyright, links de navegação e <strong>Social Icons</strong> (4 redes)</td></tr>
+                    <tr><td><code>single</code></td><td>Artigo Simples</td><td>Imagem de destaque, título H1, metadados, divider e texto do artigo + callout <strong>info</strong> "Sobre o Autor"</td></tr>
+                    <tr><td><code>archive</code></td><td>Listagem de Posts</td><td>Cabeçalho (H1 + divider ciano) e grade de <strong>3 cards</strong> col-4 com imagem, título, texto e botão "Ler Mais"</td></tr>
+                    <tr><td><code>404</code></td><td>Página 404</td><td>Seção centralizada com "404" gigante em <code>#22d3ee</code> (text shadow neon), mensagem e botão gradiente "Voltar para a Home"</td></tr>
+                    <tr><td><code>search_results</code></td><td>Resultados de Busca</td><td>Cabeçalho "Resultados de Busca" + divider e lista de <strong>3 callouts</strong> info como resultados (duplique no Navigator para mais)</td></tr>
+                </table>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Ao escolher o <strong>Type</strong> do tema, o Starter Template correspondente é <strong>selecionado automaticamente</strong> no formulário. Você pode trocá-lo ou deixar em "Blank" para começar do zero. Depois de criar, basta abrir o editor e adaptar o conteúdo.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">16.5 Templates Básicos para Popups</h3>
+                <p>O formulário de criação de Popup também ganhou o campo <strong>"Starter Template"</strong>. Além do conteúdo, o starter já define as <strong>configurações padrão do popup</strong> (largeura, posição, overlay e botão fechar), poupando configuração manual.</p>
+                <table class="widget-table">
+                    <tr><th>Starter</th><th>Nome</th><th>Conteúdo criado no editor</th><th>Popup Settings</th></tr>
+                    <tr><td><code>popup-newsletter</code></td><td>Newsletter</td><td>Ícone de envelope, título "Fique por dentro!", texto e <strong>Formulário</strong> com campo de e-mail + botão "Assinar Grátis" (<code>#6366f1</code>)</td><td>Largura <code>480px</code>, posição <code>center</code>, overlay <code>sim</code>, botão fechar <code>sim</code></td></tr>
+                    <tr><td><code>popup-announcement</code></td><td>Anúncio</td><td>Callout <strong>warning</strong> "Novidade!", título, texto descritivo e botão gradiente <code>#6366f1 → #ec4899</code> "Saiba Mais"</td><td>Largura <code>480px</code>, posição <code>center</code>, overlay <code>sim</code>, botão fechar <code>sim</code></td></tr>
+                </table>
+                <p>Depois de criar, configure os <strong>Gatilhos</strong> (quando o popup aparece) e as <strong>Condições</strong> (em quais páginas) — o popup só aparece em páginas publicadas. Para um popup que surge após 3 segundos, adicione o gatilho <code>After Timer</code> com valor <code>3</code>.</p>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> Para deixar o popup com fundo branco ou escuro, troque a <strong>cor da seção</strong> no editor (newsletter usa <code>#ffffff</code>; anúncio usa <code>#0b1120</code>). Os dois temas seguem a mesma paleta neon da seção 16.3.
+                </div>
             </div>
         </section>
 

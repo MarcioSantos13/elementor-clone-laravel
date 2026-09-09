@@ -42,6 +42,23 @@
 
             @if(!isset($popup))
             <div class="form-group">
+                <label for="template">Starter Template <span class="optional">(pre-preenche o conteúdo)</span></label>
+                <select id="template" name="template" class="form-control form-select">
+                    <option value="">-- Blank (conteúdo vazio) --</option>
+                    @foreach($popupTemplates as $key => $tmpl)
+                        <option value="{{ $key }}" {{ request('template') === $key ? 'selected' : '' }}>
+                            {{ $tmpl['name'] }} — {{ $tmpl['description'] }}
+                        </option>
+                    @endforeach
+                </select>
+                <p style="font-size:.78rem;color:#94a3b8;margin-top:.35rem">
+                    O starter também define largura e posição padrão do popup.
+                </p>
+            </div>
+            @endif
+
+            @if(!isset($popup))
+            <div class="form-group">
                 <label>Triggers</label>
                 <div id="triggers-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem"></div>
                 <div style="display:flex;gap:.5rem">

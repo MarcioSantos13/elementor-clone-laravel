@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Popup;
 use App\Services\PageBuilder\Core\PageBuilderService;
+use App\Services\PageBuilder\Core\TemplateManager;
 use App\Services\PageBuilder\Popup\PopupService;
 use App\Services\PageBuilder\Theme\ThemeService;
 use Illuminate\Http\JsonResponse;
@@ -20,11 +21,13 @@ class PopupController extends Controller
 {
     protected PageBuilderService $pageBuilder;
     protected PopupService $popupService;
+    protected TemplateManager $templateManager;
 
-    public function __construct(PageBuilderService $pageBuilder, PopupService $popupService)
+    public function __construct(PageBuilderService $pageBuilder, PopupService $popupService, TemplateManager $templateManager)
     {
         $this->pageBuilder = $pageBuilder;
         $this->popupService = $popupService;
+        $this->templateManager = $templateManager;
     }
 
     public function index(): View
@@ -37,7 +40,8 @@ class PopupController extends Controller
     {
         $types = Popup::types();
         $triggerTypes = Popup::triggerTypes();
-        return view('page-builder.popups.create', compact('types', 'triggerTypes'));
+        $popupTemplates = $this->templateManager->popupTemplateList();
+        return view('page-builder.popups.create', compact('types', 'triggerTypes', 'popupTemplates'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -48,6 +52,7 @@ class PopupController extends Controller
             'status' => 'nullable|in:draft,published',
             'triggers' => 'nullable|array',
             'settings' => 'nullable|array',
+            'template' => 'nullable|string|max:255',
         ]);
 
         $user = Auth::user();
@@ -60,6 +65,16 @@ class PopupController extends Controller
             ];
             $page = $this->pageBuilder->createPage($pageData);
 
+            $templateKey = $request->input('template');
+            $popupSettings = $validated['settings'] ?? [];
+            if ($templateKey && $this->templateManager->hasPopupTemplate($templateKey)) {
+                $popupTemplate = $this->templateManager->popupTemplate($templateKey);
+                $this->templateManager->applyPopupTemplate($page, $templateKey);
+                if (!empty($popupTemplate['popup_settings'])) {
+                    $popupSettings = array_merge($popupSettings, $popupTemplate['popup_settings']);
+                }
+            }
+
             $slug = Str::slug($validated['title']) . '-' . Str::random(6);
 
             $popup = Popup::create([
@@ -70,7 +85,7 @@ class PopupController extends Controller
                 'type' => $validated['type'],
                 'status' => $validated['status'] ?? 'draft',
                 'triggers' => $validated['triggers'] ?? [],
-                'settings' => $validated['settings'] ?? [],
+                'settings' => $popupSettings,
                 'conditions' => [],
                 'order' => Popup::count(),
             ]);

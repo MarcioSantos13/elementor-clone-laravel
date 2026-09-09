@@ -133,4 +133,65 @@ class TemplateManagerTest extends TestCase
         $this->assertEquals('section', $template['elements'][1]['type']);
         $this->assertEquals('section', $template['elements'][2]['type']);
     }
+
+    public function test_lists_all_theme_templates(): void
+    {
+        $list = $this->manager->themeTemplateList();
+
+        $expected = ['header', 'footer', 'single', 'archive', '404', 'search_results'];
+        foreach ($expected as $type) {
+            $this->assertArrayHasKey($type, $list);
+            $this->assertArrayHasKey('name', $list[$type]);
+            $this->assertArrayHasKey('description', $list[$type]);
+        }
+    }
+
+    public function test_apply_theme_template_creates_elements_and_settings(): void
+    {
+        $this->manager->applyThemeTemplate($this->page, 'header');
+
+        $this->assertGreaterThan(0, $this->page->elements()->count());
+        $this->assertEquals('full', $this->page->settings['container_width']);
+        $this->assertTrue($this->manager->hasThemeTemplate('header'));
+        $this->assertFalse($this->manager->hasThemeTemplate('nonexistent'));
+    }
+
+    public function test_apply_invalid_theme_template_does_nothing(): void
+    {
+        $this->manager->applyThemeTemplate($this->page, 'nonexistent');
+
+        $this->assertEquals(0, $this->page->elements()->count());
+
+        $this->assertNull($this->manager->themeTemplate('nonexistent'));
+    }
+
+    public function test_lists_popup_templates_with_settings(): void
+    {
+        $list = $this->manager->popupTemplateList();
+
+        $this->assertArrayHasKey('popup-newsletter', $list);
+        $this->assertArrayHasKey('popup-announcement', $list);
+        $this->assertCount(2, $list);
+
+        $newsletter = $this->manager->popupTemplate('popup-newsletter');
+        $this->assertArrayHasKey('popup_settings', $newsletter);
+        $this->assertArrayHasKey('width', $newsletter['popup_settings']);
+    }
+
+    public function test_apply_popup_template_creates_elements(): void
+    {
+        $this->manager->applyPopupTemplate($this->page, 'popup-newsletter');
+
+        $this->assertGreaterThan(0, $this->page->elements()->count());
+        $this->assertTrue($this->manager->hasPopupTemplate('popup-newsletter'));
+        $this->assertFalse($this->manager->hasPopupTemplate('nonexistent'));
+    }
+
+    public function test_apply_invalid_popup_template_does_nothing(): void
+    {
+        $this->manager->applyPopupTemplate($this->page, 'nonexistent');
+
+        $this->assertEquals(0, $this->page->elements()->count());
+        $this->assertNull($this->manager->popupTemplate('nonexistent'));
+    }
 }

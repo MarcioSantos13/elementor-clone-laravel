@@ -40,6 +40,23 @@
                 </div>
             </div>
 
+            @if(!isset($themeTemplate))
+            <div class="form-group">
+                <label for="template">Starter Template <span class="optional">(pre-preenche o conteúdo)</span></label>
+                <select id="template" name="template" class="form-control form-select">
+                    <option value="">-- Blank (conteúdo vazio) --</option>
+                    @foreach($themeTemplates as $key => $tmpl)
+                        <option value="{{ $key }}" {{ request('template') === $key ? 'selected' : '' }}>
+                            {{ $tmpl['name'] }} — {{ $tmpl['description'] }}
+                        </option>
+                    @endforeach
+                </select>
+                <p style="font-size:.78rem;color:#94a3b8;margin-top:.35rem">
+                    Um conteúdo básico é inserido automaticamente no editor. Só se aplica quando uma nova página é criada.
+                </p>
+            </div>
+            @endif
+
             <div class="form-group">
                 <label for="page_id">Associated Page <span class="optional">(optional)</span></label>
                 <select id="page_id" name="page_id" class="form-control form-select">
@@ -79,4 +96,23 @@
         </form>
     </div>
 </div>
+
+@if(!isset($themeTemplate))
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('type');
+    const templateSelect = document.getElementById('template');
+    const starterTypes = @json(array_keys($themeTemplates));
+
+    typeSelect.addEventListener('change', function() {
+        if (!this.value) return;
+        if (starterTypes.includes(this.value)) {
+            templateSelect.value = this.value;
+        }
+    });
+});
+</script>
+@endpush
+@endif
 @endsection

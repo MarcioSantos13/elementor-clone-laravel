@@ -76,6 +76,66 @@ class TemplateManager
         $this->importElements($page, $template['elements']);
     }
 
+    public function themeTemplateList(): array
+    {
+        $list = [];
+        foreach ($this->themeTemplates() as $key => $tmpl) {
+            $list[$key] = ['name' => $tmpl['name'], 'description' => $tmpl['description']];
+        }
+        return $list;
+    }
+
+    public function themeTemplate(string $type): ?array
+    {
+        return $this->themeTemplates()[$type] ?? null;
+    }
+
+    public function hasThemeTemplate(string $type): bool
+    {
+        return isset($this->themeTemplates()[$type]);
+    }
+
+    public function applyThemeTemplate(Page $page, string $type): void
+    {
+        $template = $this->themeTemplate($type);
+        if (!$template) return;
+
+        $page->settings = array_merge($page->settings ?? [], $template['settings']);
+        $page->save();
+
+        $this->importElements($page, $template['elements']);
+    }
+
+    public function popupTemplateList(): array
+    {
+        $list = [];
+        foreach ($this->popupTemplates() as $key => $tmpl) {
+            $list[$key] = ['name' => $tmpl['name'], 'description' => $tmpl['description']];
+        }
+        return $list;
+    }
+
+    public function popupTemplate(string $key): ?array
+    {
+        return $this->popupTemplates()[$key] ?? null;
+    }
+
+    public function hasPopupTemplate(string $key): bool
+    {
+        return isset($this->popupTemplates()[$key]);
+    }
+
+    public function applyPopupTemplate(Page $page, string $key): void
+    {
+        $template = $this->popupTemplate($key);
+        if (!$template) return;
+
+        $page->settings = array_merge($page->settings ?? [], $template['settings']);
+        $page->save();
+
+        $this->importElements($page, $template['elements']);
+    }
+
     protected function importElements(Page $page, array $elements, ?int $parentId = null, ?string $widgetType = null): void
     {
         foreach ($elements as $index => $elData) {
@@ -478,6 +538,181 @@ class TemplateManager
                         ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'left'], 'children' => [
                             ['type' => 'text', 'settings' => ['content' => '<p style="color:#0f172a;font-weight:600;margin-bottom:12px;">Share this post:</p>', 'alignment' => 'left', 'font_size' => '14px']],
                             ['type' => 'social_icons', 'settings' => ['icons' => [['platform' => 'facebook', 'url' => '#', 'color' => '#1877F2'], ['platform' => 'twitter', 'url' => '#', 'color' => '#1DA1F2'], ['platform' => 'linkedin', 'url' => '#', 'color' => '#0A66C2'], ['platform' => 'pinterest', 'url' => '#', 'color' => '#E60023'], ['platform' => 'whatsapp', 'url' => '#', 'color' => '#25D366']], 'columns' => '5', 'icon_size' => '40', 'gap' => '10', 'alignment' => 'left']],
+                        ]],
+                    ]],
+                ],
+            ],
+        ];
+    }
+
+    protected function themeTemplates(): array
+    {
+        return [
+            'header' => [
+                'name' => 'Header Básico',
+                'description' => 'Logo, navegação e botão de CTA',
+                'settings' => ['container_width' => 'full', 'page_background' => '#0b1120', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#0b1120', 'padding_top' => '16px', 'padding_bottom' => '16px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'icon', 'settings' => ['icon' => 'fas fa-layer-group', 'size' => '28', 'color' => '#6366f1', 'alignment' => 'left']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Sua Marca', 'tag' => 'h4', 'size' => 'small', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '700']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-5', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#cbd5e1;">Home &nbsp;&bull;&nbsp; Sobre &nbsp;&bull;&nbsp; Serviços &nbsp;&bull;&nbsp; Contato</p>', 'alignment' => 'center', 'font_size' => '15px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-3', 'text_align' => 'right'], 'children' => [
+                            ['type' => 'button', 'settings' => ['text' => 'Criar Conta', 'link' => '#', 'link_target' => '_self', 'size' => 'small', 'background_type' => 'gradient', 'background_gradient' => ['type' => 'linear', 'angle' => 135, 'color1' => '#6366f1', 'color2' => '#a855f7', 'position1' => 0, 'position2' => 100], 'text_color' => '#ffffff', 'border_radius' => '50px', 'padding_left_right' => '20px', 'font_weight' => '600', 'alignment' => 'right']],
+                        ]],
+                    ]],
+                ],
+            ],
+            'footer' => [
+                'name' => 'Rodapé Básico',
+                'description' => 'Três colunas com marca, links e redes sociais',
+                'settings' => ['container_width' => 'full', 'page_background' => '#020617', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#020617', 'padding_top' => '48px', 'padding_bottom' => '48px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Sua Marca', 'tag' => 'h4', 'size' => 'small', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '700', 'margin_bottom' => '8px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;font-size:0.85rem;">&copy; 2026 Sua Empresa. Todos os direitos reservados.</p>', 'alignment' => 'left', 'font_size' => '14px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Links', 'tag' => 'h4', 'size' => 'small', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '8px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;line-height:1.9;">Página Inicial<br>Sobre nós<br>Termos de Uso<br>Privacidade</p>', 'alignment' => 'left', 'font_size' => '14px']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Redes Sociais', 'tag' => 'h4', 'size' => 'small', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '8px']],
+                            ['type' => 'social_icons', 'settings' => ['icons' => [['platform' => 'facebook', 'url' => 'https://facebook.com', 'color' => '#1877F2'], ['platform' => 'twitter', 'url' => 'https://twitter.com', 'color' => '#1DA1F2'], ['platform' => 'linkedin', 'url' => 'https://linkedin.com', 'color' => '#0A66C2'], ['platform' => 'instagram', 'url' => 'https://instagram.com', 'color' => '#E4405F']], 'columns' => '4', 'icon_size' => '34', 'gap' => '10', 'alignment' => 'left']],
+                        ]],
+                    ]],
+                ],
+            ],
+            'single' => [
+                'name' => 'Artigo Simples',
+                'description' => 'Cabeçalho, imagem de destaque, texto e autor',
+                'settings' => ['container_width' => '800px', 'page_background' => '#0b1120', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '0px', 'padding_bottom' => '0px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'image', 'settings' => ['image' => ['url' => 'https://picsum.photos/seed/article-hero/1200/500', 'alt' => 'Imagem de destaque', 'width' => '1200', 'height' => '500'], 'width' => '100%', 'border_radius' => '0px', 'object_fit' => 'cover', 'height' => '360px']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '32px', 'padding_bottom' => '40px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Título do Artigo', 'tag' => 'h1', 'size' => 'xl', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '800', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;font-size:0.9rem;">Por Autor Exemplo &bull; 5 min de leitura</p>', 'alignment' => 'left', 'font_size' => '14px', 'margin_bottom' => '24px']],
+                            ['type' => 'divider', 'settings' => ['width' => '100', 'thickness' => '1', 'color' => '#1e293b', 'space_before' => '0', 'space_after' => '24']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#cbd5e1;font-size:1.05rem;line-height:1.8;">Este é o conteúdo do artigo. Substitua este texto pelo conteúdo real. O widget Texto aceita HTML, então você pode usar parágrafos, listas, destaques e mais.</p>', 'alignment' => 'left', 'font_size' => '17px', 'line_height' => '1.8']],
+                            ['type' => 'callout', 'settings' => ['type' => 'info', 'title' => 'Sobre o Autor', 'content' => '<p style="color:#475569;">Breve biografia do autor do artigo, com experiência e redes sociais.</p>']],
+                        ]],
+                    ]],
+                ],
+            ],
+            'archive' => [
+                'name' => 'Listagem de Posts',
+                'description' => 'Cabeçalho e grade de cards de postagens',
+                'settings' => ['container_width' => '1140px', 'page_background' => '#0b1120', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '64px', 'padding_bottom' => '16px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Arquivo de Posts', 'tag' => 'h1', 'size' => 'xl', 'color' => '#f8fafc', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Todos os artigos publicados</p>', 'alignment' => 'center', 'font_size' => '16px']],
+                            ['type' => 'divider', 'settings' => ['width' => '60', 'thickness' => '3', 'color' => '#22d3ee', 'space_before' => '16', 'space_after' => '0']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '32px', 'padding_bottom' => '64px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'image', 'settings' => ['image' => ['url' => 'https://picsum.photos/seed/post1/600/380', 'alt' => 'Post 1', 'width' => '600', 'height' => '380'], 'width' => '100%', 'border_radius' => '12px', 'object_fit' => 'cover', 'height' => '200px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Post 1', 'tag' => 'h3', 'size' => 'medium', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '8px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Resumo da postagem 1. Substitua pelos dados reais.</p>', 'alignment' => 'left', 'font_size' => '14px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Ler Mais', 'link' => '#', 'link_target' => '_self', 'size' => 'small', 'background_type' => 'classic', 'background_color' => 'transparent', 'text_color' => '#22d3ee', 'border_color' => '#22d3ee', 'border_width' => '1px', 'border_radius' => '50px', 'padding_left_right' => '16px', 'font_weight' => '600', 'alignment' => 'left']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'image', 'settings' => ['image' => ['url' => 'https://picsum.photos/seed/post2/600/380', 'alt' => 'Post 2', 'width' => '600', 'height' => '380'], 'width' => '100%', 'border_radius' => '12px', 'object_fit' => 'cover', 'height' => '200px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Post 2', 'tag' => 'h3', 'size' => 'medium', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '8px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Resumo da postagem 2. Substitua pelos dados reais.</p>', 'alignment' => 'left', 'font_size' => '14px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Ler Mais', 'link' => '#', 'link_target' => '_self', 'size' => 'small', 'background_type' => 'classic', 'background_color' => 'transparent', 'text_color' => '#22d3ee', 'border_color' => '#22d3ee', 'border_width' => '1px', 'border_radius' => '50px', 'padding_left_right' => '16px', 'font_weight' => '600', 'alignment' => 'left']],
+                        ]],
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-4', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'image', 'settings' => ['image' => ['url' => 'https://picsum.photos/seed/post3/600/380', 'alt' => 'Post 3', 'width' => '600', 'height' => '380'], 'width' => '100%', 'border_radius' => '12px', 'object_fit' => 'cover', 'height' => '200px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Post 3', 'tag' => 'h3', 'size' => 'medium', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '600', 'margin_bottom' => '8px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Resumo da postagem 3. Substitua pelos dados reais.</p>', 'alignment' => 'left', 'font_size' => '14px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Ler Mais', 'link' => '#', 'link_target' => '_self', 'size' => 'small', 'background_type' => 'classic', 'background_color' => 'transparent', 'text_color' => '#22d3ee', 'border_color' => '#22d3ee', 'border_width' => '1px', 'border_radius' => '50px', 'padding_left_right' => '16px', 'font_weight' => '600', 'alignment' => 'left']],
+                        ]],
+                    ]],
+                ],
+            ],
+            '404' => [
+                'name' => 'Página 404',
+                'description' => 'Erro centralizado com botão para voltar',
+                'settings' => ['container_width' => 'full', 'page_background' => '#0b1120', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'full_width', 'background_color' => '#0b1120', 'padding_top' => '120px', 'padding_bottom' => '120px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => '404', 'tag' => 'h1', 'size' => 'xxl', 'color' => '#22d3ee', 'alignment' => 'center', 'font_weight' => '800', 'margin_bottom' => '8px', 'text_shadow' => '0 0 24px rgba(34,211,238,.45)']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Oops! Página não encontrada', 'tag' => 'h2', 'size' => 'medium', 'color' => '#f8fafc', 'alignment' => 'center', 'font_weight' => '600', 'margin_bottom' => '16px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">A página que você procura pode ter sido movida, renomeada ou não existe mais.</p>', 'alignment' => 'center', 'font_size' => '16px', 'margin_bottom' => '32px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Voltar para a Home', 'link' => '/', 'link_target' => '_self', 'size' => 'large', 'background_type' => 'gradient', 'background_gradient' => ['type' => 'linear', 'angle' => 135, 'color1' => '#6366f1', 'color2' => '#a855f7', 'position1' => 0, 'position2' => 100], 'text_color' => '#ffffff', 'border_radius' => '50px', 'padding_left_right' => '32px', 'font_weight' => '600', 'alignment' => 'center']],
+                        ]],
+                    ]],
+                ],
+            ],
+            'search_results' => [
+                'name' => 'Resultados de Busca',
+                'description' => 'Cabeçalho e lista de resultados',
+                'settings' => ['container_width' => '800px', 'page_background' => '#0b1120', 'content_padding' => '0px'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '64px', 'padding_bottom' => '16px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'heading', 'settings' => ['title' => 'Resultados de Busca', 'tag' => 'h1', 'size' => 'xl', 'color' => '#f8fafc', 'alignment' => 'left', 'font_weight' => '800', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Mostrando resultados para: <em>termo pesquisado</em></p>', 'alignment' => 'left', 'font_size' => '15px']],
+                            ['type' => 'divider', 'settings' => ['width' => '100', 'thickness' => '1', 'color' => '#1e293b', 'space_before' => '16', 'space_after' => '24']],
+                        ]],
+                    ]],
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '0px', 'padding_bottom' => '64px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'left'], 'children' => [
+                            ['type' => 'callout', 'settings' => ['type' => 'info', 'title' => 'Resultado 1', 'content' => '<p style="color:#475569;">Resumo do resultado encontrado. Clique para abrir o conteúdo completo. Duplicar este bloco para mais resultados.</p>']],
+                            ['type' => 'callout', 'settings' => ['type' => 'info', 'title' => 'Resultado 2', 'content' => '<p style="color:#475569;">Resumo do segundo resultado. Substitua pelos resultados reais da busca.</p>']],
+                            ['type' => 'callout', 'settings' => ['type' => 'info', 'title' => 'Resultado 3', 'content' => '<p style="color:#475569;">Resumo do terceiro resultado. Use o Navigator para duplicar quantos resultados forem necessários.</p>']],
+                        ]],
+                    ]],
+                ],
+            ],
+        ];
+    }
+
+    protected function popupTemplates(): array
+    {
+        return [
+            'popup-newsletter' => [
+                'name' => 'Newsletter',
+                'description' => 'Assinatura de e-mail com formulário',
+                'settings' => ['container_width' => '520px', 'page_background' => '#ffffff', 'content_padding' => '0px'],
+                'popup_settings' => ['width' => '480', 'position' => 'center', 'overlay' => '1', 'show_close_button' => '1'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#ffffff', 'padding_top' => '40px', 'padding_bottom' => '40px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'icon', 'settings' => ['icon' => 'fas fa-envelope-open-text', 'size' => '44', 'color' => '#6366f1', 'alignment' => 'center', 'margin_bottom' => '16px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Fique por dentro!', 'tag' => 'h2', 'size' => 'medium', 'color' => '#0f172a', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#64748b;">Receba novidades, dicas e ofertas exclusivas direto no seu e-mail.</p>', 'alignment' => 'center', 'font_size' => '15px', 'margin_bottom' => '24px']],
+                            ['type' => 'form', 'settings' => ['form_name' => 'Newsletter', 'fields' => [['label' => 'Email', 'placeholder' => 'seu@email.com', 'type' => 'email', 'required' => true, 'width' => '100']], 'button_text' => 'Assinar Grátis', 'button_color' => '#6366f1', 'button_text_color' => '#ffffff', 'button_width' => 'full', 'field_spacing' => 12, 'field_radius' => 6, 'success_message' => 'Inscrição realizada com sucesso!']],
+                        ]],
+                    ]],
+                ],
+            ],
+            'popup-announcement' => [
+                'name' => 'Anúncio',
+                'description' => 'Aviso central com callout e botão',
+                'settings' => ['container_width' => '520px', 'page_background' => '#0b1120', 'content_padding' => '0px'],
+                'popup_settings' => ['width' => '480', 'position' => 'center', 'overlay' => '1', 'show_close_button' => '1'],
+                'elements' => [
+                    ['type' => 'section', 'settings' => ['layout' => 'boxed', 'background_color' => '#0b1120', 'padding_top' => '40px', 'padding_bottom' => '40px'], 'children' => [
+                        ['type' => 'column', 'settings' => ['column_width' => 'col-12', 'text_align' => 'center'], 'children' => [
+                            ['type' => 'callout', 'settings' => ['type' => 'warning', 'title' => 'Novidade!', 'content' => '<p>Não perca: atualização 3.0 já disponível.</p>', 'show_icon' => true, 'border_radius' => '12px', 'margin_bottom' => '24px']],
+                            ['type' => 'heading', 'settings' => ['title' => 'Grande novidade no Page Builder', 'tag' => 'h2', 'size' => 'medium', 'color' => '#f8fafc', 'alignment' => 'center', 'font_weight' => '700', 'margin_bottom' => '12px']],
+                            ['type' => 'text', 'settings' => ['content' => '<p style="color:#94a3b8;">Confira as novas funcionalidades e comece a usar hoje mesmo.</p>', 'alignment' => 'center', 'font_size' => '15px', 'margin_bottom' => '24px']],
+                            ['type' => 'button', 'settings' => ['text' => 'Saiba Mais', 'link' => '#', 'link_target' => '_self', 'size' => 'medium', 'background_type' => 'gradient', 'background_gradient' => ['type' => 'linear', 'angle' => 135, 'color1' => '#6366f1', 'color2' => '#ec4899', 'position1' => 0, 'position2' => 100], 'text_color' => '#ffffff', 'border_radius' => '50px', 'padding_left_right' => '28px', 'font_weight' => '600', 'alignment' => 'center']],
                         ]],
                     ]],
                 ],
