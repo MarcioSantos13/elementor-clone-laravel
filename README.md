@@ -134,6 +134,33 @@ Widgets are configured in `config/page-builder.php`. Each widget class defines:
 - `$defaultSettings`: Default configuration values
 - `$controls`: Available controls with types, labels, tabs, and options
 
+## How to Run
+
+```bash
+# Start the Laravel server (backend)
+php artisan serve
+
+# Frontend assets are pre-built (public/build).
+# Optional: enable hot-reload for the editor
+npm run dev
+```
+
+Open the browser at **http://127.0.0.1:8000** (or `http://localhost:8000`) — you will be redirected to `/login`.
+
+## Default Credentials
+
+The following users exist in the database:
+
+| Email | Password |
+|---|---|
+| `admin@sistema.local` | `password` |
+
+There is also a user `admin@test.com`, but its password is **not** `password`.
+
+After login, access the page builder editor at **http://127.0.0.1:8000/page-builder/pages**.
+
+You can also register a new account at `/register`.
+
 ## Development
 
 ### Building Assets

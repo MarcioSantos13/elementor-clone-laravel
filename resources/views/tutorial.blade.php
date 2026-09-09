@@ -87,9 +87,9 @@ DB_DATABASE=./database/database.sqlite</code></pre>
 php artisan db:seed</code></pre>
                 <p>O seeder cria automaticamente:</p>
                 <ul>
-                    <li>Um usuário de teste: <code>test@example.com</code> / <code>password</code></li>
+                    <li>Um usuário de teste: <code>test@example.com</code> / <code>password</code> (o banco incluído no repositório já contém <code>admin@sistema.local</code> / <code>password</code>)</li>
                     <li>As definições de widgets disponíveis</li>
-                    <li>Os 5 templates padrão (Blank, Landing, About, Contact, <strong>Showcase Completo</strong>)</li>
+                    <li>Os 7 templates padrão (Blank, Landing, About, Contact, Portfolio, <strong>Showcase Completo</strong>, Blog Post)</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 5: Iniciar o servidor</h3>
@@ -156,14 +156,14 @@ php artisan serve</code></pre>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th></tr>
                     <tr><td>Widgets disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
-                    <tr><td>Templates prontos</td><td>5 (Blank, Landing, About, Contact, Showcase Completo)</td></tr>
+                    <tr><td>Templates prontos</td><td>7 (Blank, Landing, About, Contact, Portfolio, Showcase Completo, Blog Post)</td></tr>
                     <tr><td>Rotas definidas</td><td>100+ (CRUD páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find & replace, API REST)</td></tr>
-                    <tr><td>Testes automatizados</td><td>93 (45 unitários + 48 de feature)</td></tr>
+                    <tr><td>Testes automatizados</td><td>136 (55 unitários + 81 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>8 principais (pages, elements, revisions, form_submissions, custom_fonts, global_widgets, popups, theme_templates) + personal_access_tokens</td></tr>
                     <tr><td>Views Blade</td><td>22 (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
                     <tr><td>Linhas de JS do editor</td><td>~5000 (8 módulos ES em resources/js/editor/)</td></tr>
                     <tr><td>API REST</td><td>Sanctum (token-based) com CRUD páginas e elementos</td></tr>
-                    <tr><td>Jobs (filas)</td><td>3 (ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob)</td></tr>
+                    <tr><td>Jobs (filas)</td><td>4 (ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob, ProcessFormSubmissionJob)</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Funcionalidades</h3>
@@ -180,8 +180,8 @@ php artisan serve</code></pre>
                     <li><strong>Busca de widgets</strong> — barra de pesquisa no painel esquerdo para encontrar widgets rapidamente</li>
                     <li><strong>Painéis redimensionáveis</strong> — arraste a borda dos painéis esquerdo/direito para ajustar largura</li>
                     <li><strong>Multi-select</strong> — Ctrl+Click para selecionar vários elementos, duplicar ou excluir em lote</li>
-                    <li><strong>Tour de onboarding</strong> — tour guiado de 5 passos na primeira vez que o editor é aberto</li>
-                    <li>Aplicar <strong>5 templates</strong> prontos</li>
+                    <li><strong>Tour de onboarding</strong> — tour guiado de 10 passos na primeira vez que o editor é aberto</li>
+                    <li>Aplicar <strong>7 templates</strong> prontos</li>
                     <li>Desfazer / refazer alterações (Ctrl+Z / Ctrl+Shift+Z)</li>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
                     <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
@@ -211,7 +211,7 @@ php artisan serve</code></pre>
                     <li><strong>Column Structure Picker</strong> — 6 opções de layout ao criar seção</li>
                     <li><strong>ARIA Accessibility</strong> — roles semânticos, navegação por Tab, focus-visible</li>
                     <li><strong>Colaboração em tempo real</strong> — presença de usuários, bloqueio de elementos, cursores</li>
-                    <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive) com condições de exibição</li>
+                    <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive, 404, search_results) com condições de exibição</li>
                     <li><strong>Popups</strong> — criação e edição de popups com gatilhos e condições de exibição</li>
                     <li><strong>Global Widgets</strong> — widgets reutilizáveis em várias páginas</li>
                     <li><strong>Custom Fonts</strong> — upload e gestão de fontes personalizadas (ttf, woff, woff2)</li>
@@ -283,12 +283,12 @@ php artisan serve</code></pre>
                 <ul>
                     <li>30 widgets (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</li>
                     <li>Editor visual completo com drag-and-drop (SortableJS), undo/redo, zoom, fullscreen</li>
-                    <li>5 templates prontos (Blank, Landing, About, Contact, Showcase)</li>
+                    <li>7 templates prontos (Blank, Landing, About, Contact, Portfolio, Showcase, Blog Post)</li>
                     <li>Sistema de revisões com diff e restauração</li>
                     <li>Exportação/Importação de páginas (JSON)</li>
                     <li>Copiar HTML para uso em outros sistemas (Moodle, WordPress, etc.)</li>
                     <li>Suporte a LaTeX via KaTeX</li>
-                    <li>93 testes automatizados</li>
+                    <li>136 testes automatizados</li>
                     <li>Integração com Moodle 4.5+</li>
                 </ul>
 
@@ -340,7 +340,7 @@ php artisan serve</code></pre>
                 <p>Clique em <strong>"Sair"</strong> no menu do Page Builder para encerrar a sessão.</p>
 
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> O único usuário pré-cadastrado é <code>test@example.com</code> com senha <code>password</code> (criado pelo seeder). Use a página de registro para adicionar novos usuários.
+                    <strong>&#128161; Dica:</strong> O banco de dados incluído no repositório já contém o usuário <code>admin@sistema.local</code> com senha <code>password</code>. Em uma instalação nova, o seeder cria <code>test@example.com</code> com senha <code>password</code>. Use a página de registro para adicionar novos usuários.
                 </div>
             </div>
         </section>
@@ -711,14 +711,14 @@ php artisan serve</code></pre>
                     <li>Lista os 30 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie</li>
                     <li><strong>Barra de busca</strong> — digite para filtrar widgets por nome (ex: "título", "imagem", "form")</li>
                     <li>Cada widget mostra um ícone (emoji) e nome</li>
-                    <li>O painel começa colapsado — clique no ícone de widgets (☰) na barra superior para expandir</li>
+                    <li>O painel é sempre visível e tem 4 abas: <strong>Widgets</strong>, <strong>Navigator</strong>, <strong>Estrutura</strong> e <strong>Layouts</strong></li>
                     <li><strong>Arraste</strong> um widget do painel para o canvas para adicioná-lo (suporte a Drop Indicator com SortableJS)</li>
                     <li><strong>Painéis redimensionáveis</strong> — arraste a borda entre o painel e o canvas para ajustar largura (200px–500px)</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Centro — Canvas</h3>
                 <ul>
-                    <li>Exibe a prévia ao vivo da página (iframe de largura 100%)</li>
+                    <li>Exibe a prévia ao vivo da página como <strong>DOM real</strong> da árvore de elementos (edição direta, não um iframe)</li>
                     <li>Clique em qualquer elemento para selecioná-lo — ele fica com borda azul</li>
                     <li><strong>Multi-select:</strong> Ctrl+Click (ou Cmd+Click) para selecionar vários elementos — borda laranja indicando seleção múltipla</li>
                     <li>Barra flutuante aparece com opções: Duplicar, Excluir ou Limpar seleção</li>
@@ -734,16 +734,16 @@ php artisan serve</code></pre>
                     <li>Cada configuração tem um campo de entrada (texto, cor, seleção, gradient, etc.)</li>
                     <li>O widget de texto exibe um <strong>editor WYSIWYG</strong> com toolbar para formatação, imagens e vídeos</li>
                     <li>As mudanças são aplicadas instantaneamente ao canvas</li>
-                    <li>O painel começa colapsado — clique no ícone de configurações (⚙️) na barra superior para expandir</li>
+                    <li>Quando nada está selecionado, mostra um aviso para selecionar um elemento; ao selecionar, exibe as configurações (Content / Style / Advanced)</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Barra Superior</h3>
                 <table class="widget-table">
                     <tr><th>Grupo</th><th>Botões</th><th>Função</th></tr>
-                    <tr><td>Layout</td><td>☰, ⚙️</td><td>Expandir/colapsar painéis esquerdo e direito</td></tr>
-                    <tr><td>Responsivo</td><td>🖥️ 📱 📲</td><td>Desktop (100%), Tablet (768px), Mobile (360px)</td></tr>
+                    <tr><td>Navegação</td><td>← Voltar + título</td><td>Voltar à listagem e mostrar o status (draft / publicado)</td></tr>
+                    <tr><td>Responsivo</td><td>🖥️ 📱 📲</td><td>Desktop (100%), Tablet (768px), Mobile (375px)</td></tr>
                     <tr><td>Ações</td><td>Desfazer / Refazer</td><td>Ctrl+Z / Ctrl+Shift+Z (máximo 50 estados)</td></tr>
-                    <tr><td>Finder</td><td>🔍 Finder</td><td>Command Finder (Ctrl+K) — busca de ações e widgets</td></tr>
+                    <tr><td>Find &amp; Replace</td><td>🔍 Find</td><td>Busca e substituição de texto nos elementos da página</td></tr>
                     <tr><td>Site</td><td>⚙️ Site Settings</td><td>Configurações globais (cores, fontes)</td></tr>
                     <tr><td>Revisões</td><td>📋 Revisões</td><td>Histórico de revisões com diff visual</td></tr>
                     <tr><td>Template</td><td>📦 Template</td><td>Salvar página como template JSON</td></tr>
@@ -2055,7 +2055,7 @@ php artisan serve</code></pre>
         <section id="theme-builder" class="step">
             <h2>17. Theme Builder</h2>
             <div class="step-body">
-                <p>O <strong>Theme Builder</strong> permite criar templates de tema (cabeçalho, rodapé, single, archive) que são renderizados ao redor do conteúdo das páginas. Diferente de páginas normais, os templates de tema têm <strong>condições de exibição</strong> que determinam em quais páginas cada template aparece.</p>
+                <p>O <strong>Theme Builder</strong> permite criar templates de tema (cabeçalho, rodapé, single, archive, página 404, resultados de busca) que são renderizados ao redor do conteúdo das páginas. Diferente de páginas normais, os templates de tema têm <strong>condições de exibição</strong> que determinam em quais páginas cada template aparece.</p>
 
                 <div class="tip">
                     <strong>&#128161; Conceito:</strong> Theme Templates funcionam como <strong>layouts mestres</strong>. Você cria um header uma vez, define em quais páginas ele aparece, e o sistema o renderiza automaticamente ao redor do conteúdo de cada página.
@@ -2066,6 +2066,10 @@ php artisan serve</code></pre>
                     <tr><th>Tipo</th><th>Onde aparece</th><th>Exemplo de uso</th></tr>
                     <tr><td><code>header</code></td><td>No topo da página</td><td>Logo, menu de navegação, barra de busca</td></tr>
                     <tr><td><code>footer</code></td><td>No final da página</td><td>Links de rodapé, copyright, redes sociais</td></tr>
+                    <tr><td><code>single</code></td><td>Em páginas individuais</td><td>Layout padrão de conteúdo/post</td></tr>
+                    <tr><td><code>archive</code></td><td>Em listagens e arquivos</td><td>Lista de posts, categorias</td></tr>
+                    <tr><td><code>404</code></td><td>Em páginas não encontradas</td><td>Página de erro 404 personalizada</td></tr>
+                    <tr><td><code>search_results</code></td><td>Em resultados de busca</td><td>Layout da página de pesquisa</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo a Passo — Criar um Header</h3>
@@ -2288,7 +2292,7 @@ php artisan serve</code></pre>
 │  ElementManager       — CRUD elementos, árvore, reordenação     │
 │  WidgetManager        — registra e gerencia widgets dinamicamente│
 │  Renderer             — renderiza árvore de elementos → HTML    │
-│  TemplateManager      — 5 templates predefinidos                │
+│  TemplateManager      — 7 templates predefinidos                │
 │  CollaborationService — presença, bloqueio, cursores (Cache)    │
 │  HtmlImportService    — converte HTML externo em widgets        │
 │  DynamicTagService    — substitui @{{ tags }} por valores        │
@@ -2540,7 +2544,7 @@ php artisan serve</code></pre>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do template</td></tr>
                     <tr><td><code>title</code></td><td>string</td><td>Título do template</td></tr>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
-                    <tr><td><code>type</code></td><td>string</td><td>Tipo (header, footer, single, archive)</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>Tipo (header, footer, single, archive, 404, search_results)</td></tr>
                     <tr><td><code>status</code></td><td>string</td><td>draft / published</td></tr>
                     <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do template</td></tr>
                     <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações</td></tr>
@@ -2712,7 +2716,7 @@ php artisan serve</code></pre>
                 <p>A API usa tokens de acesso pessoal (Personal Access Tokens) do Sanctum. Para obter um token:</p>
                 <pre style="background:#1e1e2d;color:#a6e3a1;padding:.75rem 1rem;border-radius:6px;font-size:.85rem;font-family:monospace;margin:.75rem 0"><code>POST /api/tokens
 {
-    "email": "test@example.com",
+    "email": "admin@sistema.local",
     "password": "password",
     "device_name": "Minha App"
 }
@@ -2839,35 +2843,42 @@ php artisan queue:listen --timeout=60</code></pre>
         <section id="quality" class="step">
             <h2>24. Qualidade &amp; Testes</h2>
             <div class="step-body">
-                <p>O projeto tem uma suíte completa de testes automatizados com <strong>93 testes</strong> rodando em SQLite em memória.</p>
+                <p>O projeto tem uma suíte completa de testes automatizados com <strong>136 testes</strong> rodando em SQLite em memória.</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Resumo da Qualidade</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th><th>Avaliação</th></tr>
-                    <tr><td>Testes totais</td><td>93</td><td style="color:green">Boa cobertura</td></tr>
-                    <tr><td>Testes unitários</td><td>45</td><td style="color:green">Widgets, Services, Templates</td></tr>
-                    <tr><td>Testes de feature</td><td>48</td><td style="color:green">Controllers, Auth, Fluxos</td></tr>
-                    <tr><td>Cobertura de controllers</td><td>3/3</td><td style="color:green">100% dos controllers</td></tr>
-                    <tr><td>Cobertura de widgets</td><td>17/17</td><td style="color:green">BaseWidget + todos os 16 widgets</td></tr>
+                    <tr><td>Testes totais</td><td>136</td><td style="color:green">Boa cobertura</td></tr>
+                    <tr><td>Testes unitários</td><td>55</td><td style="color:green">Widgets, Services, Templates, Colaboração</td></tr>
+                    <tr><td>Testes de feature</td><td>81</td><td style="color:green">Controllers, Auth, API, Fluxos</td></tr>
+                    <tr><td>Cobertura de controllers</td><td>5</td><td style="color:green">Page, Element, Revision, Form, HtmlImport testados</td></tr>
+                    <tr><td>BaseWidgetTest</td><td>13</td><td style="color:green">Infraestrutura base do widget (getters, validação, sanitização)</td></tr>
                     <tr><td>Sanitização de XSS</td><td>Implementada</td><td style="color:green">PageBuilderService::sanitizeContent()</td></tr>
                     <tr><td>Autorização (Policy)</td><td>Implementada</td><td style="color:green">PagePolicy em PageController</td></tr>
                     <tr><td>Tratamento de erros JS</td><td>14 fetch()</td><td style="color:green">Todos com .catch() + toast</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes Unitários (45)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes Unitários (55)</h3>
                 <table class="widget-table">
                     <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
                     <tr><td><code>BaseWidgetTest</code></td><td>13</td><td>Getters, validação, prepareSettings, sanitização, isContainer, isDynamic</td></tr>
                     <tr><td><code>PageBuilderServiceTest</code></td><td>19</td><td>Create, update, sanitize, elements, revisions, export/import, render</td></tr>
                     <tr><td><code>TemplateManagerTest</code></td><td>12</td><td>Listagem, aplicação, importação, edge cases, estrutura de templates</td></tr>
+                    <tr><td><code>CollaborationServiceTest</code></td><td>10</td><td>Presença, bloqueio de elementos, cursores, limpeza de cache</td></tr>
+                    <tr><td><code>ExampleTest</code></td><td>1</td><td>Skeleton padrão do Laravel</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (48)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (81)</h3>
                 <table class="widget-table">
                     <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
                     <tr><td><code>PageControllerTest</code></td><td>24</td><td>CRUD, auth, publish, templates, export/import, duplicate</td></tr>
-                    <tr><td><code>ElementControllerTest</code></td><td>15</td><td>CRUD, auth, reorder, move, settings, styles, controls</td></tr>
+                    <tr><td><code>ElementControllerTest</code></td><td>14</td><td>CRUD, auth, reorder, move, settings, styles, controls</td></tr>
                     <tr><td><code>RevisionControllerTest</code></td><td>9</td><td>List, show, restore, diff, delete, prune, auto-save, auth</td></tr>
+                    <tr><td><code>FormControllerTest</code></td><td>7</td><td>Envio de formulários, validação, armazenamento</td></tr>
+                    <tr><td><code>HtmlImportControllerTest</code></td><td>5</td><td>Importação de HTML via URL e textarea, jobs</td></tr>
+                    <tr><td><code>ApiTest</code></td><td>11</td><td>Tokens Sanctum, CRUD de páginas e elementos via API</td></tr>
+                    <tr><td><code>AuthTest</code></td><td>10</td><td>Registro, login, logout, rotas protegidas</td></tr>
+                    <tr><td><code>ExampleTest</code></td><td>1</td><td>Skeleton padrão do Laravel</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Rodar os Testes</h3>
@@ -2938,7 +2949,7 @@ $page->touch();</pre>
         <section id="improvements" class="step">
             <h2>25. Melhorias Propostas</h2>
             <div class="step-body">
-                <p>O projeto já tem uma base sólida com 93 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
+                <p>O projeto já tem uma base sólida com 136 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Status das Fases</h3>
                 <table class="widget-table">
@@ -2961,7 +2972,7 @@ $page->touch();</pre>
                 <ul>
                     <li><strong>30 widgets</strong> — Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie</li>
                     <li><strong>27 tipos de controles</strong> — text, number, textarea, select, color, boolean, url, image, video, wysiwyg, icon, gallery, repeater, typography, background, border, box_shadow, dimensions, hover, custom_css, animation, visibility, gradient, scroll_animation, text_shadow, text_stroke, column_width</li>
-                    <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive) com condições</li>
+                    <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive, 404, search_results) com condições</li>
                     <li><strong>Popups</strong> — criação e edição com gatilhos e condições de exibição</li>
                     <li><strong>Global Widgets</strong> — widgets reutilizáveis em várias páginas</li>
                     <li><strong>Custom Fonts</strong> — upload de fontes (ttf, woff, woff2)</li>
@@ -2970,7 +2981,7 @@ $page->touch();</pre>
                     <li><strong>Colaboração em tempo real</strong> — presença, bloqueio de elementos, cursores (via Cache)</li>
                     <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou textarea, processamento via Job</li>
                     <li><strong>API REST com Sanctum</strong> — autenticação token-based, CRUD completo de páginas e elementos</li>
-                    <li><strong>Jobs de fila</strong> — ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob</li>
+                    <li><strong>Jobs de fila</strong> — ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob, ProcessFormSubmissionJob</li>
                     <li><strong>PagePolicy</strong> — autorização por dono da página</li>
                     <li><strong>Sanitização XSS</strong> — <code>sanitizeContent()</code> e <code>sanitizeSettings()</code></li>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
@@ -2982,7 +2993,7 @@ $page->touch();</pre>
                     <li><strong>Cache invalidation robusta</strong> — <code>$page->touch()</code> + <code>Cache::tags()</code> ao invés de key registry quebrado</li>
                     <li><strong>Cache no GlobalWidgetService</strong> — <code>getAll()</code> cacheado com <code>clearCache()</code> nas mutações</li>
                     <li><strong>ProcessFormSubmissionJob</strong> — notificações de formulário em background</li>
-                    <li><strong>93 testes automatizados</strong> — cobertura completa de controllers, services e widgets</li>
+                    <li><strong>136 testes automatizados</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Editor WYSIWYG</strong> — toolbar rich-text com imagens, vídeos, listas</li>
                     <li><strong>Edição inline</strong> — preserva HTML (innerHTML) ao invés de textContent</li>
                     <li><strong>Upload de imagens no texto</strong> — botão + Ctrl+V no editor WYSIWYG</li>
