@@ -2896,9 +2896,32 @@ $page->touch();</pre>
         <section id="moodle" class="step">
             <h2>26. Uso com Moodle 4.5+</h2>
             <div class="step-body">
-                <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções detalhadas.</p>
+                <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções detalhadas, começando com um exemplo simples passo a passo.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.1 Copiar HTML para o Moodle (recomendado)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.1 Passo a Passo — Exemplo Simples: "Aula 01"</h3>
+                <p>Vamos criar uma página de aula e colá-la no Moodle como um recurso <strong>Página</strong> usando o HTML renderizado. Todo o fluxo leva menos de 5 minutos.</p>
+                <ol>
+                    <li><strong>Criar a página:</strong> no Page Builder, clique em <strong>"Criar Página"</strong>, defina o nome <code>Aula 01 — Introdução ao Page Builder</code> e o slug <code>aula-01</code>. Escolha o template <strong>Blank</strong> (ou outro, se preferir começar de um modelo).</li>
+                    <li><strong>Montar o conteúdo:</strong> no editor, adicione os seguintes widgets (veja as seções 4, 5 e 6 do tutorial):
+                        <ul>
+                            <li><strong>Heading</strong> H1: <em>"Bem-vindo à Aula 01"</em>;</li>
+                            <li><strong>Text</strong>: um parágrafo de boas-vindas;</li>
+                            <li><strong>Callout</strong> (type <code>info</code>): <em>"Leia o material indicado antes da aula"</em>;</li>
+                            <li><strong>Math</strong>: a fórmula <code>\int_0^1 x^2\,dx = \frac{1}{3}</code> (renderizada via KaTeX);</li>
+                            <li><strong>Table</strong>: um quadro de horários da semana.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Copiar o HTML:</strong> na barra de ferramentas do editor, clique no botão <strong>"Copy HTML"</strong> (ícone de clipboard). A notificação <em>"HTML copiado!"</em> confirma que o HTML do conteúdo (sem o container do site, com CSS inline) está na área de transferência.</li>
+                    <li><strong>Criar o recurso no Moodle:</strong> no seu curso Moodle 4.5+, ative a edição e clique em <strong>"Adicionar um recurso ou atividade"</strong> → escolha <strong>Página</strong>.</li>
+                    <li><strong>Configurar o recurso:</strong> em <strong>Nome</strong> digite <code>Aula 01</code>. No campo <strong>Conteúdo</strong>, clique no botão <strong>&lt;&gt;</strong> (Mostrar código-fonte / HTML) do editor, cole o conteúdo com <kbd>Ctrl+V</kbd> e clique novamente em <strong>&lt;&gt;</strong> para voltar ao modo visual.</li>
+                    <li><strong>Salvar:</strong> salve o recurso e visualize o curso. A página aparecerá com títulos, cores, callout, fórmula KaTeX (salva como HTML estático) e tabela — tudo preservado, sem nenhum plugin no Moodle.</li>
+                    <li><strong>Atualizar depois:</strong> sempre que editar a página no Page Builder, basta refazer o passo 3 e colar novamente no mesmo recurso Moodle.</li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Por que usar "Copy HTML"?</strong> O botão consulta <code>/page-builder/pages/&#123;id&#125;/render?format=inner</code> e copia apenas o conteúdo da página, sem o cabeçalho/rodapé do site e sem o container — ideal para colar dentro do editor do Moodle. O CSS é todo inline, então nada "quebra" ao colar.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.2 Copiar HTML para o Moodle (recomendado)</h3>
                 <ol>
                     <li>Crie sua página no Page Builder normalmente (use um modelo pronto ou comece do zero). Os modelos são fixos e nunca são alterados ao criar uma nova página — o sistema faz uma cópia dos dados para a página nova.</li>
                     <li>No editor visual, clique no botão <strong>"Copy HTML"</strong> (ícone de clipboard) na barra de ferramentas. Uma notificação "HTML copiado!" será exibida.</li>
@@ -2908,21 +2931,21 @@ $page->touch();</pre>
                     <li>Salve a página. O conteúdo será exibido com todos os estilos preservados.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.2 Exportar como JSON (backup ou transferência entre instalações)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.3 Exportar como JSON (backup ou transferência entre instalações)</h3>
                 <ol>
                     <li>Na lista de páginas do Page Builder, clique em <strong>"Export"</strong> na página desejada. Um arquivo <code>.json</code> será baixado com toda a estrutura da página.</li>
                     <li>Para importar em outra instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, faça upload do arquivo <code>.json</code> e a página será recriada.</li>
-                    <li>Após importar, abra a página no editor e use o <strong>"Copy HTML"</strong> (passo 26.1) para colar o conteúdo no Moodle.</li>
+                    <li>Após importar, abra a página no editor e use o <strong>"Copy HTML"</strong> (passo 26.2) para colar o conteúdo no Moodle.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.3 Renderização como Página Moodle (iframe)</h3>
+<h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.4 Renderização como Página Moodle (iframe)</h3>
                 <ol>
-                    <li>O Page Builder pode ser incorporado ao Moodle como um <strong>recurso externo</strong> ou via <strong>iframe</strong>, apontando para a URL pública da página renderizada.</li>
-                    <li>Use o parâmetro <code>?format=inner</code> na URL de renderização (<code>/page-builder/pages/{id}/render?format=inner</code>) para obter apenas o HTML do conteúdo, sem a estrutura completa da página.</li>
-                    <li>Você também pode usar <code>?format=inner&theme=none</code> para um HTML ainda mais limpo, apenas com os elementos e estilos inline.</li>
+                    <li><strong>URL pública:</strong> toda página <strong>publicada</strong> tem um endereço público em <code>/p/&#123;slug&#125;</code> (ex.: <code>/p/aula-01</code>), que renderiza a página completa com o tema (cabeçalho, rodapé e popups).</li>
+                    <li><strong>Incorporar no Moodle:</strong> crie um recurso <strong>URL</strong> apontando para <code>/p/aula-01</code>, ou adicione um bloco <strong>HTML</strong> com <code>&lt;iframe src="/p/aula-01"&gt;</code>. A rota pública não envia <code>X-Frame-Options</code>, então funciona dentro do Moodle.</li>
+                    <li><strong>Conteúdo apenas:</strong> para obter só o HTML do conteúdo (sem o tema), use o endpoint <code>/page-builder/pages/&#123;id&#125;/render?format=inner</code> (requer login) ou acrescente <code>&amp;theme=none</code> para um HTML ainda mais limpo, apenas com os elementos e estilos inline. Esse endpoint envia <code>X-Frame-Options: SAMEORIGIN</code>, portanto não use iframe nele — use a URL pública <code>/p/&#123;slug&#125;</code> para incorporar por frame.</li>
                 </ol>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.4 Widgets Educacionais no Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.5 Widgets Educacionais no Moodle</h3>
                 <p>Os widgets educacionais (Callout, Table, Math) são especialmente úteis para criar conteúdo de cursos no Moodle:</p>
                 <ul>
                     <li><strong>Callout:</strong> Caixas de destaque para definições, teoremas, exercícios, avisos e dicas. Cada tipo tem cores e ícones automáticos. O HTML renderizado mantém todos os estilos inline, compatível com o Moodle.</li>
@@ -2933,7 +2956,7 @@ $page->touch();</pre>
                     <strong>&#128161; Dica:</strong> Para cursos de matemática, combine os três widgets: use <strong>Callout (type=theorem)</strong> para enunciar teoremas, <strong>Math</strong> para as fórmulas em destaque, e <strong>Callout (type=exercise)</strong> para propostas de exercícios. Insira tabelas com <strong>Table</strong> para organizar dados e comparativos.
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.5 Dicas para Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.6 Dicas para Moodle</h3>
                 <ul>
                     <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), garantindo compatibilidade máxima com o editor do Moodle — nenhum plugin adicional é necessário.</li>
                     <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens enviadas para <code>storage/app/public/</code> no Page Builder não serão acessíveis pelo Moodle.</li>
