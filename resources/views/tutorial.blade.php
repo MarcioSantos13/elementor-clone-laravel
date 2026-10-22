@@ -33,6 +33,7 @@
             <a href="#showcase">Template Showcase Completo</a>
             <a href="#theme-builder">Theme Builder</a>
             <a href="#popups">Popups</a>
+            <a href="#projects">Projetos (Organização)</a>
             <a href="#architecture">Arquitetura do Projeto</a>
             <a href="#database">Banco de Dados</a>
             <a href="#routes">Rotas</a>
@@ -158,8 +159,8 @@ php artisan serve</code></pre>
                     <tr><td>Widgets disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
                     <tr><td>Templates prontos</td><td>7 (Blank, Landing, About, Contact, Portfolio, Showcase Completo, Blog Post)</td></tr>
                     <tr><td>Rotas definidas</td><td>100+ (CRUD páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find & replace, API REST)</td></tr>
-                    <tr><td>Testes automatizados</td><td>136 (55 unitários + 81 de feature)</td></tr>
-                    <tr><td>Tabelas no banco</td><td>8 principais (pages, elements, revisions, form_submissions, custom_fonts, global_widgets, popups, theme_templates) + personal_access_tokens</td></tr>
+                    <tr><td>Testes automatizados</td><td>155 (61 unitários + 94 de feature)</td></tr>
+                    <tr><td>Tabelas no banco</td><td>9 principais (projects, pages, elements, revisions, form_submissions, custom_fonts, global_widgets, popups, theme_templates) + personal_access_tokens</td></tr>
                     <tr><td>Views Blade</td><td>22 (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
                     <tr><td>Linhas de JS do editor</td><td>~5000 (8 módulos ES em resources/js/editor/)</td></tr>
                     <tr><td>API REST</td><td>Sanctum (token-based) com CRUD páginas e elementos</td></tr>
@@ -217,6 +218,7 @@ php artisan serve</code></pre>
                     <li><strong>Custom Fonts</strong> — upload e gestão de fontes personalizadas (ttf, woff, woff2)</li>
                     <li><strong>Dynamic Tags</strong> — conteúdo dinâmico a partir de dados do sistema</li>
                     <li><strong>Find &amp; Replace</strong> — busca e substituição de conteúdo em toda a página</li>
+                    <li><strong>Projetos</strong> — organizar páginas, temas e popups em projetos privados por usuário, com projeto padrão "Meus Projetos" e seletor de projeto nas listagens</li>
                     <li><strong>API REST</strong> — autenticação via Sanctum tokens, CRUD completo de páginas e elementos</li>
                     <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
                 </ul>
@@ -288,7 +290,8 @@ php artisan serve</code></pre>
                     <li>Exportação/Importação de páginas (JSON)</li>
                     <li>Copiar HTML para uso em outros sistemas (Moodle, WordPress, etc.)</li>
                     <li>Suporte a LaTeX via KaTeX</li>
-                    <li>136 testes automatizados</li>
+                    <li>Projetos — organização privada de páginas, temas e popups</li>
+                    <li>155 testes automatizados</li>
                     <li>Integração com Moodle 4.5+</li>
                 </ul>
 
@@ -2106,6 +2109,50 @@ php artisan serve</code></pre>
             </div>
         </section>
 
+        {{-- PROJECTS --}}
+        <section id="projects" class="step">
+            <h2>18b. Projetos (Organização)</h2>
+            <div class="step-body">
+                <p>Os <strong>Projetos</strong> permitem organizar suas <strong>páginas</strong>, <strong>templates de tema</strong> e <strong>popups</strong> em grupos separados. Cada projeto é <strong>privado por usuário</strong> — somente o dono vê e gerencia seus projetos. Widgets globais e fontes globais continuam sendo <strong>por usuário</strong> (compartilhados entre todos os seus projetos).</p>
+
+                <div class="tip">
+                    <strong>&#128161; Projeto padrão:</strong> Todo usuário possui um projeto padrão chamado <strong>"Meus Projetos"</strong> (marcado com <code>is_default</code>). Ele é criado automaticamente e <strong>não pode ser excluído</strong>. Se um projeto for removido, os itens que estavam nele são reatribuídos ao projeto padrão.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Acessar os Projetos</h3>
+                <ol>
+                    <li>No menu do Page Builder, clique em <strong>"Projetos"</strong>.</li>
+                    <li>A tela lista seus projetos, mostrando a contagem de páginas, temas e popups de cada um.</li>
+                    <li>O projeto padrão aparece destacado e não exibe a opção de exclusão.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Criar um Projeto</h3>
+                <ol>
+                    <li>Na tela de Projetos, clique em <strong>"Novo Projeto"</strong>.</li>
+                    <li>Informe o <strong>Nome</strong> (o slug é gerado automaticamente e é único por usuário).</li>
+                    <li>Opcionalmente, adicione uma <strong>Descrição</strong>.</li>
+                    <li>Clique em <strong>Salvar</strong>.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Filtrar Itens por Projeto</h3>
+                <p>As listagens de <strong>Páginas</strong>, <strong>Temas</strong> e <strong>Popups</strong> possuem um <strong>seletor de projeto</strong> no cabeçalho. Ao escolher um projeto, a listagem é filtrada via <code>?project={id}</code>. Ao criar um item com um projeto selecionado, ele já é vinculado a esse projeto.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Mover Itens entre Projetos</h3>
+                <p>É possível mover páginas, temas ou popups para outro projeto. O endpoint <code>POST /page-builder/projects/{id}/move</code> recebe o <code>type</code> (<code>page</code>, <code>theme_template</code> ou <code>popup</code>) e um array de <code>ids</code>, atualizando o <code>project_id</code> dos itens que pertencem ao usuário dono do projeto.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Excluir um Projeto</h3>
+                <ol>
+                    <li>Na tela de Projetos, clique no menu de ações do projeto (que não seja o padrão).</li>
+                    <li>Clique em <strong>"Excluir"</strong>.</li>
+                    <li>Os itens do projeto são reatribuídos automaticamente ao projeto padrão — nada é perdido.</li>
+                </ol>
+
+                <div class="warning">
+                    <strong>&#9888;&#65039; Atenção:</strong> O projeto padrão "Meus Projetos" não pode ser excluído (a API responde <code>422</code>). Mover itens entre projetos respeita o dono — você só move itens que pertencem a você.
+                </div>
+            </div>
+        </section>
+
         {{-- PROJECT STRUCTURE --}}
         <section id="architecture" class="step">
             <h2>19. Arquitetura do Projeto</h2>
@@ -2257,13 +2304,34 @@ php artisan serve</code></pre>
         <section id="database" class="step">
             <h2>20. Banco de Dados</h2>
             <div class="step-body">
-                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 8 tabelas principais além das padrão do Laravel (users, cache, jobs, personal_access_tokens):</p>
+                <p>O projeto usa <strong>SQLite</strong> por padrão (configurado em <code>.env</code> como <code>DB_CONNECTION=sqlite</code>), mas é compatível com MySQL e MariaDB. São 9 tabelas principais além das padrão do Laravel (users, cache, jobs, personal_access_tokens):</p>
 
-                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Tabela <code>pages</code></h3>
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Tabela <code>projects</code></h3>
+                <table class="widget-table">
+                    <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
+                    <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
+                    <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do projeto (cascade delete) — projetos são privados por usuário</td></tr>
+                    <tr><td><code>name</code></td><td>string</td><td>Nome do projeto</td></tr>
+                    <tr><td><code>slug</code></td><td>string</td><td>Slug único por usuário (unique <code>user_id + slug</code>)</td></tr>
+                    <tr><td><code>description</code></td><td>text (nullable)</td><td>Descrição do projeto</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações do projeto</td></tr>
+                    <tr><td><code>is_default</code></td><td>boolean</td><td>Marca o projeto padrão "Meus Projetos" (não pode ser excluído)</td></tr>
+                    <tr><td><code>created_at / updated_at</code></td><td>timestamps</td><td>Datas de criação e atualização</td></tr>
+                    <tr><td><code>deleted_at</code></td><td>softDeletes</td><td>Exclusão lógica</td></tr>
+                </table>
+                <div class="tip">
+                    <strong>&#128161; Migração de dados:</strong> A migration <code>create_projects_table</code> cria automaticamente um projeto padrão <strong>"Meus Projetos"</strong> para cada usuário e move suas páginas, temas e popups existentes para ele. Ao excluir um projeto, os itens são reatribuídos ao projeto padrão (<code>nullOnDelete</code> + reassign no service).
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Coluna <code>project_id</code></h3>
+                <p>As tabelas <code>pages</code>, <code>theme_templates</code> e <code>popups</code> possuem uma coluna <code>project_id</code> (foreignId nullable, <code>nullOnDelete</code>) que agrupa o item em um projeto. As listagens aceitam o filtro <code>?project={id}</code>.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>pages</code></h3>
                 <table class="widget-table">
                     <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
                     <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Referência ao usuário dono (cascade delete)</td></tr>
+                    <tr><td><code>project_id</code></td><td>foreignId (nullable)</td><td>Projeto ao qual a página pertence (nullOnDelete)</td></tr>
                     <tr><td><code>title</code></td><td>string</td><td>Título da página</td></tr>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug para URLs (gerado automaticamente)</td></tr>
                     <tr><td><code>status</code></td><td>string</td><td>"draft" ou "published" (padrão: draft)</td></tr>
@@ -2376,6 +2444,7 @@ php artisan serve</code></pre>
                     <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
                     <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do popup</td></tr>
+                    <tr><td><code>project_id</code></td><td>foreignId (nullable)</td><td>Projeto ao qual o popup pertence (nullOnDelete)</td></tr>
                     <tr><td><code>title</code></td><td>string</td><td>Título do popup</td></tr>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
                     <tr><td><code>status</code></td><td>string</td><td>draft / published</td></tr>
@@ -2390,6 +2459,7 @@ php artisan serve</code></pre>
                     <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
                     <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do template</td></tr>
+                    <tr><td><code>project_id</code></td><td>foreignId (nullable)</td><td>Projeto ao qual o template pertence (nullOnDelete)</td></tr>
                     <tr><td><code>title</code></td><td>string</td><td>Título do template</td></tr>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
                     <tr><td><code>type</code></td><td>string</td><td>Tipo (header, footer, single, archive, 404, search_results)</td></tr>
@@ -2426,6 +2496,16 @@ php artisan serve</code></pre>
                     <tr><td>GET</td><td><code>/page-builder/templates</code></td><td>PageController@listTemplates</td><td>Listar templates</td></tr>
                     <tr><td>POST</td><td><code>/page-builder/pages/{id}/apply-template</code></td><td>PageController@applyTemplate</td><td>Aplicar template</td></tr>
                     <tr><td>PUT</td><td><code>/page-builder/pages/{id}/layout</code></td><td>PageController@updateLayout</td><td>Atualizar layout</td></tr>
+                </table>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Projetos</h3>
+                <table class="widget-table">
+                    <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
+                    <tr><td>GET</td><td><code>/page-builder/projects</code></td><td>ProjectController@index</td><td>Listar projetos do usuário</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/projects</code></td><td>ProjectController@store</td><td>Criar projeto</td></tr>
+                    <tr><td>PUT</td><td><code>/page-builder/projects/{project}</code></td><td>ProjectController@update</td><td>Atualizar projeto</td></tr>
+                    <tr><td>DELETE</td><td><code>/page-builder/projects/{project}</code></td><td>ProjectController@destroy</td><td>Excluir projeto (reassign ao padrão)</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/projects/{project}/move</code></td><td>ProjectController@move</td><td>Mover páginas/temas/popups para o projeto</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Rotas de Elementos</h3>
@@ -2691,41 +2771,45 @@ php artisan queue:listen --timeout=60</code></pre>
         <section id="quality" class="step">
             <h2>24. Qualidade &amp; Testes</h2>
             <div class="step-body">
-                <p>O projeto tem uma suíte completa de testes automatizados com <strong>136 testes</strong> rodando em SQLite em memória.</p>
+                <p>O projeto tem uma suíte completa de testes automatizados com <strong>155 testes</strong> rodando em SQLite em memória (mais 7 testes de frontend com Vitest).</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Resumo da Qualidade</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th><th>Avaliação</th></tr>
-                    <tr><td>Testes totais</td><td>136</td><td style="color:green">Boa cobertura</td></tr>
-                    <tr><td>Testes unitários</td><td>55</td><td style="color:green">Widgets, Services, Templates, Colaboração</td></tr>
-                    <tr><td>Testes de feature</td><td>81</td><td style="color:green">Controllers, Auth, API, Fluxos</td></tr>
-                    <tr><td>Cobertura de controllers</td><td>5</td><td style="color:green">Page, Element, Revision, Form, HtmlImport testados</td></tr>
+                    <tr><td>Testes totais (PHP)</td><td>155</td><td style="color:green">Boa cobertura</td></tr>
+                    <tr><td>Testes unitários</td><td>61</td><td style="color:green">Widgets, Services, Templates, Colaboração</td></tr>
+                    <tr><td>Testes de feature</td><td>94</td><td style="color:green">Controllers, Projetos, Auth, API, Fluxos</td></tr>
+                    <tr><td>Testes de frontend (Vitest)</td><td>7</td><td style="color:green">Módulos JS do editor</td></tr>
+                    <tr><td>Cobertura de controllers</td><td>6</td><td style="color:green">Page, Element, Revision, Form, HtmlImport, Project testados</td></tr>
                     <tr><td>BaseWidgetTest</td><td>13</td><td style="color:green">Infraestrutura base do widget (getters, validação, sanitização)</td></tr>
-                    <tr><td>Sanitização de XSS</td><td>Implementada</td><td style="color:green">PageBuilderService::sanitizeContent()</td></tr>
-                    <tr><td>Autorização (Policy)</td><td>Implementada</td><td style="color:green">PagePolicy em PageController</td></tr>
+                    <tr><td>Sanitização de XSS</td><td>Implementada</td><td style="color:green">PageBuilderService + HtmlSanitizer (central)</td></tr>
+                    <tr><td>Autorização (Policy)</td><td>Implementada</td><td style="color:green">PagePolicy + ProjectPolicy + ownership em todos os controllers</td></tr>
+                    <tr><td>Proteção SSRF</td><td>Implementada</td><td style="color:green">HtmlImportService::assertSafeUrl (bloqueio de IPs privados/reservados, redirects manuais)</td></tr>
                     <tr><td>Tratamento de erros JS</td><td>14 fetch()</td><td style="color:green">Todos com .catch() + toast</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes Unitários (55)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes Unitários (61)</h3>
                 <table class="widget-table">
                     <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
                     <tr><td><code>BaseWidgetTest</code></td><td>13</td><td>Getters, validação, prepareSettings, sanitização, isContainer, isDynamic</td></tr>
                     <tr><td><code>PageBuilderServiceTest</code></td><td>19</td><td>Create, update, sanitize, elements, revisions, export/import, render</td></tr>
-                    <tr><td><code>TemplateManagerTest</code></td><td>12</td><td>Listagem, aplicação, importação, edge cases, estrutura de templates</td></tr>
+                    <tr><td><code>TemplateManagerTest</code></td><td>18</td><td>Listagem, aplicação, importação, edge cases, estrutura de templates</td></tr>
                     <tr><td><code>CollaborationServiceTest</code></td><td>10</td><td>Presença, bloqueio de elementos, cursores, limpeza de cache</td></tr>
                     <tr><td><code>ExampleTest</code></td><td>1</td><td>Skeleton padrão do Laravel</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (81)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (94)</h3>
                 <table class="widget-table">
                     <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
                     <tr><td><code>PageControllerTest</code></td><td>24</td><td>CRUD, auth, publish, templates, export/import, duplicate</td></tr>
                     <tr><td><code>ElementControllerTest</code></td><td>14</td><td>CRUD, auth, reorder, move, settings, styles, controls</td></tr>
-                    <tr><td><code>RevisionControllerTest</code></td><td>9</td><td>List, show, restore, diff, delete, prune, auto-save, auth</td></tr>
-                    <tr><td><code>FormControllerTest</code></td><td>7</td><td>Envio de formulários, validação, armazenamento</td></tr>
-                    <tr><td><code>HtmlImportControllerTest</code></td><td>5</td><td>Importação de HTML via URL e textarea, jobs</td></tr>
                     <tr><td><code>ApiTest</code></td><td>11</td><td>Tokens Sanctum, CRUD de páginas e elementos via API</td></tr>
                     <tr><td><code>AuthTest</code></td><td>10</td><td>Registro, login, logout, rotas protegidas</td></tr>
+                    <tr><td><code>RevisionControllerTest</code></td><td>9</td><td>List, show, restore, diff, delete, prune, auto-save, auth, IDOR</td></tr>
+                    <tr><td><code>ProjectControllerTest</code></td><td>9</td><td>CRUD de projetos, projeto padrão, move, autorização entre usuários</td></tr>
+                    <tr><td><code>FormControllerTest</code></td><td>7</td><td>Envio de formulários, validação, página publicada, armazenamento</td></tr>
+                    <tr><td><code>HtmlImportControllerTest</code></td><td>5</td><td>Importação de HTML via URL e textarea, jobs, validação SSRF</td></tr>
+                    <tr><td><code>StarterTemplatesSmokeTest</code></td><td>4</td><td>Smoke test dos templates iniciais</td></tr>
                     <tr><td><code>ExampleTest</code></td><td>1</td><td>Skeleton padrão do Laravel</td></tr>
                 </table>
 
@@ -2738,7 +2822,10 @@ php artisan test
 php artisan test --testsuite=Unit
 
 # Rodar com verbose
-php artisan test --verbose</pre>
+php artisan test --verbose
+
+# Rodar os testes de frontend (Vitest)
+npm test</pre>
                 </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Cache de Renderização</h3>
@@ -2797,7 +2884,7 @@ $page->touch();</pre>
         <section id="improvements" class="step">
             <h2>25. Melhorias Propostas</h2>
             <div class="step-body">
-                <p>O projeto já tem uma base sólida com 136 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
+                <p>O projeto já tem uma base sólida com 155 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Status das Fases</h3>
                 <table class="widget-table">
@@ -2820,6 +2907,7 @@ $page->touch();</pre>
                 <ul>
                     <li><strong>30 widgets</strong> — Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie</li>
                     <li><strong>27 tipos de controles</strong> — text, number, textarea, select, color, boolean, url, image, video, wysiwyg, icon, gallery, repeater, typography, background, border, box_shadow, dimensions, hover, custom_css, animation, visibility, gradient, scroll_animation, text_shadow, text_stroke, column_width</li>
+                    <li><strong>Projetos</strong> — organização privada por usuário de páginas, temas e popups; projeto padrão "Meus Projetos" (não excluível), migração automática de dados existentes, seletor de projeto nas listagens e movimentação de itens via <code>projects.move</code></li>
                     <li><strong>Theme Builder</strong> — templates de tema (header, footer, single, archive, 404, search_results) com condições</li>
                     <li><strong>Popups</strong> — criação e edição com gatilhos e condições de exibição</li>
                     <li><strong>Global Widgets</strong> — widgets reutilizáveis em várias páginas</li>
@@ -2831,6 +2919,15 @@ $page->touch();</pre>
                     <li><strong>API REST com Sanctum</strong> — autenticação token-based, CRUD completo de páginas e elementos</li>
                     <li><strong>Jobs de fila</strong> — ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob, ProcessFormSubmissionJob</li>
                     <li><strong>PagePolicy</strong> — autorização por dono da página</li>
+                    <li><strong>ProjectPolicy</strong> — autorização por dono do projeto</li>
+                    <li><strong>Sanitização XSS central</strong> — <code>PageBuilderService::sanitizeContent()</code>, <code>sanitizeSettings()</code>, <code>sanitizeStyles()</code> e <code>sanitizeUrl()</code> aplicados a elementos, páginas, templates, snapshots e importação</li>
+                    <li><strong>Endurecimento do HtmlSanitizer</strong> — remoção de handlers de evento citados/não citados, <code>srcdoc</code> e URLs perigosas (<code>javascript:</code>, <code>vbscript:</code>, <code>data:text/html</code>, <code>data:image/svg+xml</code>)</li>
+                    <li><strong>Proteção SSRF</strong> — <code>HtmlImportService</code> com redirects manuais (máx. 3) e validação de URL (bloqueio de IPs privados/reservados, localhost, <code>.local</code>, <code>.internal</code>)</li>
+                    <li><strong>Ownership em todos os controllers</strong> — FindReplace, ThemeTemplate, Popup, GlobalWidget, CustomFont, Collaboration e uploads (validação de <code>page_id</code> + elemento pertencente à página)</li>
+                    <li><strong>Correção de IDOR em revisões</strong> — <code>restore</code>/<code>diff</code> validam que a revisão pertence à página</li>
+                    <li><strong>Formulários públicos</strong> — rota de envio fora do grupo <code>auth</code>, com <code>throttle:form-submit</code>, exigindo página <code>published</code> e <code>strip_tags</code> nos dados</li>
+                    <li><strong>CSRF automático</strong> — <code>&lt;meta name=&quot;csrf-token&quot;&gt;</code> injetado pelo Renderer e pelo ThemeService</li>
+                    <li><strong>Revisões com snapshot de elementos</strong> — coluna <code>elements</code> (json) com remapeamento de IDs e UUIDs únicos ao restaurar</li>
                     <li><strong>Sanitização XSS</strong> — <code>sanitizeContent()</code> e <code>sanitizeSettings()</code></li>
                     <li><strong>Tratamento de erros JS</strong> — 14 chamadas fetch() com .catch()</li>
                     <li><strong>Content Security Policy (CSP)</strong> — middleware <code>ContentSecurityPolicy</code> no grupo <code>web</code></li>
@@ -2841,7 +2938,7 @@ $page->touch();</pre>
                     <li><strong>Cache invalidation robusta</strong> — <code>$page->touch()</code> + <code>Cache::tags()</code> ao invés de key registry quebrado</li>
                     <li><strong>Cache no GlobalWidgetService</strong> — <code>getAll()</code> cacheado com <code>clearCache()</code> nas mutações</li>
                     <li><strong>ProcessFormSubmissionJob</strong> — notificações de formulário em background</li>
-                    <li><strong>136 testes automatizados</strong> — cobertura completa de controllers, services e widgets</li>
+                    <li><strong>155 testes automatizados (PHP) + 7 (Vitest)</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Editor WYSIWYG</strong> — toolbar rich-text com imagens, vídeos, listas</li>
                     <li><strong>Edição inline</strong> — preserva HTML (innerHTML) ao invés de textContent</li>
                     <li><strong>Upload de imagens no texto</strong> — botão + Ctrl+V no editor WYSIWYG</li>
