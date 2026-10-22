@@ -6,6 +6,7 @@ use App\Models\Page;
 use App\Models\Element;
 use App\Models\Revision;
 use App\Contracts\PageBuilder\WidgetInterface;
+use App\Services\PageBuilder\Security\HtmlSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -40,8 +41,11 @@ class PageBuilderService
             $page = new Page();
             $page->fill($data);
             $page->user_id = auth()->id();
+            $page->project_id = $data['project_id'] ?? auth()->user()?->defaultProject()?->id;
             $page->status = $data['status'] ?? 'draft';
             $page->slug = $this->generateUniqueSlug($data['title']);
+            $page->settings = $this->sanitizeSettings($data['settings'] ?? []);
+            $page->meta_data = $this->sanitizeSettings($data['meta_data'] ?? []);
             $page->save();
 
             // Criar revisão inicial
@@ -87,6 +91,14 @@ class PageBuilderService
 
             if (isset($data['content'])) {
                 $page->content = $this->sanitizeContent($data['content']);
+            }
+
+            if (isset($data['settings'])) {
+                $page->settings = $this->sanitizeSettings($data['settings']);
+            }
+
+            if (isset($data['meta_data'])) {
+                $page->meta_data = $this->sanitizeSettings($data['meta_data']);
             }
 
             $page->save();
@@ -217,6 +229,14 @@ class PageBuilderService
                 $element->settings = $this->sanitizeSettings($data['settings']);
             }
 
+            if (isset($data['content'])) {
+                $element->content = $this->sanitizeContent($data['content']);
+            }
+
+            if (isset($data['styles'])) {
+                $element->styles = $this->sanitizeStyles($data['styles']);
+            }
+
             $element->save();
 
             DB::commit();
@@ -243,9 +263,10 @@ class PageBuilderService
         try {
             $pageId = $element->page_id;
 
-            // Remover elementos filhos
-            if ($element->children()->exists()) {
-                $element->children()->delete();
+            $descendantIds = $this->getDescendantIds($element->id);
+
+            if (!empty($descendantIds)) {
+                Element::whereIn('id', $descendantIds)->delete();
             }
 
             $element->delete();
@@ -272,20 +293,11 @@ class PageBuilderService
         DB::beginTransaction();
 
         try {
-            $newElement = $element->replicate();
-            $newElement->uuid = (string) Str::uuid();
-            $newElement->name = $element->name . ' (copy)';
-            $newElement->order = $element->page->elements()->max('order') + 1;
-            $newElement->save();
+            $order = $element->parent_id
+                ? Element::where('parent_id', $element->parent_id)->max('order') + 1
+                : $element->page->elements()->max('order') + 1;
 
-            // Duplicar elementos filhos
-            foreach ($element->children as $child) {
-                $newChild = $child->replicate();
-                $newChild->uuid = (string) Str::uuid();
-                $newChild->parent_id = $newElement->id;
-                $newChild->order = $child->order;
-                $newChild->save();
-            }
+            $newElement = $this->duplicateElementTree($element, $element->parent_id, $order);
 
             DB::commit();
 
@@ -301,6 +313,34 @@ class PageBuilderService
         }
     }
 
+    protected function getDescendantIds(int $elementId): array
+    {
+        $ids = [];
+
+        foreach (Element::where('parent_id', $elementId)->pluck('id') as $childId) {
+            $ids[] = $childId;
+            $ids = array_merge($ids, $this->getDescendantIds($childId));
+        }
+
+        return $ids;
+    }
+
+    protected function duplicateElementTree(Element $element, ?int $parentId, int $order): Element
+    {
+        $newElement = $element->replicate();
+        $newElement->uuid = (string) Str::uuid();
+        $newElement->name = $element->name . ' (copy)';
+        $newElement->parent_id = $parentId;
+        $newElement->order = $order;
+        $newElement->save();
+
+        foreach ($element->children()->orderBy('order')->get() as $child) {
+            $this->duplicateElementTree($child, $newElement->id, $child->order);
+        }
+
+        return $newElement;
+    }
+
     /**
      * Criar revisão
      */
@@ -312,6 +352,7 @@ class PageBuilderService
         $revision->content = $page->content;
         $revision->settings = $page->settings;
         $revision->meta_data = $page->meta_data;
+        $revision->elements = $this->snapshotElements($page);
         $revision->version = $this->generateVersionNumber($page);
         $revision->label = $label ?? 'Auto-save';
         $revision->type = 'manual';
@@ -330,11 +371,89 @@ class PageBuilderService
         return $revision;
     }
 
+    public function snapshotElements(Page $page): array
+    {
+        return Element::where('page_id', $page->id)
+            ->orderBy('order')
+            ->get()
+            ->map(fn (Element $element) => [
+                'id' => $element->id,
+                'parent_id' => $element->parent_id,
+                'uuid' => $element->uuid,
+                'type' => $element->type,
+                'name' => $element->name,
+                'order' => $element->order,
+                'settings' => $element->settings,
+                'content' => $element->content,
+                'styles' => $element->styles,
+                'responsive_settings' => $element->responsive_settings,
+                'animation' => $element->animation,
+                'effects' => $element->effects,
+                'column_size' => $element->column_size,
+                'css_classes' => $element->css_classes,
+                'css_id' => $element->css_id,
+            ])
+            ->all();
+    }
+
+    public function restoreElementsFromSnapshot(Page $page, array $snapshot): void
+    {
+        Element::where('page_id', $page->id)->forceDelete();
+
+        $pending = $snapshot;
+        $idMap = [];
+
+        while (!empty($pending)) {
+            $created = false;
+
+            foreach ($pending as $index => $data) {
+                $oldParent = $data['parent_id'] ?? null;
+
+                if ($oldParent !== null && !isset($idMap[$oldParent])) {
+                    continue;
+                }
+
+                $uuid = $data['uuid'] ?? null;
+                if (!$uuid || Element::where('uuid', $uuid)->exists()) {
+                    $uuid = (string) Str::uuid();
+                }
+
+                $element = new Element();
+                $element->page_id = $page->id;
+                $element->parent_id = $oldParent !== null ? $idMap[$oldParent] : null;
+                $element->uuid = $uuid;
+                $element->type = $data['type'];
+                $element->name = $data['name'] ?? $data['type'];
+                $element->order = $data['order'] ?? 0;
+                $element->settings = $this->sanitizeSettings($data['settings'] ?? []);
+                $element->content = $this->sanitizeContent($data['content'] ?? []);
+                $element->styles = $this->sanitizeStyles($data['styles'] ?? []);
+                $element->responsive_settings = $data['responsive_settings'] ?? [];
+                $element->animation = $data['animation'] ?? null;
+                $element->effects = $data['effects'] ?? null;
+                $element->column_size = $data['column_size'] ?? 'col-12';
+                $element->css_classes = $data['css_classes'] ?? null;
+                $element->css_id = $data['css_id'] ?? null;
+                $element->save();
+
+                $idMap[$data['id']] = $element->id;
+                unset($pending[$index]);
+                $created = true;
+            }
+
+            if (!$created) {
+                break;
+            }
+        }
+    }
+
     /**
      * Restaurar revisão
      */
     public function restoreRevision(Page $page, Revision $revision): Page
     {
+        abort_unless((int) $revision->page_id === (int) $page->id, 404);
+
         DB::beginTransaction();
 
         try {
@@ -342,6 +461,10 @@ class PageBuilderService
             $page->settings = $revision->settings;
             $page->meta_data = $revision->meta_data;
             $page->save();
+
+            if (is_array($revision->elements)) {
+                $this->restoreElementsFromSnapshot($page, $revision->elements);
+            }
 
             $this->createRevision($page, 'Restored from revision #' . $revision->id);
 
@@ -379,7 +502,7 @@ class PageBuilderService
     /**
      * Sanitizar conteúdo
      */
-    protected function sanitizeContent(array $content): array
+    public function sanitizeContent(array $content): array
     {
         return array_map(function ($item) {
             if (is_array($item)) {
@@ -425,16 +548,20 @@ class PageBuilderService
     /**
      * Sanitizar settings com base no tipo esperado
      */
-    protected function sanitizeSettings(array $settings): array
+    public function sanitizeSettings(array $settings): array
     {
         $sanitized = [];
 
         foreach ($settings as $key => $value) {
             if (is_string($value)) {
-                if (str_contains($key, 'color') || str_contains($key, '_color')) {
+                if ($key === 'custom_css') {
+                    $sanitized[$key] = HtmlSanitizer::sanitizeCustomCss($value);
+                } elseif ($key === 'custom_js') {
+                    $sanitized[$key] = HtmlSanitizer::sanitizeCustomJs($value);
+                } elseif (str_contains($key, 'color') || str_contains($key, '_color')) {
                     $sanitized[$key] = preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value) ? $value : '#000000';
                 } elseif (str_contains($key, 'url') || str_contains($key, 'link') || str_contains($key, 'src')) {
-                    $sanitized[$key] = filter_var($value, FILTER_SANITIZE_URL);
+                    $sanitized[$key] = $this->sanitizeUrl($value);
                 } elseif (str_contains($key, 'content') || str_contains($key, 'html') || $key === 'content') {
                     $allowed = '<p><br><strong><em><u><s><sup><sub><mark><ul><ol><li><dl><dt><dd><a><img><div><span><h1><h2><h3><h4><h5><h6><blockquote><pre><code><hr><table><thead><tbody><tr><th><td><figure><figcaption><video><source><iframe>';
                     $sanitized[$key] = strip_tags($value, $allowed);
@@ -454,6 +581,44 @@ class PageBuilderService
             } else {
                 $sanitized[$key] = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8', false);
             }
+        }
+
+        return $sanitized;
+    }
+
+    protected function sanitizeUrl(string $url): string
+    {
+        $url = trim($url);
+
+        if (preg_match('/^\s*(javascript|vbscript|data:text\/html)/i', $url)) {
+            return '';
+        }
+
+        return $url;
+    }
+
+    public function sanitizeStyles(array $styles): array
+    {
+        $sanitized = [];
+
+        foreach ($styles as $key => $value) {
+            if (is_array($value)) {
+                $sanitized[$key] = $this->sanitizeStyles($value);
+                continue;
+            }
+
+            if (!is_string($value)) {
+                $sanitized[$key] = $value;
+                continue;
+            }
+
+            $value = strip_tags($value);
+            $value = preg_replace('/expression\s*\(/i', '', $value);
+            $value = preg_replace('/(javascript|vbscript)\s*:/i', '', $value);
+            $value = preg_replace('/-moz-binding\s*:/i', '', $value);
+            $value = preg_replace('/url\s*\(\s*[\'"]?\s*(javascript|vbscript|data:text\/html)[^)]*\)/i', 'none', $value);
+
+            $sanitized[$key] = $value;
         }
 
         return $sanitized;
@@ -539,20 +704,17 @@ class PageBuilderService
     /**
      * Importar página de JSON
      */
-    public function importPage(array $data, Page $page = null): Page
+    public function importPage(array $data, ?int $userId = null): Page
     {
         DB::beginTransaction();
 
         try {
-            if (!$page) {
-                $page = new Page();
-                $page->user_id = auth()->id();
-            }
-
+            $page = new Page();
+            $page->user_id = $userId ?? auth()->id();
             $page->title = $data['title'] ?? 'Imported Page';
-            $page->slug = Str::slug($page->title);
-            $page->settings = $data['settings'] ?? [];
-            $page->meta_data = $data['meta_data'] ?? [];
+            $page->slug = $this->generateUniqueSlug($page->title);
+            $page->settings = $this->sanitizeSettings($data['settings'] ?? []);
+            $page->meta_data = $this->sanitizeSettings($data['meta_data'] ?? []);
             $page->status = 'draft';
             $page->save();
 
@@ -582,14 +744,19 @@ class PageBuilderService
                 continue;
             }
 
+            $uuid = $elementData['id'] ?? null;
+            if (!$uuid || Element::where('uuid', $uuid)->exists()) {
+                $uuid = (string) Str::uuid();
+            }
+
             $element = new Element();
             $element->page_id = $page->id;
             $element->type = $elementData['type'];
             $element->name = $elementData['name'] ?? $widget->getLabel();
-            $element->uuid = $elementData['id'] ?? (string) Str::uuid();
-            $element->settings = $elementData['settings'] ?? $widget->getDefaultSettings();
-            $element->content = $elementData['content'] ?? [];
-            $element->styles = $elementData['styles'] ?? [];
+            $element->uuid = $uuid;
+            $element->settings = $this->sanitizeSettings($elementData['settings'] ?? $widget->getDefaultSettings());
+            $element->content = $this->sanitizeContent($elementData['content'] ?? []);
+            $element->styles = $this->sanitizeStyles($elementData['styles'] ?? []);
             $element->responsive_settings = $elementData['responsive_settings'] ?? [];
             $element->animation = $elementData['animation'] ?? null;
             $element->effects = $elementData['effects'] ?? null;

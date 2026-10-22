@@ -31,6 +31,8 @@ class PageApiController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorize('create', Page::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'status' => 'nullable|in:draft,published',

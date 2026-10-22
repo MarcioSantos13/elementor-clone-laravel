@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PageBuilder;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Element;
+use App\Models\Project;
 use App\Services\PageBuilder\Core\PageBuilderService;
 use App\Services\PageBuilder\Core\ElementManager;
 use App\Services\PageBuilder\Core\Renderer;
@@ -35,10 +36,25 @@ class PageController extends Controller
         return $this->templateManager->all();
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $pages = Page::latest()->paginate(20);
-        return view('page-builder.pages.index', compact('pages'));
+        $user = auth()->user();
+        $projectId = $request->integer('project') ?: null;
+
+        $pages = Page::query()
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->when($projectId, fn ($query) => $query->where('project_id', $projectId))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $projects = Project::query()
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+
+        return view('page-builder.pages.index', compact('pages', 'projects', 'projectId'));
     }
 
     public function create(): View
@@ -53,6 +69,8 @@ class PageController extends Controller
 
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
+        $this->authorize('create', Page::class);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'status' => 'nullable|in:draft,published',
@@ -67,7 +85,10 @@ class PageController extends Controller
         $templateKey = $request->input('template');
         if ($templateKey && $this->templateManager->has($templateKey)) {
             $template = $this->templateManager->get($templateKey);
-            $page->settings = array_merge($page->settings ?? [], $template['settings']);
+            $page->settings = array_merge(
+                $page->settings ?? [],
+                $this->pageBuilder->sanitizeSettings($template['settings'])
+            );
             $page->save();
             $this->importTemplateElements($page, $template['elements']);
         }
@@ -110,8 +131,11 @@ class PageController extends Controller
 
         DB::beginTransaction();
         try {
-            $page->elements()->delete();
-            $page->settings = array_merge($page->settings ?? [], $template['settings']);
+            $page->allElements()->forceDelete();
+            $page->settings = array_merge(
+                $page->settings ?? [],
+                $this->pageBuilder->sanitizeSettings($template['settings'])
+            );
             $page->save();
 
             $this->importTemplateElements($page, $template['elements']);
@@ -135,7 +159,10 @@ class PageController extends Controller
             'settings' => 'required|array',
         ]);
 
-        $page->settings = array_merge($page->settings ?? [], $validated['settings']);
+        $page->settings = array_merge(
+            $page->settings ?? [],
+            $this->pageBuilder->sanitizeSettings($validated['settings'])
+        );
         $page->save();
 
         return response()->json([
@@ -180,10 +207,10 @@ class PageController extends Controller
 
         $settings = $page->settings ?? [];
         if (isset($validated['global_colors'])) {
-            $settings['global_colors'] = $validated['global_colors'];
+            $settings['global_colors'] = $this->pageBuilder->sanitizeSettings($validated['global_colors']);
         }
         if (isset($validated['global_fonts'])) {
-            $settings['global_fonts'] = $validated['global_fonts'];
+            $settings['global_fonts'] = $this->pageBuilder->sanitizeSettings($validated['global_fonts']);
         }
         $page->settings = $settings;
         $page->save();
@@ -207,9 +234,9 @@ class PageController extends Controller
             $element->type = $type;
             $element->uuid = (string) \Illuminate\Support\Str::uuid();
             $element->name = $elData['settings']['name'] ?? ucfirst($type);
-            $element->settings = $elData['settings'] ?? [];
-            $element->content = [];
-            $element->styles = [];
+            $element->settings = $this->pageBuilder->sanitizeSettings($elData['settings'] ?? []);
+            $element->content = $this->pageBuilder->sanitizeContent($elData['content'] ?? []);
+            $element->styles = $this->pageBuilder->sanitizeStyles($elData['styles'] ?? []);
             $element->order = $index;
             $element->save();
 
@@ -320,6 +347,8 @@ class PageController extends Controller
 
     public function import(Request $request): JsonResponse
     {
+        $this->authorize('create', Page::class);
+
         $validated = $request->validate([
             'data' => 'required|array',
             'data.title' => 'required|string|max:255',

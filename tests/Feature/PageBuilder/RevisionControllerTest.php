@@ -35,14 +35,14 @@ class RevisionControllerTest extends TestCase
         $response->assertJsonStructure(['revisions']);
     }
 
-    public function test_can_list_revisions_of_other_users_page(): void
+    public function test_cannot_list_revisions_of_other_users_page(): void
     {
         $otherPage = Page::factory()->create(['user_id' => $this->otherUser->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('page-builder.revisions.index', $otherPage));
 
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_show_revision(): void
@@ -125,7 +125,7 @@ class RevisionControllerTest extends TestCase
             ]);
 
         $response->assertStatus(200);
-        $response->assertJsonPath('message', 'Auto-saved successfully');
+        $response->assertJsonPath('message', 'Auto-save queued successfully');
         $this->assertDatabaseHas('revisions', [
             'page_id' => $this->page->id,
             'type' => 'auto_save',

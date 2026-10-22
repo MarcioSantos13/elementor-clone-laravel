@@ -26,7 +26,11 @@ class CustomFontController extends Controller
 
     public function index(): JsonResponse
     {
-        $fonts = CustomFont::global()->orderBy('family')->get();
+        $user = auth()->user();
+        $fonts = CustomFont::global()
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->orderBy('family')
+            ->get();
         return response()->json($fonts);
     }
 
@@ -86,6 +90,7 @@ class CustomFontController extends Controller
 
     public function update(Request $request, CustomFont $customFont): JsonResponse
     {
+        $this->authorizeOwner($customFont);
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'family' => 'sometimes|string|max:255',
@@ -108,6 +113,7 @@ class CustomFontController extends Controller
 
     public function destroy(CustomFont $customFont): JsonResponse
     {
+        $this->authorizeOwner($customFont);
         $path = config('page-builder.fonts.path');
 
         foreach (['ttf', 'woff', 'woff2'] as $format) {
@@ -126,6 +132,8 @@ class CustomFontController extends Controller
 
     public function download(CustomFont $customFont, string $format)
     {
+        $this->authorizeOwner($customFont);
+
         if (!in_array($format, ['ttf', 'woff', 'woff2'])) {
             abort(404);
         }
@@ -142,7 +150,14 @@ class CustomFontController extends Controller
         }
 
         if ($customFont->$urlField) {
-            return redirect()->away($customFont->$urlField);
+            $url = $customFont->$urlField;
+            $scheme = parse_url($url, PHP_URL_SCHEME);
+
+            if (!in_array($scheme, ['http', 'https'], true)) {
+                abort(404);
+            }
+
+            return redirect()->away($url);
         }
 
         abort(404);

@@ -19,7 +19,11 @@ class GlobalWidgetController extends Controller
 
     public function index(): JsonResponse
     {
-        $widgets = $this->globalWidgetService->getAll();
+        $user = auth()->user();
+        $widgets = collect($this->globalWidgetService->getAll())
+            ->when(!$user->isAdmin(), fn ($items) => $items->where('user_id', $user->id))
+            ->values()
+            ->all();
 
         return response()->json([
             'global_widgets' => $widgets,
@@ -47,6 +51,7 @@ class GlobalWidgetController extends Controller
 
     public function show(GlobalWidget $globalWidget): JsonResponse
     {
+        $this->authorizeOwner($globalWidget);
         $globalWidget->load('user');
 
         return response()->json([
@@ -56,6 +61,7 @@ class GlobalWidgetController extends Controller
 
     public function update(Request $request, GlobalWidget $globalWidget): JsonResponse
     {
+        $this->authorizeOwner($globalWidget);
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
             'type' => 'sometimes|required|string',
@@ -76,6 +82,7 @@ class GlobalWidgetController extends Controller
 
     public function destroy(GlobalWidget $globalWidget): JsonResponse
     {
+        $this->authorizeOwner($globalWidget);
         $this->globalWidgetService->delete($globalWidget);
 
         return response()->json([
@@ -85,6 +92,7 @@ class GlobalWidgetController extends Controller
 
     public function render(GlobalWidget $globalWidget): \Illuminate\Http\Response
     {
+        $this->authorizeOwner($globalWidget);
         $html = $this->globalWidgetService->renderWidget($globalWidget);
 
         return response($html)

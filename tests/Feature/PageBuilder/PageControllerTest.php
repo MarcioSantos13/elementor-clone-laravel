@@ -205,14 +205,14 @@ class PageControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_user_can_export_other_users_page(): void
+    public function test_user_cannot_export_other_users_page(): void
     {
         $page = Page::factory()->create(['user_id' => $this->otherUser->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('page-builder.pages.export', $page));
 
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_list_templates(): void

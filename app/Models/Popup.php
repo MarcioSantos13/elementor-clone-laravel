@@ -16,6 +16,7 @@ class Popup extends Model
 
     protected $fillable = [
         'user_id',
+        'project_id',
         'page_id',
         'title',
         'slug',
@@ -50,6 +51,11 @@ class Popup extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function page(): BelongsTo

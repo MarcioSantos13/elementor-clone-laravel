@@ -49,6 +49,20 @@ class User extends Authenticatable
         ];
     }
 
+    public function projects(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function defaultProject(): Project
+    {
+        return $this->projects()->where('is_default', true)->first()
+            ?? app(\App\Services\PageBuilder\Project\ProjectService::class)->create($this, [
+                'name' => 'Meus Projetos',
+                'is_default' => true,
+            ]);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

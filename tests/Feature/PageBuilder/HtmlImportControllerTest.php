@@ -53,7 +53,7 @@ class HtmlImportControllerTest extends TestCase
 
     public function test_guest_cannot_import(): void
     {
-        $response = $this->postJson(route('page-builder.html-import'), [
+        $response = $this->post(route('page-builder.html-import'), [
             'html' => '<p>test</p>',
         ]);
 

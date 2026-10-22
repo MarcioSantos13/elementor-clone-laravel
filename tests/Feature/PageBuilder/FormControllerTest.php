@@ -18,7 +18,7 @@ class FormControllerTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
-        $this->page = Page::factory()->create(['user_id' => $this->user->id]);
+        $this->page = Page::factory()->create(['user_id' => $this->user->id, 'status' => 'published']);
     }
 
     public function test_can_submit_form(): void

@@ -16,6 +16,15 @@
                     <p class="pb-hero-sub">Gerencie, importe e publique suas páginas no construtor visual</p>
                 </div>
                 <div style="display:flex;gap:.6rem;align-items:center;position:relative;z-index:2">
+                    @if(isset($projects) && $projects->count())
+                        <select onchange="if(this.value){window.location='{{ route('page-builder.pages.index') }}?project='+this.value}else{window.location='{{ route('page-builder.pages.index') }}'}"
+                                class="pb-hero-btn-ghost" style="padding:.5rem .75rem;cursor:pointer">
+                            <option value="">Todos os projetos</option>
+                            @foreach($projects as $project)
+                                <option value="{{ $project->id }}" @selected(($projectId ?? null) == $project->id)>{{ $project->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                     <button onclick="openHtmlImportModal()" class="pb-hero-btn-ghost">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Importar HTML
@@ -386,7 +395,9 @@
             background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
             display: flex; flex-direction: column; transition: all .25s cubic-bezier(.4,0,.2,1);
             box-shadow: 0 1px 3px rgba(0,0,0,.04);
+            position: relative; z-index: 1;
         }
+        .pb-page-card.dropdown-open { z-index: 100; }
         .pb-page-card:hover {
             border-color: #c7d2fe; box-shadow: 0 8px 30px rgba(99,102,241,.12);
             transform: translateY(-3px);
@@ -464,8 +475,10 @@
             display: flex; justify-content: space-between; align-items: center;
             background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
             padding: .85rem 1.25rem; transition: all .2s; gap: 1.5rem;
+            position: relative; z-index: 1;
         }
         .pb-list-row:hover { border-color: #c7d2fe; box-shadow: 0 2px 12px rgba(99,102,241,.06); }
+        .pb-list-row.dropdown-open { z-index: 100; }
         .pb-list-info { display: flex; align-items: center; gap: .75rem; flex: 1; }
         .pb-list-icon {
             width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9;
@@ -539,14 +552,25 @@
             document.getElementById('pages-list').style.display = mode === 'list' ? '' : 'none';
         }
 
+        function closeDropdowns(except) {
+            document.querySelectorAll('.pb-dropdown-menu.show').forEach(m => {
+                if (m === except) return;
+                m.classList.remove('show');
+                const container = m.closest('.pb-page-card, .pb-list-row');
+                if (container) container.classList.remove('dropdown-open');
+            });
+        }
+
         function toggleDropdown(btn) {
             const menu = btn.nextElementSibling;
-            document.querySelectorAll('.pb-dropdown-menu.show').forEach(m => { if (m !== menu) m.classList.remove('show'); });
+            const container = btn.closest('.pb-page-card, .pb-list-row');
+            closeDropdowns(menu);
             menu.classList.toggle('show');
+            if (container) container.classList.toggle('dropdown-open', menu.classList.contains('show'));
         }
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.pb-card-dropdown')) {
-                document.querySelectorAll('.pb-dropdown-menu.show').forEach(m => m.classList.remove('show'));
+                closeDropdowns();
             }
         });
 
@@ -560,7 +584,7 @@
         });
 
         function duplicatePage(id) {
-            document.querySelectorAll('.pb-dropdown-menu.show').forEach(m => m.classList.remove('show'));
+            closeDropdowns();
             fetch(`/page-builder/pages/${id}/duplicate`, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': csrf },
@@ -571,7 +595,7 @@
         }
 
         function copyHtml(id) {
-            document.querySelectorAll('.pb-dropdown-menu.show').forEach(m => m.classList.remove('show'));
+            closeDropdowns();
             fetch(`/page-builder/pages/${id}/render?format=inner`)
                 .then(r => r.text())
                 .then(html => {
@@ -607,7 +631,7 @@
         let importPageId = null;
 
         function openImportModal(id) {
-            document.querySelectorAll('.pb-dropdown-menu.show').forEach(m => m.classList.remove('show'));
+            closeDropdowns();
             importPageId = id || null;
             document.getElementById('import-modal').style.display = '';
             document.getElementById('import-file').value = '';

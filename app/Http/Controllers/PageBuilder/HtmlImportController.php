@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\PageBuilder;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ImportHtmlJob;
 use App\Services\PageBuilder\Core\HtmlImportService;
 use App\Services\PageBuilder\Core\PageBuilderService;
 use App\Models\Page;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class HtmlImportController extends Controller
 {
@@ -19,9 +19,11 @@ class HtmlImportController extends Controller
 
     public function import(Request $request): JsonResponse
     {
+        $this->authorize('create', Page::class);
+
         $validated = $request->validate([
             'html' => 'required_without:url|string|max:512000',
-            'url'  => 'required_without:html|nullable|string|max:2048',
+            'url'  => 'required_without:html|nullable|url|max:2048',
             'title' => 'nullable|string|max:255',
         ]);
 
@@ -33,19 +35,8 @@ class HtmlImportController extends Controller
             }
 
             $title = $validated['title'] ?? 'Página Importada';
-            $converted = $this->htmlImport->convert($html, $title);
 
-            $slug = Str::slug($converted['title'] ?? $title);
-            if (Page::where('slug', $slug)->exists()) {
-                $converted['title'] = ($converted['title'] ?? $title) . ' ' . date('H:i');
-            }
-
-            $job = new \App\Jobs\ImportHtmlJob(
-                $html,
-                auth()->id(),
-                $converted['title'] ?? $title,
-            );
-            $job->dispatch();
+            ImportHtmlJob::dispatch($html, auth()->id(), $title);
 
             return response()->json([
                 'message'      => 'Importação iniciada em segundo plano',

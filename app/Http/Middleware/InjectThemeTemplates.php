@@ -79,7 +79,7 @@ class InjectThemeTemplates
             return false;
         }
 
-        if ($request->is('p/*')) {
+        if ($request->is('p/*') || $request->is('login') || $request->is('register') || $request->is('tutorial')) {
             return false;
         }
 

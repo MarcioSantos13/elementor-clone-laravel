@@ -30,10 +30,24 @@ class PopupController extends Controller
         $this->templateManager = $templateManager;
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $popups = Popup::ordered()->with('user', 'page')->get();
-        return view('page-builder.popups.index', compact('popups'));
+        $user = auth()->user();
+        $projectId = $request->integer('project') ?: null;
+
+        $popups = Popup::ordered()
+            ->with('user', 'page')
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->when($projectId, fn ($query) => $query->where('project_id', $projectId))
+            ->get();
+
+        $projects = \App\Models\Project::query()
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+
+        return view('page-builder.popups.index', compact('popups', 'projects', 'projectId'));
     }
 
     public function create(): View
@@ -79,6 +93,7 @@ class PopupController extends Controller
 
             $popup = Popup::create([
                 'user_id' => $user->id,
+                'project_id' => $page->project_id,
                 'page_id' => $page->id,
                 'title' => $validated['title'],
                 'slug' => $slug,
@@ -111,6 +126,7 @@ class PopupController extends Controller
 
     public function edit(Popup $popup): View
     {
+        $this->authorizeOwner($popup);
         $types = Popup::types();
         $triggerTypes = Popup::triggerTypes();
         return view('page-builder.popups.create', compact('popup', 'types', 'triggerTypes'));
@@ -118,6 +134,7 @@ class PopupController extends Controller
 
     public function update(Request $request, Popup $popup): RedirectResponse
     {
+        $this->authorizeOwner($popup);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string|in:' . implode(',', Popup::types()),
@@ -141,6 +158,7 @@ class PopupController extends Controller
 
     public function destroy(Popup $popup): RedirectResponse
     {
+        $this->authorizeOwner($popup);
         $title = $popup->title;
         $popup->delete();
 
@@ -152,6 +170,7 @@ class PopupController extends Controller
 
     public function editor(Popup $popup): View
     {
+        $this->authorizeOwner($popup);
         $page = $popup->page;
         if (!$page) {
             abort(404, 'Associated page not found');
@@ -171,6 +190,7 @@ class PopupController extends Controller
 
     public function getTriggers(Popup $popup): JsonResponse
     {
+        $this->authorizeOwner($popup);
         return response()->json([
             'triggers' => $popup->triggers ?? [],
             'triggerTypes' => Popup::triggerTypes(),
@@ -179,6 +199,7 @@ class PopupController extends Controller
 
     public function updateTriggers(Request $request, Popup $popup): JsonResponse
     {
+        $this->authorizeOwner($popup);
         $validated = $request->validate([
             'triggers' => 'nullable|array',
             'triggers.*.type' => 'required|string',
@@ -199,11 +220,13 @@ class PopupController extends Controller
 
     public function getConditions(Popup $popup): JsonResponse
     {
+        $this->authorizeOwner($popup);
         return response()->json([
             'conditions' => $popup->conditions ?? [],
             'options' => ThemeService::conditionOptions(),
             'pages' => Page::select('id', 'title', 'slug')
                 ->where('status', 'published')
+                ->when(!auth()->user()->isAdmin(), fn ($query) => $query->where('user_id', auth()->id()))
                 ->orderBy('title')
                 ->get()
                 ->map(fn($p) => ['id' => $p->id, 'title' => $p->title, 'slug' => $p->slug]),
@@ -212,6 +235,7 @@ class PopupController extends Controller
 
     public function updateConditions(Request $request, Popup $popup): JsonResponse
     {
+        $this->authorizeOwner($popup);
         $validated = $request->validate([
             'conditions' => 'nullable|array',
             'conditions.*.type' => 'required|string',
@@ -232,6 +256,7 @@ class PopupController extends Controller
 
     public function publish(Popup $popup): JsonResponse
     {
+        $this->authorizeOwner($popup);
         $popup->update([
             'status' => 'published',
             'published_at' => now(),
@@ -247,6 +272,7 @@ class PopupController extends Controller
 
     public function unpublish(Popup $popup): JsonResponse
     {
+        $this->authorizeOwner($popup);
         $popup->update([
             'status' => 'draft',
             'published_at' => null,
@@ -262,6 +288,7 @@ class PopupController extends Controller
 
     public function render(Popup $popup): \Illuminate\Http\Response
     {
+        $this->authorizeOwner($popup);
         $html = $this->popupService->renderPopup($popup);
 
         return response($html)

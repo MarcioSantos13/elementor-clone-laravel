@@ -23,7 +23,7 @@ Route::middleware('auth')->get('/tutorial', function () {
     return view('tutorial');
 })->name('tutorial');
 
-Route::middleware('web')->get('/p/{slug}', function ($slug) {
+Route::get('/p/{slug}', function ($slug) {
     $page = \App\Models\Page::where('slug', $slug)->where('status', 'published')->firstOrFail();
     $themeService = app(\App\Services\PageBuilder\Theme\ThemeService::class);
     $html = $themeService->renderPageWithTheme($page);

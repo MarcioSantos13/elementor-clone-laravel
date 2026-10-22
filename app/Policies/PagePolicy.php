@@ -22,7 +22,7 @@ class PagePolicy
             return true;
         }
 
-        return $page->user_id === $user->id || $page->status === 'published';
+        return (int) $page->user_id === (int) $user->id;
     }
 
     public function create(User $user): bool

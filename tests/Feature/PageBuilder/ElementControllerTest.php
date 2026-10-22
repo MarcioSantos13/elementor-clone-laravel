@@ -35,14 +35,14 @@ class ElementControllerTest extends TestCase
         $response->assertJsonStructure(['elements']);
     }
 
-    public function test_can_list_elements_of_other_users_page(): void
+    public function test_cannot_list_elements_of_other_users_page(): void
     {
         $otherPage = Page::factory()->create(['user_id' => $this->otherUser->id]);
 
         $response = $this->actingAs($this->user)
             ->get(route('page-builder.elements.index', $otherPage));
 
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_add_element(): void
@@ -80,7 +80,7 @@ class ElementControllerTest extends TestCase
         $response->assertJsonStructure(['element']);
     }
 
-    public function test_can_show_element_of_other_users_page(): void
+    public function test_cannot_show_element_of_other_users_page(): void
     {
         $otherPage = Page::factory()->create(['user_id' => $this->otherUser->id]);
         $element = Element::factory()->create(['page_id' => $otherPage->id]);
@@ -88,7 +88,7 @@ class ElementControllerTest extends TestCase
         $response = $this->actingAs($this->user)
             ->get(route('page-builder.elements.show', $element));
 
-        $response->assertStatus(200);
+        $response->assertStatus(403);
     }
 
     public function test_update_element(): void

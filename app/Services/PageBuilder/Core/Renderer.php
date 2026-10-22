@@ -38,7 +38,7 @@ class Renderer
         $innerStyle = "max-width: {$containerWidth}; margin: 0 auto; padding: {$contentPadding};";
 
         $content = <<<HTML
-<div class="{$wrapperClass}" style="{$pageStyle}">
+<div class="{$wrapperClass}" data-page-id="{$page->id}" style="{$pageStyle}">
     <div class="pb-page-inner" style="{$innerStyle}">
         {$html}
     </div>
@@ -51,6 +51,7 @@ HTML;
             $renderStyles = $this->renderStyles($page, $hasMath);
             $renderScripts = $this->renderScripts($page, $hasMath);
             $title = htmlspecialchars($page->title, ENT_QUOTES, 'UTF-8');
+            $csrfToken = csrf_token();
             $csp = implode('; ', [
                 "default-src 'self'",
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://www.youtube.com https://player.vimeo.com",
@@ -70,6 +71,7 @@ HTML;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{$csrfToken}">
     <meta http-equiv="Content-Security-Policy" content="{$csp}">
     <title>{$title}</title>
     <style>
@@ -279,7 +281,7 @@ HTML;
         return implode(' ', $classes);
     }
 
-    protected function processEmbeds(string $html): string
+    public function processEmbeds(string $html): string
     {
         $processed = preg_replace_callback(
             '/<iframe\s[^>]*src=["\'](https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com)[^"\']+)["\'][^>]*>/i',
@@ -506,7 +508,7 @@ HTML;
         $page->setRelation('elements', $rootElements);
     }
 
-    protected function hasMathElements(Page $page): bool
+    public function hasMathElements(Page $page): bool
     {
         $all = collect();
         $flatten = function ($elements) use (&$all, &$flatten) {

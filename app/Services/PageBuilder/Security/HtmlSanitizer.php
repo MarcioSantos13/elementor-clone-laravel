@@ -44,30 +44,44 @@ class HtmlSanitizer
 
     private static function removeEventHandlers(string $html): string
     {
-        return preg_replace('/\s+on\w+="[^"]*"/si', '', $html);
+        $html = preg_replace('/\s+on\w+\s*=\s*"[^"]*"/si', '', $html);
+        $html = preg_replace("/\s+on\w+\s*=\s*'[^']*'/si", '', $html);
+
+        return preg_replace('/\s+on\w+\s*=\s*[^\s>]+/si', '', $html);
     }
 
     private static function removeScriptTags(string $html): string
     {
-        return preg_replace('/<script\b[^>]*>.*?<\/script>/si', '', $html);
+        return preg_replace('/<script\b[^>]*>(.*?)<\/script>/si', '', $html);
     }
 
     private static function sanitizeUrls(string $html): string
     {
-        $dangerous = ['javascript:', 'vbscript:', 'data:text/html', 'data:text/javascript'];
+        $html = preg_replace('/\s+srcdoc\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/si', '', $html);
 
         return preg_replace_callback(
-            '/((?:href|src|action|formaction|poster)\s*=\s*")([^"]*)(")/si',
-            function ($matches) use ($dangerous) {
-                $url = strtolower(trim($matches[2]));
-                foreach ($dangerous as $prefix) {
-                    if (str_starts_with($url, $prefix)) {
-                        return $matches[1] . '#' . $matches[3];
-                    }
+            '/((?:href|src|action|formaction|poster)\s*=\s*)("[^"]*"|\'[^\']*\'|[^\s>]+)/si',
+            function ($matches) {
+                $value = trim($matches[2], " \t\n\r\0\x0B\"'");
+
+                if (self::isDangerousUrl($value)) {
+                    return $matches[1] . '"#"';
                 }
+
                 return $matches[0];
             },
             $html
+        );
+    }
+
+    private static function isDangerousUrl(string $url): bool
+    {
+        $url = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $url = preg_replace('/[\x00-\x20]+/', '', $url);
+
+        return (bool) preg_match(
+            '/^(javascript|vbscript|data:text\/html|data:application\/xhtml\+xml|data:image\/svg\+xml)/i',
+            $url
         );
     }
 }

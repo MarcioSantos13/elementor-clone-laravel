@@ -20,6 +20,7 @@ class Revision extends Model
         'content',
         'settings',
         'meta_data',
+        'elements',
         'diff',
     ];
 
@@ -27,6 +28,7 @@ class Revision extends Model
         'content' => 'array',
         'settings' => 'array',
         'meta_data' => 'array',
+        'elements' => 'array',
         'diff' => 'array',
     ];
 

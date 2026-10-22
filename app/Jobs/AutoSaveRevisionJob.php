@@ -26,11 +26,15 @@ class AutoSaveRevisionJob implements ShouldQueue
 
     public function handle(): void
     {
+        $pageBuilder = app(\App\Services\PageBuilder\Core\PageBuilderService::class);
+
         $revision = new Revision();
         $revision->page_id = $this->page->id;
         $revision->user_id = $this->userId;
         $revision->content = $this->content ?? $this->page->content;
         $revision->settings = $this->settings ?? $this->page->settings;
+        $revision->meta_data = $this->page->meta_data;
+        $revision->elements = $pageBuilder->snapshotElements($this->page);
         $revision->version = '1.0.' . time();
         $revision->label = 'Auto-save';
         $revision->type = 'auto_save';

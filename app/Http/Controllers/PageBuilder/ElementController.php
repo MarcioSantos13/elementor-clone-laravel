@@ -47,20 +47,41 @@ class ElementController extends Controller
         $validated = $request->validate([
             'type' => 'required|string',
             'settings' => 'nullable|array',
-            'parent_id' => 'nullable|integer|exists:elements,id',
+            'parent_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('elements', 'id')->where('page_id', $page->id),
+            ],
+            'insert_before_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('elements', 'id')->where('page_id', $page->id),
+            ],
         ]);
+
+        if (!$this->widgetManager->getWidget($validated['type'])) {
+            return response()->json(['error' => 'Widget type not found'], 422);
+        }
 
         $parentId = $validated['parent_id'] ?? null;
 
         if ($parentId) {
-            $parent = Element::find($parentId);
+            $parent = Element::where('id', $parentId)->where('page_id', $page->id)->first();
             $parentWidget = $parent ? $this->widgetManager->getWidget($parent->type) : null;
             if (!$parentWidget || !$parentWidget->isContainer()) {
                 $parentId = null;
             }
         }
 
-        $element = $this->elementManager->create($page, $validated['type'], $validated['settings'] ?? [], $parentId);
+        $settings = $this->pageBuilder->sanitizeSettings($validated['settings'] ?? []);
+
+        $element = $this->elementManager->create(
+            $page,
+            $validated['type'],
+            $settings,
+            $parentId,
+            $validated['insert_before_id'] ?? null
+        );
 
         return response()->json([
             'message' => 'Element added successfully',
@@ -213,9 +234,23 @@ class ElementController extends Controller
         $this->authorize('update', $element->page);
         $validated = $request->validate([
             'settings' => 'required|array',
+            'content' => 'sometimes|array',
+            'styles' => 'sometimes|array',
         ]);
 
-        $element->settings = array_merge($element->settings ?? [], $validated['settings']);
+        $element->settings = array_merge(
+            $element->settings ?? [],
+            $this->pageBuilder->sanitizeSettings($validated['settings'])
+        );
+
+        if (isset($validated['content'])) {
+            $element->content = $this->pageBuilder->sanitizeContent($validated['content']);
+        }
+
+        if (isset($validated['styles'])) {
+            $element->styles = $this->pageBuilder->sanitizeStyles($validated['styles']);
+        }
+
         $element->save();
         $element->page->touch();
 
@@ -232,7 +267,10 @@ class ElementController extends Controller
             'styles' => 'required|array',
         ]);
 
-        $element->styles = array_merge($element->styles ?? [], $validated['styles']);
+        $element->styles = array_merge(
+            $element->styles ?? [],
+            $this->pageBuilder->sanitizeStyles($validated['styles'])
+        );
         $element->save();
         $element->page->touch();
 
@@ -302,9 +340,12 @@ class ElementController extends Controller
 
     public function uploadImage(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
+            'page_id' => 'required|integer|exists:pages,id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp,svg|max:10240',
         ]);
+
+        $this->authorize('update', Page::findOrFail($validated['page_id']));
 
         $file = $request->file('image');
 
@@ -343,9 +384,12 @@ class ElementController extends Controller
 
     public function uploadVideo(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
+            'page_id' => 'required|integer|exists:pages,id',
             'video' => 'required|file|mimes:mp4,webm,ogg|max:51200',
         ]);
+
+        $this->authorize('update', Page::findOrFail($validated['page_id']));
 
         $file = $request->file('video');
 
@@ -443,9 +487,15 @@ class ElementController extends Controller
                     'type' => $snapshot['type'] ?? $existing->type,
                     'name' => $snapshot['name'] ?? $existing->name,
                     'order' => $index,
-                    'settings' => $snapshot['settings'] ?? $existing->settings,
-                    'content' => $snapshot['content'] ?? $existing->content,
-                    'styles' => $snapshot['styles'] ?? $existing->styles,
+                    'settings' => $this->pageBuilder->sanitizeSettings($snapshot['settings'] ?? $existing->settings ?? []),
+                    'content' => $this->pageBuilder->sanitizeContent($snapshot['content'] ?? $existing->content ?? []),
+                    'styles' => $this->pageBuilder->sanitizeStyles($snapshot['styles'] ?? $existing->styles ?? []),
+                    'responsive_settings' => $snapshot['responsive_settings'] ?? $existing->responsive_settings,
+                    'animation' => $snapshot['animation'] ?? $existing->animation,
+                    'effects' => $snapshot['effects'] ?? $existing->effects,
+                    'column_size' => $snapshot['column_size'] ?? $existing->column_size,
+                    'css_classes' => $snapshot['css_classes'] ?? $existing->css_classes,
+                    'css_id' => $snapshot['css_id'] ?? $existing->css_id,
                 ]);
                 $element = $existing;
             } else {
@@ -458,9 +508,15 @@ class ElementController extends Controller
                 $element->type = $snapshot['type'] ?? 'text';
                 $element->name = $snapshot['name'] ?? ($snapshot['type'] ?? 'Element');
                 $element->order = $index;
-                $element->settings = $snapshot['settings'] ?? $defaultSettings;
-                $element->content = $snapshot['content'] ?? [];
-                $element->styles = $snapshot['styles'] ?? [];
+                $element->settings = $this->pageBuilder->sanitizeSettings($snapshot['settings'] ?? $defaultSettings);
+                $element->content = $this->pageBuilder->sanitizeContent($snapshot['content'] ?? []);
+                $element->styles = $this->pageBuilder->sanitizeStyles($snapshot['styles'] ?? []);
+                $element->responsive_settings = $snapshot['responsive_settings'] ?? [];
+                $element->animation = $snapshot['animation'] ?? null;
+                $element->effects = $snapshot['effects'] ?? null;
+                $element->column_size = $snapshot['column_size'] ?? 'col-12';
+                $element->css_classes = $snapshot['css_classes'] ?? null;
+                $element->css_id = $snapshot['css_id'] ?? null;
                 $element->save();
             }
 

@@ -33,7 +33,7 @@ class ImportHtmlJob implements ShouldQueue
 
         $converted = $htmlImport->convert($this->html, $this->title);
 
-        $page = $pageBuilder->importPage($converted);
+        $page = $pageBuilder->importPage($converted, $this->userId);
 
         $this->pageId = $page->id;
 

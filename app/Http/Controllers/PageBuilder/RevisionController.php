@@ -39,6 +39,7 @@ class RevisionController extends Controller
     public function restore(Page $page, Revision $revision): JsonResponse
     {
         $this->authorize('update', $page);
+        abort_unless((int) $revision->page_id === (int) $page->id, 404);
         $this->pageBuilder->restoreRevision($page, $revision);
 
         return response()->json([
@@ -50,6 +51,7 @@ class RevisionController extends Controller
     public function diff(Page $page, Revision $revision): JsonResponse
     {
         $this->authorize('view', $page);
+        abort_unless((int) $revision->page_id === (int) $page->id, 404);
         $previousRevision = Revision::where('page_id', $page->id)
             ->where('id', '<', $revision->id)
             ->orderBy('id', 'desc')

@@ -13,8 +13,15 @@ use App\Http\Controllers\PageBuilder\DynamicTagController;
 use App\Http\Controllers\PageBuilder\FindReplaceController;
 use App\Http\Controllers\PageBuilder\GlobalWidgetController;
 use App\Http\Controllers\PageBuilder\PopupController;
+use App\Http\Controllers\PageBuilder\ProjectController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
+    Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::post('projects/{project}/move', [ProjectController::class, 'move'])->name('projects.move');
+
     Route::resource('pages', PageController::class)->except(['show', 'edit']);
     Route::get('pages/{page}/editor', [PageController::class, 'edit'])->name('editor');
     Route::get('pages/{page}/render', [PageController::class, 'render'])->name('render');
@@ -58,7 +65,6 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::post('pages/{page}/revisions/prune', [RevisionController::class, 'prune'])->name('revisions.prune');
     Route::post('pages/{page}/revisions/auto-save', [RevisionController::class, 'autoSave'])->name('revisions.auto-save');
 
-    Route::post('pages/{page}/form/submit', [FormController::class, 'submit'])->name('form.submit')->middleware('throttle:form-submit');
     Route::get('pages/{page}/form/submissions', [FormController::class, 'submissions'])->name('form.submissions');
 
     Route::post('pages/{page}/collab/join', [CollaborationController::class, 'join'])->name('collab.join');
@@ -109,4 +115,8 @@ Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.'
     Route::put('popups/{popup}/conditions', [PopupController::class, 'updateConditions'])->name('popups.conditions.update');
     Route::post('popups/{popup}/publish', [PopupController::class, 'publish'])->name('popups.publish');
     Route::post('popups/{popup}/unpublish', [PopupController::class, 'unpublish'])->name('popups.unpublish');
+});
+
+Route::middleware(['web'])->prefix('page-builder')->name('page-builder.')->group(function () {
+    Route::post('pages/{page}/form/submit', [FormController::class, 'submit'])->name('form.submit')->middleware('throttle:form-submit');
 });

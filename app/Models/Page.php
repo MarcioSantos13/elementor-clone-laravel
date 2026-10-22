@@ -15,6 +15,8 @@ class Page extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',
+        'project_id',
         'title',
         'slug',
         'status',
@@ -33,6 +35,11 @@ class Page extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function elements(): HasMany

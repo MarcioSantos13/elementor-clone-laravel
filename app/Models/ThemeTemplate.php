@@ -13,6 +13,7 @@ class ThemeTemplate extends Model
 
     protected $fillable = [
         'user_id',
+        'project_id',
         'page_id',
         'title',
         'slug',
@@ -43,6 +44,11 @@ class ThemeTemplate extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function project(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Project::class);
     }
 
     public function page(): \Illuminate\Database\Eloquent\Relations\BelongsTo

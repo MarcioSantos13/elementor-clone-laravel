@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\PageBuilder;
 
 use App\Http\Controllers\Controller;
+use App\Models\Element;
 use App\Models\Page;
 use App\Services\PageBuilder\Core\CollaborationService;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +28,7 @@ class CollaborationController extends Controller
 
     public function leave(Request $request, Page $page): JsonResponse
     {
+        $this->authorize('view', $page);
         $this->collaboration->userLeftPage($page, $request->user());
 
         return response()->json(['message' => 'Left collaboration']);
@@ -34,6 +36,7 @@ class CollaborationController extends Controller
 
     public function heartbeat(Request $request, Page $page): JsonResponse
     {
+        $this->authorize('view', $page);
         $cursorPosition = $request->input('cursor_position');
         $this->collaboration->heartbeat($page, $request->user(), $cursorPosition);
 
@@ -53,6 +56,7 @@ class CollaborationController extends Controller
     public function lockElement(Request $request, Page $page, int $elementId): JsonResponse
     {
         $this->authorize('update', $page);
+        abort_unless(Element::where('id', $elementId)->where('page_id', $page->id)->exists(), 404);
         $locked = $this->collaboration->lockElement($page, $elementId, $request->user());
 
         if (!$locked) {
@@ -68,6 +72,8 @@ class CollaborationController extends Controller
 
     public function unlockElement(Request $request, Page $page, int $elementId): JsonResponse
     {
+        $this->authorize('update', $page);
+        abort_unless(Element::where('id', $elementId)->where('page_id', $page->id)->exists(), 404);
         $this->collaboration->unlockElement($page, $elementId, $request->user());
 
         return response()->json(['message' => 'Element unlocked']);

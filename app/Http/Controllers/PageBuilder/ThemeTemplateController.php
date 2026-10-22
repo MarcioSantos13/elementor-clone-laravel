@@ -36,17 +36,35 @@ class ThemeTemplateController extends Controller
         $this->themeService = $themeService;
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $templates = ThemeTemplate::ordered()->with('user', 'page')->get();
+        $user = auth()->user();
+        $projectId = $request->integer('project') ?: null;
+
+        $templates = ThemeTemplate::ordered()
+            ->with('user', 'page')
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->when($projectId, fn ($query) => $query->where('project_id', $projectId))
+            ->get();
         $grouped = $templates->groupBy('type');
-        return view('page-builder.theme-templates.index', compact('templates', 'grouped'));
+
+        $projects = \App\Models\Project::query()
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->orderByDesc('is_default')
+            ->orderBy('name')
+            ->get();
+
+        return view('page-builder.theme-templates.index', compact('templates', 'grouped', 'projects', 'projectId'));
     }
 
     public function create(): View
     {
+        $user = auth()->user();
         $types = ThemeTemplate::typeOptions();
-        $pages = Page::select('id', 'title')->orderBy('title')->get();
+        $pages = Page::select('id', 'title')
+            ->when(!$user->isAdmin(), fn ($query) => $query->where('user_id', $user->id))
+            ->orderBy('title')
+            ->get();
         $themeTemplates = $this->templateManager->themeTemplateList();
         return view('page-builder.theme-templates.create', compact('types', 'pages', 'themeTemplates'));
     }
@@ -68,6 +86,7 @@ class ThemeTemplateController extends Controller
             $page = null;
             if (!empty($validated['page_id'])) {
                 $page = Page::findOrFail($validated['page_id']);
+                $this->authorizeOwner($page);
             } else {
                 $pageData = [
                     'title' => $validated['title'] . ' (' . ($validated['type'] ?? 'template') . ')',
@@ -85,6 +104,7 @@ class ThemeTemplateController extends Controller
 
             $template = ThemeTemplate::create([
                 'user_id' => $user->id,
+                'project_id' => $page->project_id,
                 'page_id' => $page->id,
                 'title' => $validated['title'],
                 'slug' => $slug,
@@ -115,6 +135,7 @@ class ThemeTemplateController extends Controller
 
     public function edit(ThemeTemplate $themeTemplate): View
     {
+        $this->authorizeOwner($themeTemplate);
         $types = ThemeTemplate::typeOptions();
         $pages = Page::select('id', 'title')->orderBy('title')->get();
         return view('page-builder.theme-templates.create', compact('themeTemplate', 'types', 'pages'));
@@ -122,6 +143,7 @@ class ThemeTemplateController extends Controller
 
     public function update(Request $request, ThemeTemplate $themeTemplate): RedirectResponse
     {
+        $this->authorizeOwner($themeTemplate);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|string|in:' . implode(',', ThemeTemplate::types()),
@@ -145,6 +167,7 @@ class ThemeTemplateController extends Controller
 
     public function destroy(ThemeTemplate $themeTemplate): RedirectResponse
     {
+        $this->authorizeOwner($themeTemplate);
         $title = $themeTemplate->title;
         $themeTemplate->delete();
 
@@ -156,6 +179,7 @@ class ThemeTemplateController extends Controller
 
     public function editor(ThemeTemplate $themeTemplate): View
     {
+        $this->authorizeOwner($themeTemplate);
         $page = $themeTemplate->page;
         if (!$page) {
             abort(404, 'Associated page not found');
@@ -175,11 +199,13 @@ class ThemeTemplateController extends Controller
 
     public function editConditions(ThemeTemplate $themeTemplate): View
     {
+        $this->authorizeOwner($themeTemplate);
         return view('page-builder.theme-templates.conditions', compact('themeTemplate'));
     }
 
     public function getConditions(ThemeTemplate $themeTemplate): JsonResponse
     {
+        $this->authorizeOwner($themeTemplate);
         return response()->json([
             'conditions' => $themeTemplate->conditions ?? [],
             'options' => ThemeService::conditionOptions(),
@@ -193,6 +219,7 @@ class ThemeTemplateController extends Controller
 
     public function updateConditions(Request $request, ThemeTemplate $themeTemplate): JsonResponse
     {
+        $this->authorizeOwner($themeTemplate);
         $validated = $request->validate([
             'conditions' => 'nullable|array',
             'conditions.*.type' => 'required|string',
@@ -213,6 +240,7 @@ class ThemeTemplateController extends Controller
 
     public function publish(ThemeTemplate $themeTemplate): JsonResponse
     {
+        $this->authorizeOwner($themeTemplate);
         $themeTemplate->update([
             'status' => 'published',
             'published_at' => now(),
@@ -228,6 +256,7 @@ class ThemeTemplateController extends Controller
 
     public function unpublish(ThemeTemplate $themeTemplate): JsonResponse
     {
+        $this->authorizeOwner($themeTemplate);
         $themeTemplate->update([
             'status' => 'draft',
             'published_at' => null,
@@ -243,6 +272,7 @@ class ThemeTemplateController extends Controller
 
     public function render(ThemeTemplate $themeTemplate): \Illuminate\Http\Response
     {
+        $this->authorizeOwner($themeTemplate);
         $html = $this->renderer->render($themeTemplate->page, [
             'with_container' => request('format') !== 'inner',
             'theme' => 'theme-template-' . $themeTemplate->type,

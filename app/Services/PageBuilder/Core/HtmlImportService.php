@@ -2,6 +2,7 @@
 
 namespace App\Services\PageBuilder\Core;
 
+use App\Services\PageBuilder\Security\HtmlSanitizer;
 use Illuminate\Support\Facades\Http;
 
 class HtmlImportService
@@ -21,29 +22,112 @@ class HtmlImportService
 
     public function fetchUrl(string $url): string
     {
+        $currentUrl = $url;
+
+        for ($attempt = 0; $attempt <= 3; $attempt++) {
+            $this->assertSafeUrl($currentUrl);
+
+            $response = Http::timeout(15)
+                ->withOptions([
+                    'allow_redirects' => false,
+                ])
+                ->withUserAgent('Mozilla/5.0 (compatible; PageBuilder/1.0)')
+                ->get($currentUrl);
+
+            if ($response->redirect()) {
+                $location = $response->header('Location');
+                if (!$location) {
+                    throw new \RuntimeException('Redirecionamento inválido.');
+                }
+
+                $currentUrl = $this->resolveRedirectUrl($currentUrl, $location);
+                continue;
+            }
+
+            if ($response->failed()) {
+                throw new \RuntimeException('Não foi possível acessar a URL fornecida.');
+            }
+
+            $html = $response->body();
+
+            if (strlen($html) > $this->maxSize) {
+                throw new \RuntimeException('O conteúdo excede o tamanho máximo de 500KB.');
+            }
+
+            return $html;
+        }
+
+        throw new \RuntimeException('Número máximo de redirecionamentos excedido.');
+    }
+
+    private function assertSafeUrl(string $url): void
+    {
         $parsed = parse_url($url);
-        if (!$parsed || !in_array($parsed['scheme'] ?? '', ['http', 'https'])) {
+        $scheme = strtolower($parsed['scheme'] ?? '');
+
+        if (!$parsed || !in_array($scheme, ['http', 'https']) || empty($parsed['host'])) {
             throw new \InvalidArgumentException('URL inválida. Apenas http/https são permitidos.');
         }
 
-        $response = Http::timeout(15)
-            ->withOptions([
-                'allow_redirects' => ['max' => 3],
-            ])
-            ->withUserAgent('Mozilla/5.0 (compatible; PageBuilder/1.0)')
-            ->get($url);
+        $host = strtolower(trim($parsed['host'], '[]'));
 
-        if ($response->failed()) {
-            throw new \RuntimeException('Não foi possível acessar a URL fornecida.');
+        if ($host === 'localhost' || str_ends_with($host, '.local') || str_ends_with($host, '.internal')) {
+            throw new \InvalidArgumentException('Host não permitido.');
         }
 
-        $html = $response->body();
+        $ips = [];
 
-        if (strlen($html) > $this->maxSize) {
-            throw new \RuntimeException('O conteúdo excede o tamanho máximo de 500KB.');
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips[] = $host;
+        } else {
+            $ipv4 = gethostbynamel($host);
+            if ($ipv4 === false) {
+                throw new \RuntimeException('Não foi possível resolver o host informado.');
+            }
+            $ips = array_merge($ips, $ipv4);
+
+            $ipv6Records = @dns_get_record($host, DNS_AAAA);
+            if (is_array($ipv6Records)) {
+                foreach ($ipv6Records as $record) {
+                    if (!empty($record['ipv6'])) {
+                        $ips[] = $record['ipv6'];
+                    }
+                }
+            }
         }
 
-        return $html;
+        foreach (array_unique($ips) as $ip) {
+            $ip = preg_replace('/%.*$/', '', $ip);
+
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                throw new \InvalidArgumentException('O host informado aponta para uma rede não permitida.');
+            }
+        }
+    }
+
+    private function resolveRedirectUrl(string $baseUrl, string $location): string
+    {
+        if (preg_match('#^https?://#i', $location)) {
+            return $location;
+        }
+
+        $base = parse_url($baseUrl);
+        $scheme = $base['scheme'] ?? 'https';
+        $host = $base['host'] ?? '';
+        $port = isset($base['port']) ? ':' . $base['port'] : '';
+
+        if (str_starts_with($location, '//')) {
+            return $scheme . ':' . $location;
+        }
+
+        if (str_starts_with($location, '/')) {
+            return $scheme . '://' . $host . $port . $location;
+        }
+
+        $path = $base['path'] ?? '/';
+        $directory = rtrim(dirname($path), '/');
+
+        return $scheme . '://' . $host . $port . $directory . '/' . ltrim($location, '/');
     }
 
     public function convert(string $html, string $fallbackTitle = 'Página Importada'): array
@@ -85,14 +169,52 @@ class HtmlImportService
         }
 
         return [
-            'title' => $title,
+            'title' => strip_tags($title),
             'settings' => [
                 'container_width' => '1140px',
                 'page_background' => '#ffffff',
                 'content_padding' => '0px',
             ],
-            'elements' => $elements,
+            'elements' => $this->sanitizeElements($elements),
         ];
+    }
+
+    private function sanitizeElements(array $elements): array
+    {
+        foreach ($elements as $index => $element) {
+            if (isset($element['settings']) && is_array($element['settings'])) {
+                $elements[$index]['settings'] = $this->sanitizeValue($element['settings']);
+            }
+
+            if (isset($element['styles']) && is_array($element['styles'])) {
+                $elements[$index]['styles'] = $this->sanitizeValue($element['styles']);
+            }
+
+            if (isset($element['content'])) {
+                $elements[$index]['content'] = $this->sanitizeValue($element['content']);
+            }
+
+            if (isset($element['children']) && is_array($element['children'])) {
+                $elements[$index]['children'] = $this->sanitizeElements($element['children']);
+            }
+        }
+
+        return $elements;
+    }
+
+    private function sanitizeValue(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return HtmlSanitizer::sanitize($value);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->sanitizeValue($item);
+            }
+        }
+
+        return $value;
     }
 
     private function preProcess(string $html): string
@@ -401,9 +523,27 @@ class HtmlImportService
         return $this->makeText('<pre style="background:#f1f5f9;padding:1rem;border-radius:6px;overflow-x:auto;font-size:.85rem"><code>'.$content.'</code></pre>');
     }
 
+    private function isSafeHref(string $href): bool
+    {
+        $href = trim(html_entity_decode($href, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+        if ($href === '') {
+            return true;
+        }
+
+        if (preg_match('/^[#\/?]/', $href)) {
+            return true;
+        }
+
+        return (bool) preg_match('/^(https?:|mailto:|tel:)/i', $href);
+    }
+
     private function convertLink(\DOMElement $el): array
     {
         $href = $el->getAttribute('href');
+        if (!$this->isSafeHref($href)) {
+            $href = '#';
+        }
         $text = trim($el->textContent);
         if (empty($text)) return [];
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PageBuilder;
 use App\Http\Controllers\Controller;
 use App\Models\Element;
 use App\Models\Page;
+use App\Services\PageBuilder\Security\HtmlSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,7 @@ class FindReplaceController extends Controller
         $request->validate(['query' => 'required|string|min:1']);
         $query = $request->input('query');
         $pageId = $request->input('page_id');
+        $user = $request->user();
 
         $elementsQuery = Element::query()
             ->where(function ($q) use ($query) {
@@ -26,7 +28,11 @@ class FindReplaceController extends Controller
             });
 
         if ($pageId) {
-            $elementsQuery->where('page_id', $pageId);
+            $page = Page::findOrFail($pageId);
+            $this->authorize('view', $page);
+            $elementsQuery->where('page_id', $page->id);
+        } elseif (!$user->isAdmin()) {
+            $elementsQuery->whereHas('page', fn ($q) => $q->where('user_id', $user->id));
         }
 
         $results = $elementsQuery->limit(100)->get()->map(function ($el) {
@@ -48,8 +54,12 @@ class FindReplaceController extends Controller
             ];
         });
 
-        $pages = Page::where('title', 'like', "%{$query}%")
-            ->orWhere('slug', 'like', "%{$query}%")
+        $pages = Page::query()
+            ->when(!$user->isAdmin(), fn ($q) => $q->where('user_id', $user->id))
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('slug', 'like', "%{$query}%");
+            })
             ->limit(20)->get(['id', 'title', 'slug']);
 
         return response()->json([
@@ -70,10 +80,15 @@ class FindReplaceController extends Controller
         $find = $request->input('find');
         $replace = $request->input('replace', '');
         $pageId = $request->input('page_id');
+        $user = $request->user();
 
         $elementsQuery = Element::query();
         if ($pageId) {
-            $elementsQuery->where('page_id', $pageId);
+            $page = Page::findOrFail($pageId);
+            $this->authorize('update', $page);
+            $elementsQuery->where('page_id', $page->id);
+        } elseif (!$user->isAdmin()) {
+            $elementsQuery->whereHas('page', fn ($q) => $q->where('user_id', $user->id));
         }
 
         $count = 0;
@@ -119,7 +134,7 @@ class FindReplaceController extends Controller
     protected function arrayStrReplace($find, $replace, $data)
     {
         if (is_string($data)) {
-            return str_ireplace($find, $replace, $data);
+            return HtmlSanitizer::sanitize(str_ireplace($find, $replace, $data));
         }
         if (is_array($data)) {
             foreach ($data as $key => $value) {

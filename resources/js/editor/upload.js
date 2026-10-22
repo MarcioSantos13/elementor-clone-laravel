@@ -4,6 +4,7 @@ import { showToast, toastSuccess, toastError, apiFetch } from './utils.js';
 export function uploadImageFile(file, callback) {
     const formData = new FormData();
     formData.append('image', file);
+    formData.append('page_id', state.pageId);
     showToast('Enviando imagem...', 'info');
     apiFetch('/page-builder/upload', {
         method: 'POST',
@@ -20,6 +21,7 @@ export function uploadImageFile(file, callback) {
 export function uploadVideoFile(file, callback) {
     const formData = new FormData();
     formData.append('video', file);
+    formData.append('page_id', state.pageId);
     showToast('Enviando video...', 'info');
     apiFetch('/page-builder/upload-video', {
         method: 'POST',

@@ -16,12 +16,32 @@ class ElementManager
         $this->widgetManager = $widgetManager;
     }
 
-    public function create(Page $page, string $widgetType, array $settings = [], ?int $parentId = null): Element
+    public function create(Page $page, string $widgetType, array $settings = [], ?int $parentId = null, ?int $insertBeforeId = null): Element
     {
         $widget = $this->widgetManager->getWidget($widgetType);
 
         if (!$widget) {
             throw new \InvalidArgumentException("Widget type '{$widgetType}' not found");
+        }
+
+        $insertBefore = null;
+
+        if ($insertBeforeId) {
+            $insertBefore = Element::where('id', $insertBeforeId)->where('page_id', $page->id)->first();
+            if ($insertBefore) {
+                $parentId = $insertBefore->parent_id;
+            }
+        }
+
+        $order = $insertBefore
+            ? $insertBefore->order
+            : $this->getNextOrder($page, $parentId);
+
+        if ($insertBefore) {
+            Element::where('page_id', $page->id)
+                ->where('parent_id', $parentId)
+                ->where('order', '>=', $order)
+                ->increment('order');
         }
 
         $element = new Element();
@@ -31,7 +51,7 @@ class ElementManager
         $element->settings = array_merge($widget->getDefaultSettings(), $settings);
         $element->content = [];
         $element->styles = [];
-        $element->order = $this->getNextOrder($page, $parentId);
+        $element->order = $order;
 
         if ($parentId) {
             $element->parent_id = $parentId;
