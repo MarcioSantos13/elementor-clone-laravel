@@ -54,14 +54,26 @@ class TextWidget extends BaseWidget
         $settings = $this->prepareSettings($settings);
         $text = $settings['content'];
         $alignment = $settings['alignment'];
-        $color = $settings['color'];
-        $fontSize = $settings['font_size'];
-        $fontWeight = $settings['font_weight'];
-        $lineHeight = $settings['line_height'];
-        $fontFamily = $settings['font_family'];
+        $color = $settings['color'] ?? '';
+        $fontSize = $settings['font_size'] ?? '';
+        $fontWeight = $settings['font_weight'] ?? '';
+        $lineHeight = $settings['line_height'] ?? '';
+        $fontFamily = $settings['font_family'] ?? '';
         $children = $content['children'] ?? '';
 
-        $style = "text-align: {$this->safeCssValue($alignment)}; color: {$this->safeCssValue($color)}; font-size: {$this->safeCssValue($fontSize)}; font-weight: {$this->safeCssValue($fontWeight)}; line-height: {$this->safeCssValue($lineHeight)};";
+        $style = "text-align: {$this->safeCssValue($alignment)};";
+        if ($color) {
+            $style .= " color: {$this->safeCssValue($color)};";
+        }
+        if ($fontSize) {
+            $style .= " font-size: {$this->safeCssValue($fontSize)};";
+        }
+        if ($fontWeight) {
+            $style .= " font-weight: {$this->safeCssValue($fontWeight)};";
+        }
+        if ($lineHeight) {
+            $style .= " line-height: {$this->safeCssValue($lineHeight)};";
+        }
 
         if ($fontFamily) {
             $style .= " font-family: {$this->safeCssValue($fontFamily)};";
@@ -87,14 +99,26 @@ class TextWidget extends BaseWidget
         $settings = $this->prepareSettings($settings);
         $text = $settings['content'];
         $alignment = $settings['alignment'];
-        $color = $settings['color'];
-        $fontSize = $settings['font_size'];
-        $fontWeight = $settings['font_weight'];
-        $lineHeight = $settings['line_height'];
-        $fontFamily = $settings['font_family'];
+        $color = $settings['color'] ?? '';
+        $fontSize = $settings['font_size'] ?? '';
+        $fontWeight = $settings['font_weight'] ?? '';
+        $lineHeight = $settings['line_height'] ?? '';
+        $fontFamily = $settings['font_family'] ?? '';
         $children = $content['children'] ?? '';
 
-        $style = "text-align: {$this->safeCssValue($alignment)}; color: {$this->safeCssValue($color)}; font-size: {$this->safeCssValue($fontSize)}; font-weight: {$this->safeCssValue($fontWeight)}; line-height: {$this->safeCssValue($lineHeight)};";
+        $style = "text-align: {$this->safeCssValue($alignment)};";
+        if ($color) {
+            $style .= " color: {$this->safeCssValue($color)};";
+        }
+        if ($fontSize) {
+            $style .= " font-size: {$this->safeCssValue($fontSize)};";
+        }
+        if ($fontWeight) {
+            $style .= " font-weight: {$this->safeCssValue($fontWeight)};";
+        }
+        if ($lineHeight) {
+            $style .= " line-height: {$this->safeCssValue($lineHeight)};";
+        }
 
         if ($fontFamily) {
             $style .= " font-family: {$this->safeCssValue($fontFamily)};";

@@ -21,25 +21,35 @@ export function _colorInput(key, value, saveFn, elementId) {
     row1.style.cssText = 'display:flex;gap:.35rem;align-items:center';
 
     const swatch = document.createElement('div');
-    swatch.style.cssText = 'width:32px;height:32px;border-radius:6px;border:2px solid var(--pb-border);cursor:pointer;background:' + (value || '#000000') + ';flex-shrink:0';
+    swatch.style.cssText = 'width:32px;height:32px;border-radius:6px;border:2px solid var(--pb-border);cursor:pointer;background:' + (value ? value : 'transparent') + ';flex-shrink:0' + (value ? '' : ';background-image:linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);background-size:8px 8px;background-position:0 0,0 4px,4px -4px,-4px 0px');
 
     const inp = document.createElement('input');
-    inp.type = 'color'; inp.id = 'ctrl-' + key; inp.value = value || '#000000';
+    inp.type = 'color'; inp.id = 'ctrl-' + key; inp.value = (value && /^#[0-9a-f]{3,8}$/i.test(value)) ? value : '#000000';
     inp.style.cssText = 'width:0;height:0;padding:0;border:none;opacity:0;position:absolute;pointer-events:none';
 
     const txt = document.createElement('input');
-    txt.type = 'text'; txt.value = value || '#000000';
-    txt.placeholder = '#000000';
+    txt.type = 'text'; txt.value = value || '';
+    txt.placeholder = '#000000 ou nome da cor';
     txt.dataset.fk = key;
     txt.style.cssText = 'flex:1;padding:.4rem .55rem;background:var(--pb-surface2);border:1px solid var(--pb-border);border-radius:6px;color:var(--pb-text);font-size:.78rem;font-family:monospace';
 
     const update = (v) => {
-        const color = v || '#000000';
-        inp.value = color;
-        txt.value = color;
-        swatch.style.background = color;
+        const color = v === '' ? '' : (v || '#000000');
+        if (color === '') {
+            inp.value = '#000000';
+            txt.value = '';
+            swatch.style.background = 'transparent';
+            swatch.style.backgroundImage = 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)';
+            swatch.style.backgroundSize = '8px 8px';
+            swatch.style.backgroundPosition = '0 0, 0 4px, 4px -4px, -4px 0px';
+        } else {
+            inp.value = color;
+            txt.value = color;
+            swatch.style.backgroundImage = 'none';
+            swatch.style.background = color;
+        }
         saveFn(key, color);
-        addRecentColor(color);
+        if (color) addRecentColor(color);
     };
 
     swatch.onclick = () => inp.click();
@@ -47,8 +57,15 @@ export function _colorInput(key, value, saveFn, elementId) {
         update(e.target.value);
     };
     txt.oninput = (e) => {
-        if (/^#[0-9a-f]{3,8}$/i.test(e.target.value)) update(e.target.value);
-        else swatch.style.background = e.target.value;
+        const v = e.target.value;
+        if (/^#[0-9a-f]{3,8}$/i.test(v) || /^rgba?\(|^hsla?\(|^[a-z]+$/i.test(v)) {
+            if (v) { swatch.style.backgroundImage = 'none'; swatch.style.background = v; } else { swatch.style.backgroundImage = 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)'; swatch.style.backgroundSize = '8px 8px'; swatch.style.backgroundPosition = '0 0, 0 4px, 4px -4px, -4px 0px'; swatch.style.background = 'transparent'; }
+            if (/^#[0-9a-f]{3,8}$/i.test(v)) inp.value = v.length === 4 ? '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3] : v;
+            saveFn(key, v);
+            if (v && /^#[0-9a-f]{6}$/i.test(v)) addRecentColor(v);
+        } else {
+            swatch.style.backgroundImage = 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)'; swatch.style.backgroundSize = '8px 8px'; swatch.style.backgroundPosition = '0 0, 0 4px, 4px -4px, -4px 0px'; swatch.style.background = 'transparent';
+        }
     };
 
     row1.appendChild(swatch);
