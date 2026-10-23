@@ -392,6 +392,24 @@ class PageController extends Controller
             'theme' => request('theme', 'default'),
         ]);
 
+        if (request('format') === 'inner') {
+            $appUrl = rtrim(config('app.url') ?: url('/'), '/');
+            $html = preg_replace_callback(
+                '/(src|href)=(["\'])(\/(?:storage|uploads)[^"\']*)\2/i',
+                function ($matches) use ($appUrl) {
+                    return $matches[1] . '=' . $matches[2] . $appUrl . $matches[3] . $matches[2];
+                },
+                $html
+            );
+            $html = preg_replace_callback(
+                '/url\((["\']?)(\/(?:storage|uploads)[^)"\']*)\1\)/i',
+                function ($matches) use ($appUrl) {
+                    return 'url(' . $matches[1] . $appUrl . $matches[2] . $matches[1] . ')';
+                },
+                $html
+            );
+        }
+
         return response($html)
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
