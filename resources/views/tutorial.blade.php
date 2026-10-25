@@ -17,13 +17,13 @@
             <a href="#auth">Criar Conta &amp; Acessar</a>
             <a href="#create-page">Criar uma Página</a>
             <a href="#build-from-zero">Construir do Zero (Passo a Passo)</a>
-            <a href="#editor">O Editor</a>
-            <a href="#drag-widgets">Adicionar Widgets</a>
+            <a href="#editor">Conhecendo o Novo Editor</a>
+            <a href="#drag-widgets">Inserir Elementos</a>
             <a href="#educational-widgets">Widgets Educacionais</a>
-            <a href="#select-settings">Editar Configurações</a>
+            <a href="#select-settings">Editar Propriedades</a>
             <a href="#page-settings">Configurações da Página &amp; Site</a>
             <a href="#responsive">Visualização Responsiva</a>
-            <a href="#templates">Templates &amp; Save as Template</a>
+            <a href="#templates">Modelos &amp; Salvar como Modelo</a>
             <a href="#undo-redo">Desfazer, Refazer &amp; Revisões</a>
             <a href="#save-publish">Salvar &amp; Publicar</a>
             <a href="#preview">Visualizar Página</a>
@@ -700,23 +700,23 @@ php artisan serve</code></pre>
 
         {{-- THE EDITOR --}}
         <section id="editor" class="step">
-            <h2>4. O Editor</h2>
+            <h2>4. Conhecendo o Novo Editor</h2>
             <div class="step-body">
-                <p>O editor é uma interface em tela cheia com tema escuro. Ele carrega ao acessar <code>/page-builder/pages/{id}/editor</code>. A URL do canvas é acessível publicamente.</p>
+                <p>O editor foi redesenhado com uma interface mais limpa e fluida, inspirada no <strong>Articulate Storyline/Rise</strong>. Agora é mais fácil focar no conteúdo, com menos distrações. Ele carrega ao acessar <code>/page-builder/pages/{id}/editor</code>.</p>
                 <div class="panel-layout-ill">
-                    <div class="panel-ill left"><strong>Widgets</strong><br><span style="font-size:.75rem">arraste itens para a tela</span></div>
-                    <div class="panel-ill center"><strong>Canvas</strong><br><span style="font-size:.75rem">prévia ao vivo da sua página</span></div>
-                    <div class="panel-ill right"><strong>Configurações</strong><br><span style="font-size:.75rem">opções do elemento selecionado</span></div>
+                    <div class="panel-ill left"><strong>Inserir / Camadas</strong><br><span style="font-size:.75rem">elementos e hierarquia</span></div>
+                    <div class="panel-ill center"><strong>Canvas</strong><br><span style="font-size:.75rem">prévia limpa ao vivo</span></div>
+                    <div class="panel-ill right"><strong>Propriedades</strong><br><span style="font-size:.75rem">estilo e configurações</span></div>
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Esquerdo — Widgets</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Painel Esquerdo — Inserir, Camadas, Estrutura e Modelos</h3>
                 <ul>
-                    <li>Lista os 30 widgets disponíveis: Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie</li>
-                    <li><strong>Barra de busca</strong> — digite para filtrar widgets por nome (ex: "título", "imagem", "form")</li>
-                    <li>Cada widget mostra um ícone (emoji) e nome</li>
-                    <li>O painel é sempre visível e tem 4 abas: <strong>Widgets</strong>, <strong>Navigator</strong>, <strong>Estrutura</strong> e <strong>Layouts</strong></li>
-                    <li><strong>Arraste</strong> um widget do painel para o canvas para adicioná-lo (suporte a Drop Indicator com SortableJS)</li>
-                    <li><strong>Painéis redimensionáveis</strong> — arraste a borda entre o painel e o canvas para ajustar largura (200px–500px)</li>
+                    <li><strong>Inserir</strong> — Lista os elementos disponíveis em grupos organizados (Layout, Básicos, Interativo, Educacional). Arraste e solte direto no canvas.</li>
+                    <li><strong>Camadas</strong> — Árvore unificada com hierarquia Seção → Coluna → Widget. Ótimo para navegar e reorganizar rapidamente.</li>
+                    <li><strong>Estrutura</strong> — Visão alternativa da hierarquia para inspeção rápida.</li>
+                    <li><strong>Modelos</strong> — Acesso rápido a modelos e blocos prontos.</li>
+                    <li><strong>Busca</strong> — Digite para filtrar elementos instantaneamente.</li>
+                    <li><strong>Painéis redimensionáveis</strong> — Ajuste a largura dos painéis conforme seu fluxo de trabalho.</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Centro — Canvas</h3>
@@ -743,15 +743,13 @@ php artisan serve</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Barra Superior</h3>
                 <table class="widget-table">
                     <tr><th>Grupo</th><th>Botões</th><th>Função</th></tr>
-                    <tr><td>Navegação</td><td>← Voltar + título</td><td>Voltar à listagem e mostrar o status (draft / publicado)</td></tr>
-                    <tr><td>Responsivo</td><td>🖥️ 📱 📲</td><td>Desktop (100%), Tablet (768px), Mobile (375px)</td></tr>
-                    <tr><td>Ações</td><td>Desfazer / Refazer</td><td>Ctrl+Z / Ctrl+Shift+Z (máximo 50 estados)</td></tr>
-                    <tr><td>Find &amp; Replace</td><td>🔍 Find</td><td>Busca e substituição de texto nos elementos da página</td></tr>
-                    <tr><td>Site</td><td>⚙️ Site Settings</td><td>Configurações globais (cores, fontes)</td></tr>
-                    <tr><td>Revisões</td><td>📋 Revisões</td><td>Histórico de revisões com diff visual</td></tr>
-                    <tr><td>Template</td><td>📦 Template</td><td>Salvar página como template JSON</td></tr>
-                    <tr><td>Salvar</td><td>💾 Salvar</td><td>Salva como rascunho (sem publicar)</td></tr>
-                    <tr><td>Publicar</td><td>🚀 Publicar</td><td>Muda status para "publicado"</td></tr>
+                    <tr><td>Navegação</td><td>← Páginas / Temas + título + status</td><td>Voltar à listagem e visualizar status (Rascunho / Publicado)</td></tr>
+                    <tr><td>Histórico</td><td>Desfazer / Refazer</td><td>Ctrl+Z / Ctrl+Shift+Z (máximo 50 estados)</td></tr>
+                    <tr><td>Responsivo</td><td>Desktop / Tablet / Mobile</td><td>Alterna visualização com frame limpo por dispositivo</td></tr>
+                    <tr><td>Zoom &amp; Tela Cheia</td><td>+ / - / 100% / Tela Cheia</td><td>Controle de zoom (25%-200%) e modo sem distrações</td></tr>
+                    <tr><td>Ferramentas</td><td>Página / Site / Revisões / Localizar</td><td>Configurações globais, histórico e busca/substituição</td></tr>
+                    <tr><td>Utilitários</td><td>Visualizar / Exportar / Salvar como Modelo / Importar HTML</td><td>Ações complementares organizadas em grupo</td></tr>
+                    <tr><td>Ações Primárias</td><td>Salvar / Publicar</td><td>Salvar rascunho ou publicar a página</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Carregamento do Editor</h3>
@@ -767,23 +765,24 @@ php artisan serve</code></pre>
 
         {{-- ADDING WIDGETS --}}
         <section id="drag-widgets" class="step">
-            <h2>5. Adicionar Widgets (Arrastar &amp; Soltar)</h2>
+            <h2>5. Inserir Elementos (Arrastar &amp; Soltar)</h2>
             <div class="step-body">
-                <p>O editor usa <strong>SortableJS</strong> (mesma biblioteca do Elementor real) para um drag-and-drop fluido e preciso. Arraste qualquer widget do painel esquerdo e solte exatamente onde deseja no canvas. Indicadores visuais mostram onde o elemento será inserido.</p>
-                <p>Cada widget adiciona um tipo diferente de conteúdo. Veja o que cada um faz e suas configurações disponíveis:</p>
+                <p>O editor usa <strong>SortableJS</strong> para um arrastar e soltar fluido e preciso. Abra a aba <strong>Inserir</strong> no painel esquerdo, arraste o elemento desejado e solte no local exato do canvas. Indicadores sutis mostram onde ele será inserido.</p>
+                <p>Cada elemento adiciona um tipo diferente de conteúdo. Veja o que cada um faz e suas configurações disponíveis:</p>
 
-                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Visão Geral dos Widgets</h3>
+                <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Visão Geral dos Elementos</h3>
                 <table class="widget-table">
-                    <tr><th>Widget</th><th>O que cria</th><th>Total de controles</th></tr>
+                    <tr><th>Elemento</th><th>O que cria</th><th>Total de controles</th></tr>
                     <tr><td><strong>Título (Heading)</strong></td><td>Um título grande (&lt;h1&gt;–&lt;h6&gt;) com tag, texto, alinhamento e cor configuráveis</td><td>8</td></tr>
                     <tr><td><strong>Texto</strong></td><td>Um parágrafo ou bloco de texto com conteúdo rich-text (WYSIWYG), imagens, vídeos e listas</td><td>7</td></tr>
                     <tr><td><strong>Imagem</strong></td><td>Uma imagem com URL, texto alternativo e largura configuráveis</td><td>7</td></tr>
                     <tr><td><strong>Botão</strong></td><td>Um botão clicável com texto, URL, alinhamento e cor configuráveis</td><td>8</td></tr>
-                    <tr><td><strong>Seção</strong></td><td>Um contêiner estrutural (linha de largura total). Você coloca Colunas ou outros widgets dentro dela</td><td>16</td></tr>
+                    <tr><td><strong>Seção</strong></td><td>Um contêiner estrutural. Você coloca Colunas ou outros elementos dentro dela</td><td>16</td></tr>
                     <tr><td><strong>Coluna</strong></td><td>Uma coluna vertical dentro de uma Seção. Controla largura, alinhamento, padding, fundo</td><td>10</td></tr>
-                    <tr><td><strong>Callout</strong></td><td>Caixa de destaque educacional com 9 tipos (info, success, warning, danger, tip, definition, theorem, exercise, note)</td><td>7</td></tr>
-                    <tr><td><strong>Table</strong></td><td>Tabela HTML estilizada com cabeçalho, linhas alternadas e bordas configuráveis</td><td>9</td></tr>
-                    <tr><td><strong>Math</strong></td><td>Fórmula matemática LaTeX renderizada via KaTeX</td><td>8</td></tr>
+                    <tr><td><strong>Seção Interna</strong></td><td>Permite criar colunas aninhadas dentro de uma coluna existente</td><td>10</td></tr>
+                    <tr><td><strong>Destaque (Callout)</strong></td><td>Caixa de destaque com 9 tipos (info, success, warning, danger, tip, definition, theorem, exercise, note)</td><td>7</td></tr>
+                    <tr><td><strong>Tabela</strong></td><td>Tabela HTML estilizada com cabeçalho, linhas alternadas e bordas configuráveis</td><td>9</td></tr>
+                    <tr><td><strong>Fórmula Matemática</strong></td><td>Fórmula matemática LaTeX renderizada via KaTeX</td><td>8</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Título (Heading)</h3>
@@ -920,11 +919,11 @@ php artisan serve</code></pre>
 
         {{-- EDUCATIONAL WIDGETS --}}
         <section id="educational-widgets" class="step">
-            <h2>5b. Widgets Educacionais</h2>
+            <h2>5b. Elementos Educacionais</h2>
             <div class="step-body">
-                <p>Além dos widgets básicos, o Page Builder inclui widgets especiais para conteúdo educacional, disponíveis no grupo <strong>"Educacional"</strong> no painel esquerdo:</p>
+                <p>Além dos elementos básicos, o Page Builder inclui elementos especiais para conteúdo educacional, disponíveis no grupo <strong>"Educacional"</strong> na aba <strong>Inserir</strong> do painel esquerdo:</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Callout (Caixa de Destaque)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Destaque (Callout)</h3>
                 <p>Caixas coloridas para destacar informações importantes no conteúdo. Perfeitas para definições, teoremas, exercícios, avisos e dicas.</p>
                 <table class="widget-table">
                     <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
@@ -958,7 +957,7 @@ php artisan serve</code></pre>
                     <strong>&#128161; Dica:</strong> Para criar a tabela, insira o HTML básico no editor WYSIWYG. Exemplo: <code>&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Nome&lt;/th&gt;&lt;th&gt;Nota&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;João&lt;/td&gt;&lt;td&gt;8.5&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;</code>
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Math (Fórmula Matemática)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Fórmula Matemática (Math)</h3>
                 <p>Fórmulas matemáticas em LaTeX, renderizadas via <a href="https://katex.org" target="_blank">KaTeX</a>. Suporta display mode (centralizado e maior) e inline mode.</p>
                 <table class="widget-table">
                     <tr><th>Controle</th><th>Tipo</th><th>Opções</th></tr>
@@ -1211,19 +1210,19 @@ php artisan serve</code></pre>
 
         {{-- EDITING WIDGET SETTINGS --}}
         <section id="select-settings" class="step">
-            <h2>6. Selecionar &amp; Editar Configurações</h2>
+            <h2>6. Selecionar &amp; Editar Propriedades</h2>
             <div class="step-body">
                 <ol>
-                    <li><strong>Clique</strong> em qualquer elemento no canvas — ele ganha uma borda azul indicando que está selecionado</li>
-                    <li>O <strong>painel direito</strong> é atualizado para mostrar todas as configurações editáveis daquele widget</li>
-                    <li>Cada widget expõe seus próprios controles (ex.: Título tem <em>Nível</em>, <em>Texto</em>, <em>Alinhamento</em>, <em>Cor</em>)</li>
+                    <li><strong>Clique</strong> em qualquer elemento no canvas — ele ganha um destaque azul indicando que está selecionado</li>
+                    <li>O <strong>painel direito</strong> é atualizado para mostrar todas as propriedades editáveis daquele elemento</li>
+                    <li>Cada elemento expõe seus próprios controles (ex.: Título tem <em>Tag HTML</em>, <em>Texto</em>, <em>Alinhamento</em>, <em>Cor</em>)</li>
                     <li>Altere qualquer valor — o canvas <strong>atualiza em tempo real</strong></li>
                 </ol>
                 <div class="illustration">
                     <div class="ill-flow">
                         <span>Clique no elemento</span>
                         <span>&rarr;</span>
-                        <span>Painel direito mostra controles</span>
+                        <span>Painel de propriedades exibe controles</span>
                         <span>&rarr;</span>
                         <span>Altere o valor</span>
                         <span>&rarr;</span>

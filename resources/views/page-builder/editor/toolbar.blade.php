@@ -1,44 +1,59 @@
 <div class="pb-toolbar" role="toolbar" aria-label="Editor toolbar">
     @php $isThemeEditor = isset($themeContext) && !empty($themeContext); @endphp
-    <span class="pb-toolbar-title">
-        @if($isThemeEditor)
-            <a href="{{ route('page-builder.themes.index') }}" class="btn-back">&#8592; Temas</a>
-            <span style="color:var(--pb-accent);font-size:.75rem;font-weight:600;margin-right:.35rem;padding:.1rem .4rem;background:rgba(99,102,241,.1);border-radius:4px">{{ $themeContext['template_type'] }}</span>
-            {{ $themeContext['template_title'] }}
-        @else
-            <a href="{{ route('page-builder.pages.index') }}" class="btn-back">&#8592; Voltar</a> {{ $page->title }}
+    <div class="pb-toolbar-group">
+        <span class="pb-toolbar-title">
+            @if($isThemeEditor)
+                <a href="{{ route('page-builder.themes.index') }}" class="btn-back" title="Voltar para temas">&#8592; Temas</a>
+                <span style="color:var(--pb-accent);font-size:.7rem;font-weight:600;padding:.14rem .42rem;background:var(--pb-primary-light);border:1px solid rgba(59,130,246,.4);border-radius:999px">{{ $themeContext['template_type'] }}</span>
+                <span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $themeContext['template_title'] }}</span>
+            @else
+                <a href="{{ route('page-builder.pages.index') }}" class="btn-back" title="Voltar para páginas">&#8592; Páginas</a>
+                <span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $page->title }}</span>
+            @endif
+        </span>
+        @if(!$isThemeEditor)
+            <span class="pb-toolbar-badge" style="background:{{ $page->status === 'published' ? 'rgba(34,197,94,.16)' : 'rgba(245,158,11,.16)' }};color:{{ $page->status === 'published' ? '#22c55e' : '#f59e0b' }};border:1px solid {{ $page->status === 'published' ? 'rgba(34,197,94,.4)' : 'rgba(245,158,11,.4)' }}">{{ $page->status }}</span>
         @endif
-    </span>
-    <span class="pb-toolbar-badge badge-{{ $page->status === 'published' ? 'published' : 'draft' }}" style="background:{{ $page->status === 'published' ? 'rgba(34,197,94,.15)' : 'rgba(245,158,11,.15)' }};color:{{ $page->status === 'published' ? '#22c55e' : '#f59e0b' }}">{{ $page->status }}</span>
+    </div>
     <div class="pb-toolbar-spacer"></div>
-    <button id="pb-undo" onclick="editor.undo()" title="Desfazer (Ctrl+Z)">&#8630; <span style="font-size:.65rem;opacity:.6">Desfazer</span></button>
-    <button id="pb-redo" onclick="editor.redo()" title="Refazer (Ctrl+Shift+Z)">&#8631; <span style="font-size:.65rem;opacity:.6">Refazer</span></button>
+    <div class="pb-toolbar-group">
+        <button id="pb-undo" onclick="editor.undo()" title="Desfazer (Ctrl+Z)">&#8630;</button>
+        <button id="pb-redo" onclick="editor.redo()" title="Refazer (Ctrl+Shift+Z)">&#8631;</button>
+    </div>
     <span class="tb-divider"></span>
-    <button class="active" data-mode="desktop" onclick="editor.setResponsive('desktop')" title="Desktop">&#128421;</button>
-    <button data-mode="tablet" onclick="editor.setResponsive('tablet')" title="Tablet">&#128241;</button>
-    <button data-mode="mobile" onclick="editor.setResponsive('mobile')" title="Mobile">&#128241;</button>
+    <div class="pb-toolbar-group">
+        <button class="active" data-mode="desktop" onclick="editor.setResponsive('desktop')" title="Visualização Desktop">&#128421;</button>
+        <button data-mode="tablet" onclick="editor.setResponsive('tablet')" title="Visualização Tablet">&#128241;</button>
+        <button data-mode="mobile" onclick="editor.setResponsive('mobile')" title="Visualização Mobile">&#128241;</button>
+    </div>
     <span class="tb-divider"></span>
-    <button id="pb-zoom-out" onclick="editor.zoomOut()" title="Zoom Out (-)" style="padding:.4rem .5rem">&#8722;</button>
-    <span id="pb-zoom-label" style="font-size:.7rem;color:var(--pb-text2);min-width:38px;text-align:center;cursor:pointer" onclick="editor.zoomReset()" title="Reset Zoom (Ctrl+0)">100%</span>
-    <button id="pb-zoom-in" onclick="editor.zoomIn()" title="Zoom In (+)" style="padding:.4rem .5rem">+</button>
-    <button id="pb-fullscreen" onclick="editor.toggleFullscreen()" title="Tela Cheia (F11)" style="padding:.4rem .5rem">&#9974;</button>
+    <div class="pb-toolbar-group">
+        <button id="pb-zoom-out" onclick="editor.zoomOut()" title="Diminuir Zoom (-)" style="padding:.38rem .5rem">&#8722;</button>
+        <span id="pb-zoom-label" style="font-size:.72rem;color:var(--pb-text2);min-width:40px;text-align:center;cursor:pointer" onclick="editor.zoomReset()" title="Redefinir Zoom (Ctrl+0)">100%</span>
+        <button id="pb-zoom-in" onclick="editor.zoomIn()" title="Aumentar Zoom (+)" style="padding:.38rem .5rem">+</button>
+        <button id="pb-fullscreen" onclick="editor.toggleFullscreen()" title="Tela Cheia (F11)">&#9974;</button>
+    </div>
     <span class="tb-divider"></span>
-    <button onclick="editor.showPageSettings()" title="Configurações da Página" id="btn-page-settings">&#9881; <span style="font-size:.65rem;opacity:.6">Página</span></button>
-    <button onclick="editor.showSiteSettings()" title="Configurações do Site" id="btn-site-settings">&#127968; <span style="font-size:.65rem;opacity:.6">Site</span></button>
-    <button onclick="editor.showRevisionHistory()" title="Histórico de Revisões">&#128338; <span style="font-size:.65rem;opacity:.6">Revisões</span></button>
-    @if($isThemeEditor)
-        <a href="{{ route('page-builder.themes.render', $themeContext['template_id']) }}?t={{ time() }}" target="_blank" class="tb-link">&#128065; <span style="font-size:.65rem;opacity:.6">Visualizar</span></a>
-    @else
-        <a href="{{ route('page-builder.render', $page) }}?t={{ time() }}" target="_blank" class="tb-link">&#128065; <span style="font-size:.65rem;opacity:.6">Visualizar</span></a>
-    @endif
+    <div class="pb-toolbar-group">
+        <button onclick="editor.showPageSettings()" title="Configurações da Página" id="btn-page-settings">&#9881; Página</button>
+        <button onclick="editor.showSiteSettings()" title="Configurações do Site" id="btn-site-settings">&#127968; Site</button>
+        <button onclick="editor.showRevisionHistory()" title="Histórico de Revisões">&#128338; Revisões</button>
+        <button onclick="editor.openFindReplace()" title="Localizar e Substituir">&#128269; Localizar</button>
+    </div>
     <span class="tb-divider"></span>
-    <button onclick="editor.openFindReplace()" title="Find &amp; Replace">&#128269; <span style="font-size:.65rem;opacity:.6">Find</span></button>
+    <div class="pb-toolbar-group">
+        @if($isThemeEditor)
+            <a href="{{ route('page-builder.themes.render', $themeContext['template_id']) }}?t={{ time() }}" target="_blank" class="tb-link" title="Visualizar">&#128065; Visualizar</a>
+        @else
+            <a href="{{ route('page-builder.render', $page) }}?t={{ time() }}" target="_blank" class="tb-link" title="Visualizar">&#128065; Visualizar</a>
+        @endif
+        <button onclick="editor.exportPage()" title="Exportar como JSON">&#128229;</button>
+        <button onclick="editor.saveAsTemplate()" title="Salvar como Template">&#128203;</button>
+        <button onclick="editor.importHtml()" title="Importar HTML">&#128228;</button>
+    </div>
     <span class="tb-divider"></span>
-    <button onclick="editor.exportPage()" title="Exportar como JSON">&#128229;</button>
-    <button onclick="editor.saveAsTemplate()" title="Salvar como Template">&#128203; <span style="font-size:.65rem;opacity:.6">Template</span></button>
-    <button onclick="editor.copyHtml()" title="Copiar HTML da página">&#128203;</button>
-    <button onclick="editor.importHtml()" title="Importar HTML de site externo">&#128228; <span style="font-size:.65rem;opacity:.6">Importar HTML</span></button>
-    <span class="tb-divider"></span>
-    <button onclick="editor.save()" class="btn-save">&#128190; Salvar</button>
-    <button onclick="editor.publish()" class="btn-publish">&#128752; Publicar</button>
+    <div class="pb-toolbar-group">
+        <button onclick="editor.save()" class="btn-save">&#128190; Salvar</button>
+        <button onclick="editor.publish()" class="btn-publish">&#128752; Publicar</button>
+    </div>
 </div>
