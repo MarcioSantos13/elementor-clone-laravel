@@ -4,6 +4,14 @@
 
 @section("content")
     <div class="container">
+        @if(session('error'))
+            <div class="toast toast-error" id="error-toast">
+                <span>&#10005;</span>
+                <span>{{ session('error') }}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+        @endif
+
         <div class="pb-hero">
             <div class="pb-hero-orb pb-hero-orb-1"></div>
             <div class="pb-hero-orb pb-hero-orb-2"></div>
@@ -20,7 +28,11 @@
                     <h1 class="pb-hero-title">{{ $project->name }}</h1>
                     <p class="pb-hero-sub">{{ $project->description ?: "Gerencie páginas, temas e popups deste projeto" }}</p>
                 </div>
-                <div style="display:flex;gap:.6rem;align-items:center;position:relative;z-index:2">
+                <div style="display:flex;gap:.6rem;align-items:center;position:relative;z-index:2;flex-wrap:wrap">
+                    <a href="{{ route("page-builder.projects.export.moodle", $project) }}" class="pb-hero-btn-ghost" style="display:flex;align-items:center;gap:.4rem" title="Baixar pacote IMS Content Package para importar no Moodle" download>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Exportar Moodle
+                    </a>
                     <div class="pb-card-dropdown">
                         <button class="pb-hero-btn-ghost" style="display:flex;align-items:center;gap:.4rem">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>

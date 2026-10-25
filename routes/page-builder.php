@@ -1,26 +1,29 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PageBuilder\PageController;
-use App\Http\Controllers\PageBuilder\ElementController;
-use App\Http\Controllers\PageBuilder\RevisionController;
-use App\Http\Controllers\PageBuilder\FormController;
-use App\Http\Controllers\PageBuilder\HtmlImportController;
 use App\Http\Controllers\PageBuilder\CollaborationController;
-use App\Http\Controllers\PageBuilder\ThemeTemplateController;
 use App\Http\Controllers\PageBuilder\CustomFontController;
 use App\Http\Controllers\PageBuilder\DynamicTagController;
+use App\Http\Controllers\PageBuilder\ElementController;
 use App\Http\Controllers\PageBuilder\FindReplaceController;
+use App\Http\Controllers\PageBuilder\FormController;
 use App\Http\Controllers\PageBuilder\GlobalWidgetController;
+use App\Http\Controllers\PageBuilder\HtmlImportController;
+use App\Http\Controllers\PageBuilder\PageController;
 use App\Http\Controllers\PageBuilder\PopupController;
 use App\Http\Controllers\PageBuilder\ProjectController;
+use App\Http\Controllers\PageBuilder\RevisionController;
+use App\Http\Controllers\PageBuilder\ThemeTemplateController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('projects/{project}/dashboard', [ProjectController::class, 'dashboard'])->name('projects.dashboard');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::post('projects/example', [ProjectController::class, 'createExample'])->name('projects.example');
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::post('projects/{project}/duplicate', [ProjectController::class, 'duplicate'])->name('projects.duplicate');
+    Route::get('projects/{project}/export/moodle', [ProjectController::class, 'exportMoodle'])->name('projects.export.moodle');
     Route::post('projects/{project}/move', [ProjectController::class, 'move'])->name('projects.move');
 
     Route::resource('pages', PageController::class)->except(['show', 'edit']);

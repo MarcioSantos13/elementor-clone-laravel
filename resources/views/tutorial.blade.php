@@ -9,44 +9,84 @@
             <a href="{{ route('page-builder.pages.index') }}" class="btn btn-secondary">&larr; Voltar para Páginas</a>
         </div>
 
-        <div class="toc">
-            <strong>Conteúdo</strong>
-            <a href="#prerequisites">Pré-requisitos &amp; Instalação</a>
-            <a href="#overview">Visão Geral</a>
-            <a href="#license">Custo &amp; Licença</a>
-            <a href="#auth">Criar Conta &amp; Acessar</a>
-            <a href="#projects-hub">Hub de Projetos (Estilo Unity)</a>
-            <a href="#project-dashboard">Dashboard do Projeto</a>
-            <a href="#create-page">Criar uma Página</a>
-            <a href="#build-from-zero">Construir do Zero (Passo a Passo)</a>
-            <a href="#editor">Conhecendo o Novo Editor</a>
-            <a href="#drag-widgets">Inserir Elementos</a>
-            <a href="#educational-widgets">Elementos Educacionais</a>
-            <a href="#select-settings">Editar Propriedades</a>
-            <a href="#page-settings">Configurações da Página &amp; Site</a>
-            <a href="#responsive">Visualização Responsiva</a>
-            <a href="#templates">Modelos &amp; Salvar como Modelo</a>
-            <a href="#undo-redo">Desfazer, Refazer &amp; Revisões</a>
-            <a href="#save-publish">Salvar &amp; Publicar</a>
-            <a href="#preview">Visualizar Página</a>
-            <a href="#duplicate-delete">Duplicar &amp; Excluir</a>
-            <a href="#collaboration">Colaboração em Tempo Real</a>
-            <a href="#html-import">Importação de HTML</a>
-            <a href="#showcase">Template Showcase Completo</a>
-            <a href="#theme-builder">Theme Builder</a>
-            <a href="#popups">Popups</a>
-            <a href="#projects">Projetos (Organização)</a>
-            <a href="#architecture">Arquitetura do Projeto</a>
-            <a href="#database">Banco de Dados</a>
-            <a href="#routes">Rotas</a>
-            <a href="#api">API REST (Sanctum)</a>
-            <a href="#jobs">Jobs &amp; Filas</a>
-            <a href="#quality">Qualidade &amp; Testes</a>
-            <a href="#improvements">Melhorias Propostas</a>
-            <a href="#moodle">Uso com Moodle 4.5+</a>
-        </div>
+        <div class="tutorial-shell" id="tutorial-top">
+            <aside class="tutorial-toc">
+                <div class="toc-head">
+                    <span class="toc-icon" aria-hidden="true">&#9776;</span>
+                    <div>
+                        <strong>Índice do tutorial</strong>
+                        <span>33 tópicos &middot; 7 grupos</span>
+                    </div>
+                </div>
 
-        {{-- PREREQUISITES --}}
+                <nav class="toc-nav" aria-label="Índice do tutorial">
+                    <div class="toc-group">
+                        <span class="toc-group-title">Primeiros passos</span>
+                        <a href="#prerequisites"><span class="toc-num" aria-hidden="true">0</span> Pré-requisitos &amp; instalação</a>
+                        <a href="#overview"><span class="toc-num" aria-hidden="true">1</span> Visão geral</a>
+                        <a href="#license"><span class="toc-num" aria-hidden="true">1b</span> Custo &amp; licença</a>
+                        <a href="#auth"><span class="toc-num" aria-hidden="true">2</span> Conta &amp; acesso</a>
+                    </div>
+
+                    <div class="toc-group">
+                        <span class="toc-group-title">Projetos</span>
+                        <a href="#projects-hub"><span class="toc-num" aria-hidden="true">2b</span> Hub de projetos</a>
+                        <a href="#project-dashboard"><span class="toc-num" aria-hidden="true">2c</span> Dashboard do projeto</a>
+                        <a href="#projects"><span class="toc-num" aria-hidden="true">18b</span> Organizar projetos</a>
+                    </div>
+
+                    <div class="toc-group">
+                        <span class="toc-group-title">Construindo páginas</span>
+                        <a href="#create-page"><span class="toc-num" aria-hidden="true">3</span> Criar uma página</a>
+                        <a href="#build-from-zero"><span class="toc-num" aria-hidden="true">3b</span> Construir do zero</a>
+                        <a href="#editor"><span class="toc-num" aria-hidden="true">4</span> Conhecer o editor</a>
+                        <a href="#drag-widgets"><span class="toc-num" aria-hidden="true">5</span> Inserir elementos</a>
+                        <a href="#educational-widgets"><span class="toc-num" aria-hidden="true">5b</span> Elementos educacionais</a>
+                        <a href="#select-settings"><span class="toc-num" aria-hidden="true">6</span> Editar propriedades</a>
+                        <a href="#page-settings"><span class="toc-num" aria-hidden="true">7</span> Página &amp; site</a>
+                        <a href="#responsive"><span class="toc-num" aria-hidden="true">8</span> Visualização responsiva</a>
+                    </div>
+
+                    <div class="toc-group">
+                        <span class="toc-group-title">Editor avançado</span>
+                        <a href="#templates"><span class="toc-num" aria-hidden="true">9</span> Usar templates</a>
+                        <a href="#undo-redo"><span class="toc-num" aria-hidden="true">10</span> Histórico &amp; revisões</a>
+                        <a href="#save-publish"><span class="toc-num" aria-hidden="true">11</span> Salvar &amp; publicar</a>
+                        <a href="#preview"><span class="toc-num" aria-hidden="true">12</span> Visualizar página</a>
+                        <a href="#duplicate-delete"><span class="toc-num" aria-hidden="true">13</span> Duplicar &amp; excluir</a>
+                        <a href="#collaboration"><span class="toc-num" aria-hidden="true">14</span> Colaboração</a>
+                        <a href="#html-import"><span class="toc-num" aria-hidden="true">15</span> Importar HTML</a>
+                        <a href="#showcase"><span class="toc-num" aria-hidden="true">16</span> Template showcase</a>
+                    </div>
+
+                    <div class="toc-group">
+                        <span class="toc-group-title">Temas &amp; popups</span>
+                        <a href="#theme-builder"><span class="toc-num" aria-hidden="true">17</span> Theme builder</a>
+                        <a href="#popups"><span class="toc-num" aria-hidden="true">18</span> Popups</a>
+                    </div>
+
+                    <div class="toc-group">
+                        <span class="toc-group-title">Referência técnica</span>
+                        <a href="#architecture"><span class="toc-num" aria-hidden="true">19</span> Arquitetura</a>
+                        <a href="#database"><span class="toc-num" aria-hidden="true">20</span> Banco de dados</a>
+                        <a href="#routes"><span class="toc-num" aria-hidden="true">21</span> Rotas</a>
+                        <a href="#api"><span class="toc-num" aria-hidden="true">22</span> API REST</a>
+                        <a href="#jobs"><span class="toc-num" aria-hidden="true">23</span> Jobs &amp; filas</a>
+                        <a href="#quality"><span class="toc-num" aria-hidden="true">24</span> Qualidade &amp; testes</a>
+                        <a href="#improvements"><span class="toc-num" aria-hidden="true">25</span> Melhorias</a>
+                    </div>
+
+                    <div class="toc-group">
+                        <span class="toc-group-title">Moodle</span>
+                        <a href="#moodle"><span class="toc-num" aria-hidden="true">26</span> Moodle 4.5+</a>
+                    </div>
+                </nav>
+
+                <a class="toc-top-link" href="#tutorial-top">&uarr; Voltar ao topo</a>
+            </aside>
+
+            <div class="tutorial-content">
+                {{-- PREREQUISITES --}}
         <section id="prerequisites" class="step">
             <h2>0. Pré-requisitos &amp; Instalação</h2>
             <div class="step-body">
@@ -161,7 +201,7 @@ php artisan serve</code></pre>
                     <tr><td>Elementos disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
                     <tr><td>Templates prontos</td><td>7 (Blank, Landing, About, Contact, Portfolio, Showcase Completo, Blog Post)</td></tr>
                     <tr><td>Rotas definidas</td><td>100+ (CRUD páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find & replace, API REST)</td></tr>
-                    <tr><td>Testes automatizados</td><td>155 (61 unitários + 94 de feature)</td></tr>
+                    <tr><td>Testes automatizados</td><td>163 (61 unitários + 102 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>9 principais (projects, pages, elements, revisions, form_submissions, custom_fonts, global_widgets, popups, theme_templates) + personal_access_tokens</td></tr>
                     <tr><td>Views Blade</td><td>22 (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
                     <tr><td>Linhas de JS do editor</td><td>~5000 (8 módulos ES em resources/js/editor/)</td></tr>
@@ -188,7 +228,7 @@ php artisan serve</code></pre>
                     <li>Desfazer / refazer alterações (Ctrl+Z / Ctrl+Shift+Z)</li>
                     <li>Salvamento automático a cada 60 segundos, ou salvar / publicar manualmente</li>
                     <li>Sistema de <strong>revisões</strong> com diff e restauração</li>
-                    <li>Duplicar, exportar (JSON), importar, copiar HTML, excluir páginas</li>
+                    <li>Duplicar, exportar (JSON), importar, copiar HTML, excluir páginas e exportar o projeto completo para o Moodle</li>
                     <li><strong>Importação de HTML</strong> — importar páginas externas via URL ou colar HTML diretamente</li>
                     <li><strong>Navegador (Navigator)</strong> — painel flutuante com árvore de elementos, drag-and-drop SortableJS para reordenar, renomear, menu de contexto</li>
                     <li><strong>Right-click context menu</strong> no canvas e no Navigator (Editar, Duplicar, Copiar, Colar, Mover, Excluir)</li>
@@ -222,7 +262,7 @@ php artisan serve</code></pre>
                     <li><strong>Find &amp; Replace</strong> — busca e substituição de conteúdo em toda a página</li>
                     <li><strong>Projetos</strong> — organizar páginas, temas e popups em projetos privados por usuário, com projeto padrão "Meus Projetos" e seletor de projeto nas listagens</li>
                     <li><strong>API REST</strong> — autenticação via Sanctum tokens, CRUD completo de páginas e elementos</li>
-                    <li>Integração com <strong>Moodle 4.5+</strong> via HTML renderizado</li>
+                    <li>Integração com <strong>Moodle 4.5+</strong> via pacote IMS Content Package ou HTML renderizado</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Arquitetura Resumida</h3>
@@ -290,11 +330,12 @@ php artisan serve</code></pre>
                     <li>7 templates prontos (Blank, Landing, About, Contact, Portfolio, Showcase, Blog Post)</li>
                     <li>Sistema de revisões com diff e restauração</li>
                     <li>Exportação/Importação de páginas (JSON)</li>
+                    <li>Exportação do projeto completo para Moodle 4.5+ (IMS Content Package)</li>
                     <li>Copiar HTML para uso em outros sistemas (Moodle, WordPress, etc.)</li>
                     <li>Suporte a LaTeX via KaTeX</li>
                     <li>Projetos — organização privada de páginas, temas e popups</li>
-                    <li>155 testes automatizados</li>
-                    <li>Integração com Moodle 4.5+</li>
+                    <li>163 testes automatizados</li>
+                    <li>Integração com Moodle 4.5+ via pacote IMS ou HTML</li>
                 </ul>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Stack tecnológica (tudo open-source)</h3>
@@ -2569,7 +2610,11 @@ php artisan serve</code></pre>
                 <table class="widget-table">
                     <tr><th>Método</th><th>URL</th><th>Controller</th><th>Descrição</th></tr>
                     <tr><td>GET</td><td><code>/page-builder/projects</code></td><td>ProjectController@index</td><td>Listar projetos do usuário</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/projects/{project}/dashboard</code></td><td>ProjectController@dashboard</td><td>Dashboard do projeto</td></tr>
                     <tr><td>POST</td><td><code>/page-builder/projects</code></td><td>ProjectController@store</td><td>Criar projeto</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/projects/example</code></td><td>ProjectController@createExample</td><td>Criar projeto de exemplo completo</td></tr>
+                    <tr><td>POST</td><td><code>/page-builder/projects/{project}/duplicate</code></td><td>ProjectController@duplicate</td><td>Duplicar projeto com páginas, temas e popups</td></tr>
+                    <tr><td>GET</td><td><code>/page-builder/projects/{project}/export/moodle</code></td><td>ProjectController@exportMoodle</td><td>Exportar projeto como IMS Content Package</td></tr>
                     <tr><td>PUT</td><td><code>/page-builder/projects/{project}</code></td><td>ProjectController@update</td><td>Atualizar projeto</td></tr>
                     <tr><td>DELETE</td><td><code>/page-builder/projects/{project}</code></td><td>ProjectController@destroy</td><td>Excluir projeto (reassign ao padrão)</td></tr>
                     <tr><td>POST</td><td><code>/page-builder/projects/{project}/move</code></td><td>ProjectController@move</td><td>Mover páginas/temas/popups para o projeto</td></tr>
@@ -2838,12 +2883,12 @@ php artisan queue:listen --timeout=60</code></pre>
         <section id="quality" class="step">
             <h2>24. Qualidade &amp; Testes</h2>
             <div class="step-body">
-                <p>O projeto tem uma suíte completa de testes automatizados com <strong>155 testes</strong> rodando em SQLite em memória (mais 7 testes de frontend com Vitest).</p>
+                <p>O projeto tem uma suíte completa de testes automatizados com <strong>163 testes</strong> rodando em SQLite em memória (mais 7 testes de frontend com Vitest).</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Resumo da Qualidade</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th><th>Avaliação</th></tr>
-                    <tr><td>Testes totais (PHP)</td><td>155</td><td style="color:green">Boa cobertura</td></tr>
+                    <tr><td>Testes totais (PHP)</td><td>163</td><td style="color:green">Boa cobertura</td></tr>
                     <tr><td>Testes unitários</td><td>61</td><td style="color:green">Widgets, Services, Templates, Colaboração</td></tr>
                     <tr><td>Testes de feature</td><td>94</td><td style="color:green">Controllers, Projetos, Auth, API, Fluxos</td></tr>
                     <tr><td>Testes de frontend (Vitest)</td><td>7</td><td style="color:green">Módulos JS do editor</td></tr>
@@ -2951,7 +2996,7 @@ $page->touch();</pre>
         <section id="improvements" class="step">
             <h2>25. Melhorias Propostas</h2>
             <div class="step-body">
-                <p>O projeto já tem uma base sólida com 155 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
+                <p>O projeto já tem uma base sólida com 163 testes, sanitização XSS, autorização por Policy e tratamento de erros no JS. O plano de melhorias <strong>IMPROVEMENTS.md</strong> contém 74 passos organizados em 12 fases. Abaixo está o status atual de cada fase:</p>
 
                 <h3 style="font-size:1rem;margin-top:1rem;margin-bottom:.5rem">Status das Fases</h3>
                 <table class="widget-table">
@@ -3005,7 +3050,7 @@ $page->touch();</pre>
                     <li><strong>Cache invalidation robusta</strong> — <code>$page->touch()</code> + <code>Cache::tags()</code> ao invés de key registry quebrado</li>
                     <li><strong>Cache no GlobalWidgetService</strong> — <code>getAll()</code> cacheado com <code>clearCache()</code> nas mutações</li>
                     <li><strong>ProcessFormSubmissionJob</strong> — notificações de formulário em background</li>
-                    <li><strong>155 testes automatizados (PHP) + 7 (Vitest)</strong> — cobertura completa de controllers, services e widgets</li>
+                    <li><strong>163 testes automatizados (PHP) + 7 (Vitest)</strong> — cobertura completa de controllers, services e widgets</li>
                     <li><strong>Editor WYSIWYG</strong> — toolbar rich-text com imagens, vídeos, listas</li>
                     <li><strong>Edição inline</strong> — preserva HTML (innerHTML) ao invés de textContent</li>
                     <li><strong>Upload de imagens no texto</strong> — botão + Ctrl+V no editor WYSIWYG</li>
@@ -3056,83 +3101,129 @@ $page->touch();</pre>
             </div>
         </section>
 
-        {{-- MOODLE --}}
+        {{-- PROJECT CREATION & MOODLE --}}
         <section id="moodle" class="step">
-            <h2>26. Uso com Moodle 4.5+</h2>
+            <h2>26. Criar Projeto Completo &amp; Uso no Moodle 4.5+</h2>
             <div class="step-body">
-                <p>O Page Builder pode ser integrado ao <strong>Moodle 4.5+</strong> para criar páginas ricas dentro da sua plataforma de aprendizado. Abaixo estão as instruções detalhadas, começando com um exemplo simples passo a passo.</p>
+                <p>O Page Builder pode exportar um <strong>projeto completo</strong> — páginas publicadas, cabeçalho, rodapé, popups e mídias locais — como um <strong>IMS Content Package</strong> pronto para importar no <strong>Moodle 4.5+</strong> como uma atividade com navegação entre páginas. O processo abaixo cobre desde a criação do projeto até a atualização do conteúdo no Moodle.</p>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.1 Passo a Passo — Exemplo Simples: "Aula 01"</h3>
-                <p>Vamos criar uma página de aula e colá-la no Moodle como um recurso <strong>Página</strong> usando o HTML renderizado. Todo o fluxo leva menos de 5 minutos.</p>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.1 Qual formato usar?</h3>
+                <table class="widget-table">
+                    <tr><th>Cenário</th><th>Formato</th><th>Tracking</th><th>Quando usar</th></tr>
+                    <tr><td><strong>Projeto completo no Moodle</strong></td><td>IMS Content Package (<code>.zip</code>) — botão <strong>Exportar Moodle</strong></td><td>Não</td><td>Recomendado para várias páginas com navegação, tema e mídias locais.</td></tr>
+                    <tr><td><strong>Uma página isolada</strong></td><td>Copy HTML</td><td>Não</td><td>Rápido para um recurso <strong>Página</strong> ou <strong>Livro</strong>.</td></tr>
+                    <tr><td><strong>Conteúdo sempre atualizado</strong></td><td>URL pública ou iframe</td><td>Não</td><td>Quando o Moodle pode acessar a instalação do Page Builder.</td></tr>
+                    <tr><td><strong>Conclusão/tentativas</strong></td><td>SCORM 1.2</td><td>Sim</td><td>Quando o Moodle precisa registrar conclusão. O Page Builder ainda não gera SCORM; prefira SCORM 1.2, pois o suporte a SCORM 2004 no Moodle é limitado.</td></tr>
+                    <tr><td><strong>Backup entre instalações</strong></td><td>JSON por página</td><td>Não</td><td>Para levar páginas de um Page Builder para outro, não para importar no Moodle.</td></tr>
+                </table>
+                <div class="tip">
+                    <strong>&#128161; Recomendação:</strong> para o <strong>projeto completo</strong>, use o botão <strong>Exportar Moodle</strong> no dashboard do projeto. Ele gera um pacote IMS 1.1.4 com todas as páginas publicadas e navegação no Moodle. O Moodle também importa <strong>IMS Common Cartridge 1.0/1.1</strong> via restauração de curso, mas o IMS Content Package é mais simples e fica disponível como atividade no curso.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.2 Criar o projeto completo — passo a passo</h3>
                 <ol>
-                    <li><strong>Criar a página:</strong> no Page Builder, clique em <strong>"Criar Página"</strong>, defina o nome <code>Aula 01 — Introdução ao Page Builder</code> e o slug <code>aula-01</code>. Escolha o template <strong>Blank</strong> (ou outro, se preferir começar de um modelo).</li>
-                    <li><strong>Montar o conteúdo:</strong> no editor, adicione os seguintes widgets (veja as seções 4, 5 e 6 do tutorial):
+                    <li><strong>Acesse o sistema:</strong> faça login em <code>/login</code> ou crie uma conta em <code>/register</code>. Você será direcionado para o <strong>Hub de Projetos</strong>.</li>
+                    <li><strong>Crie o projeto:</strong> clique em <strong>Novo Projeto</strong> e informe nome e descrição. Para começar com uma base completa, clique em <strong>Projeto de Exemplo</strong>: ele cria 4 páginas públicas (Início, Sobre, Contato e 404), 4 templates de tema (header, footer, artigo e listagem) e 1 popup de newsletter. As páginas internas de tema/popup não aparecem na exportação.</li>
+                    <li><strong>Abra o dashboard do projeto:</strong> ali ficam os atalhos para <strong>Páginas</strong>, <strong>Temas</strong> e <strong>Popups</strong>, além do botão <strong>Exportar Moodle</strong>.</li>
+                    <li><strong>Crie as páginas:</strong> em <strong>Páginas &rarr; Nova Página</strong>, escolha um template (Landing, About, Contact, etc.) ou comece em branco. Defina título, slug e status. O slug vira o endereço público <code>/p/&#123;slug&#125;</code> e também o nome do arquivo HTML dentro do pacote Moodle.</li>
+                    <li><strong>Monte o conteúdo:</strong> no editor visual, insira seções, colunas e widgets. Use <strong>Copy HTML</strong> apenas quando quiser uma página isolada; para o projeto completo, não é necessário copiar página por página.</li>
+                    <li><strong>Configure o tema:</strong> em <strong>Temas</strong>, edite o <strong>Header</strong> e o <strong>Footer</strong>. Verifique as condições de exibição (por exemplo, <code>all</code> para todo o site) e publique os templates. O HTML exportado já inclui header, footer e popups publicados em cada página.</li>
+                    <li><strong>Configure popups (opcional):</strong> em <strong>Popups</strong>, defina gatilhos (ao carregar, após X segundos, scroll, saída do mouse ou clique) e publique. O popup é incorporado no HTML do pacote.</li>
+                    <li><strong>Revise a navegação:</strong> links internos para <code>/p/&#123;slug&#125;</code> são reescritos automaticamente para os arquivos do pacote. Publique todas as páginas que devem fazer parte da navegação. Páginas não publicadas não entram no pacote e seus links permanecem apontando para <code>/p/...</code>.</li>
+                    <li><strong>Teste no navegador:</strong> abra <code>/p/&#123;slug&#125;</code> para cada página publicada e confira layout, links, imagens, fórmulas e popups antes de exportar.</li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> use o projeto de exemplo como referência de estrutura e depois clique no ícone de <strong>duplicar</strong> no Hub para criar uma cópia editável. A clonagem copia páginas, elementos, temas e popups com novos IDs e slugs.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.3 Exportar o projeto para o Moodle</h3>
+                <ol>
+                    <li><strong>Publique as páginas:</strong> somente páginas com status <strong>published</strong> e que não sejam internas (tema/popup) entram no pacote.</li>
+                    <li><strong>Abra o dashboard do projeto</strong> e clique em <strong>Exportar Moodle</strong>. O download de um arquivo <code>.zip</code> será iniciado, por exemplo <code>meu-projeto-moodle-ims.zip</code>.</li>
+                    <li><strong>Confira o pacote:</strong> o ZIP contém:
                         <ul>
-                            <li><strong>Heading</strong> H1: <em>"Bem-vindo à Aula 01"</em>;</li>
-                            <li><strong>Text</strong>: um parágrafo de boas-vindas;</li>
-                            <li><strong>Callout</strong> (type <code>info</code>): <em>"Leia o material indicado antes da aula"</em>;</li>
-                            <li><strong>Math</strong>: a fórmula <code>\int_0^1 x^2\,dx = \frac{1}{3}</code> (renderizada via KaTeX);</li>
-                            <li><strong>Table</strong>: um quadro de horários da semana.</li>
+                            <li><code>imsmanifest.xml</code> — manifesto IMS 1.1.4 com a organização e a navegação das páginas;</li>
+                            <li><code>pages/&#123;slug&#125;.html</code> — cada página publicada com tema, popups e CSS inline;</li>
+                            <li><code>media/...</code> — imagens e vídeos locais usados nas páginas, quando encontrados em <code>storage/app/public</code> ou <code>public/uploads</code>.</li>
                         </ul>
                     </li>
-                    <li><strong>Copiar o HTML:</strong> na barra de ferramentas do editor, clique no botão <strong>"Copy HTML"</strong> (ícone de clipboard). A notificação <em>"HTML copiado!"</em> confirma que o HTML do conteúdo (sem o container do site, com CSS inline) está na área de transferência.</li>
-                    <li><strong>Criar o recurso no Moodle:</strong> no seu curso Moodle 4.5+, ative a edição e clique em <strong>"Adicionar um recurso ou atividade"</strong> → escolha <strong>Página</strong>.</li>
-                    <li><strong>Configurar o recurso:</strong> em <strong>Nome</strong> digite <code>Aula 01</code>. No campo <strong>Conteúdo</strong>, clique no botão <strong>&lt;&gt;</strong> (Mostrar código-fonte / HTML) do editor, cole o conteúdo com <kbd>Ctrl+V</kbd> e clique novamente em <strong>&lt;&gt;</strong> para voltar ao modo visual.</li>
-                    <li><strong>Salvar:</strong> salve o recurso e visualize o curso. A página aparecerá com títulos, cores, callout, fórmula KaTeX (salva como HTML estático) e tabela — tudo preservado, sem nenhum plugin no Moodle.</li>
-                    <li><strong>Atualizar depois:</strong> sempre que editar a página no Page Builder, basta refazer o passo 3 e colar novamente no mesmo recurso Moodle.</li>
+                    <li><strong>Entenda as limitações:</strong> o pacote é estático. Imagens externas e CDNs (Font Awesome, KaTeX, Google Fonts) continuam sendo carregados da internet. Formulários não enviam dados para o Laravel dentro do pacote IMS; para formulários funcionais, use a URL pública/iframe. Valores de dynamic tags são congelados no momento da exportação.</li>
+                    <li><strong>Sem páginas publicadas?</strong> O sistema exibe um erro e não gera o ZIP. Publique ao menos uma página e tente novamente.</li>
                 </ol>
                 <div class="tip">
-                    <strong>&#128161; Por que usar "Copy HTML"?</strong> O botão consulta <code>/page-builder/pages/&#123;id&#125;/render?format=inner</code> e copia apenas o conteúdo da página, sem o cabeçalho/rodapé do site e sem o container — ideal para colar dentro do editor do Moodle. O CSS é todo inline, então nada "quebra" ao colar.
+                    <strong>&#128161; Atualização:</strong> sempre que alterar o projeto, clique novamente em <strong>Exportar Moodle</strong> e substitua o pacote no Moodle. O IMS Content Package não sincroniza automaticamente com o Page Builder.
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.2 Copiar HTML para o Moodle (recomendado)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.4 Importar no Moodle 4.5+</h3>
                 <ol>
-                    <li>Crie sua página no Page Builder normalmente (use um modelo pronto ou comece do zero). Os modelos são fixos e nunca são alterados ao criar uma nova página — o sistema faz uma cópia dos dados para a página nova.</li>
-                    <li>No editor visual, clique no botão <strong>"Copy HTML"</strong> (ícone de clipboard) na barra de ferramentas. Uma notificação "HTML copiado!" será exibida.</li>
-                    <li>O HTML renderizado da página (com CSS inline) está na sua área de transferência.</li>
-                    <li>No Moodle, edite um recurso do tipo <strong>Página (Page)</strong> ou <strong>Livro (Book)</strong>.</li>
-                    <li>No editor do Moodle, clique no botão <strong>&lt;&gt;</strong> (Mostrar código fonte / HTML) e cole o conteúdo com <kbd>Ctrl+V</kbd>.</li>
-                    <li>Salve a página. O conteúdo será exibido com todos os estilos preservados.</li>
+                    <li><strong>Entre no Moodle</strong> com uma conta de professor ou usuário com permissão para editar o curso.</li>
+                    <li><strong>Ative o modo de edição</strong> no curso e vá até a seção onde o conteúdo deve aparecer.</li>
+                    <li>Clique em <strong>Adicionar uma atividade ou recurso</strong> (&plus;).</li>
+                    <li>Na aba <strong>Recursos</strong>, escolha <strong>Pacote de conteúdo IMS</strong> (<em>IMS content package</em>). Não escolha SCORM para este pacote.</li>
+                    <li><strong>Nome:</strong> informe o nome do projeto/aula. <strong>Descrição:</strong> opcional. Marque a opção de exibir a descrição no curso se desejar.</li>
+                    <li><strong>Conteúdo:</strong> clique em <strong>Escolher arquivo</strong> (ou arraste o ZIP) e envie o pacote gerado pelo Page Builder. Mantenha o arquivo original no pacote.</li>
+                    <li><strong>Configurações:</strong> para o primeiro teste, mantenha as opções padrão de exibição. Em cursos com muitos arquivos, verifique o limite de upload do Moodle.</li>
+                    <li>Clique em <strong>Salvar e mostrar</strong>. O Moodle abrirá o pacote com um sumário/navegação lateral contendo as páginas exportadas.</li>
+                    <li><strong>Navegue</strong> pelo sumário e confira cada página. O IMS Content Package não registra conclusão nem notas; ele é um recurso de conteúdo.</li>
                 </ol>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.3 Exportar como JSON (backup ou transferência entre instalações)</h3>
-                <ol>
-                    <li>Na lista de páginas do Page Builder, clique em <strong>"Export"</strong> na página desejada. Um arquivo <code>.json</code> será baixado com toda a estrutura da página.</li>
-                    <li>Para importar em outra instalação do Page Builder, clique em <strong>"Import"</strong> na lista de páginas, faça upload do arquivo <code>.json</code> e a página será recriada.</li>
-                    <li>Após importar, abra a página no editor e use o <strong>"Copy HTML"</strong> (passo 26.2) para colar o conteúdo no Moodle.</li>
-                </ol>
-
-<h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.4 Renderização como Página Moodle (iframe)</h3>
-                <ol>
-                    <li><strong>URL pública:</strong> toda página <strong>publicada</strong> tem um endereço público em <code>/p/&#123;slug&#125;</code> (ex.: <code>/p/aula-01</code>), que renderiza a página completa com o tema (cabeçalho, rodapé e popups).</li>
-                    <li><strong>Incorporar no Moodle:</strong> crie um recurso <strong>URL</strong> apontando para <code>/p/aula-01</code>, ou adicione um bloco <strong>HTML</strong> com <code>&lt;iframe src="/p/aula-01"&gt;</code>. A rota pública não envia <code>X-Frame-Options</code>, então funciona dentro do Moodle.</li>
-                    <li><strong>Conteúdo apenas:</strong> para obter só o HTML do conteúdo (sem o tema), use o endpoint <code>/page-builder/pages/&#123;id&#125;/render?format=inner</code> (requer login) ou acrescente <code>&amp;theme=none</code> para um HTML ainda mais limpo, apenas com os elementos e estilos inline. Esse endpoint envia <code>X-Frame-Options: SAMEORIGIN</code>, portanto não use iframe nele — use a URL pública <code>/p/&#123;slug&#125;</code> para incorporar por frame.</li>
-                </ol>
-
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.5 Widgets Educacionais no Moodle</h3>
-                <p>Os widgets educacionais (Callout, Table, Math) são especialmente úteis para criar conteúdo de cursos no Moodle:</p>
-                <ul>
-                    <li><strong>Callout:</strong> Caixas de destaque para definições, teoremas, exercícios, avisos e dicas. Cada tipo tem cores e ícones automáticos. O HTML renderizado mantém todos os estilos inline, compatível com o Moodle.</li>
-                    <li><strong>Table:</strong> Tabelas estilizadas para dados, comparativos e exercícios. O CSS inline garante que as bordas e cores funcionem no editor do Moodle.</li>
-                    <li><strong>Math (LaTeX):</strong> Fórmulas matemáticas renderizadas via KaTeX. No Moodle, a fórmula é salva como HTML estático com SVG/PNG, sem precisar do KaTeX no Moodle. Para fórmulas inline no texto, use o botão &#945; no editor WYSIWYG.</li>
-                </ul>
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> Para cursos de matemática, combine os três widgets: use <strong>Callout (type=theorem)</strong> para enunciar teoremas, <strong>Math</strong> para as fórmulas em destaque, e <strong>Callout (type=exercise)</strong> para propostas de exercícios. Insira tabelas com <strong>Table</strong> para organizar dados e comparativos.
+                    <strong>&#128161; Onde encontrar:</strong> em português, o recurso pode aparecer como <strong>Pacote de conteúdo IMS</strong>; em inglês, <strong>IMS content package</strong>. Ele fica na lista de <strong>Recursos</strong>, não na lista de <strong>Atividades</strong>.
                 </div>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.6 Dicas para Moodle</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.5 Atualizar o projeto no Moodle</h3>
+                <ol>
+                    <li>No Page Builder, edite as páginas, temas ou popups e <strong>publique</strong> as alterações.</li>
+                    <li>No dashboard do projeto, clique em <strong>Exportar Moodle</strong> para baixar um novo ZIP.</li>
+                    <li>No Moodle, abra o curso, localize a atividade <strong>Pacote de conteúdo IMS</strong> e clique em <strong>Editar configurações</strong>.</li>
+                    <li>No campo <strong>Conteúdo</strong>, remova o arquivo antigo (ícone de lixeira) e envie o novo ZIP. Salve.</li>
+                    <li>Se o Moodle mantiver cache ou o arquivo antigo, exclua a atividade e crie outra com o novo pacote. Para conteúdo que muda com frequência, prefira a <strong>URL pública/iframe</strong> (seção 26.6).</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.6 Alternativa: URL pública ou iframe</h3>
+                <ol>
+                    <li><strong>URL pública:</strong> toda página publicada tem endereço em <code>/p/&#123;slug&#125;</code> (ex.: <code>/p/inicio</code>), renderizada com header, footer e popups.</li>
+                    <li><strong>Recurso URL:</strong> no Moodle, adicione uma <strong>URL</strong> apontando para a página. Ideal para uma aula ou página inicial do projeto.</li>
+                    <li><strong>Iframe em bloco HTML:</strong> adicione um bloco <strong>HTML</strong> com <code>&lt;iframe src="https://seu-dominio/p/inicio" style="width:100%;height:80vh;border:0"&gt;&lt;/iframe&gt;</code>. A rota pública não envia <code>X-Frame-Options</code>, então funciona dentro do Moodle.</li>
+                    <li><strong>Requisitos:</strong> o Moodle precisa conseguir acessar a URL pública (sem firewall/bloqueio), e a instalação do Page Builder deve continuar online. As alterações aparecem sem reexportar.</li>
+                    <li><strong>Formulários:</strong> com URL/iframe, os formulários continuam funcionando no Laravel; no pacote IMS estático, não.</li>
+                </ol>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.7 Alternativa: Copy HTML por página</h3>
+                <ol>
+                    <li>Na lista de páginas ou no editor, clique em <strong>Copy HTML</strong>. O sistema copia o conteúdo renderizado com CSS inline, sem o container do site.</li>
+                    <li>No Moodle, crie ou edite um recurso <strong>Página</strong> ou <strong>Livro</strong>.</li>
+                    <li>No editor do Moodle, clique no botão <strong>&lt;&gt;</strong> (Mostrar código-fonte / HTML), cole com <kbd>Ctrl+V</kbd> e salve.</li>
+                    <li>Repita para cada página. Para um projeto completo, o pacote IMS é mais rápido e preserva a navegação entre páginas.</li>
+                </ol>
+                <div class="tip">
+                    <strong>&#128161; Por que usar Copy HTML?</strong> O botão consulta <code>/page-builder/pages/&#123;id&#125;/render?format=inner</code> e copia apenas o conteúdo da página, sem cabeçalho/rodapé do site e sem o container. O CSS é inline, então o conteúdo costuma funcionar bem dentro do editor do Moodle.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.8 Widgets educacionais no Moodle</h3>
                 <ul>
-                    <li><strong>Estilos inline:</strong> Todo o CSS gerado pelo Page Builder é inline (atributo <code>style</code>), garantindo compatibilidade máxima com o editor do Moodle — nenhum plugin adicional é necessário.</li>
-                    <li><strong>Imagens:</strong> Use URLs públicas para imagens (ex.: placehold.co ou imagens hospedadas). Imagens enviadas para <code>storage/app/public/</code> no Page Builder não serão acessíveis pelo Moodle.</li>
-                    <li><strong>Imagens no texto:</strong> O editor de texto (WYSIWYG) permite inserir imagens diretamente no conteúdo. Faça upload pela toolbar ou cole (Ctrl+V). As imagens ficam com CSS inline, compatíveis com o Moodle.</li>
-                    <li><strong>Vídeos YouTube:</strong> Na toolbar do editor de texto, clique no botão <strong>&#9654;</strong> (vermelho) e cole a URL do vídeo. O embed é inserido como <code>&lt;iframe&gt;</code> com privacidade ativada (<code>youtube-nocookie.com</code>), recomendado pelo Moodle.</li>
-                    <li><strong>Fórmulas matemáticas:</strong> O Page Builder usa KaTeX para renderizar LaTeX no editor. Ao copiar o HTML, as fórmulas são salvas como HTML estático — o Moodle não precisa de KaTeX instalado. Para fórmulas inline no parágrafo, use o botão &#945; no editor WYSIWYG.</li>
-                    <li><strong>Responsividade:</strong> O HTML gerado mantém a responsividade. Teste em diferentes dispositivos após colar no Moodle.</li>
-                    <li><strong>Limitação de largura:</strong> O Moodle pode aplicar estilos próprios de container. Use o parâmetro <code>?format=inner</code> para obter apenas o conteúdo bruto e ajuste margens no Moodle se necessário.</li>
+                    <li><strong>Callout:</strong> caixas de destaque para definições, teoremas, exercícios, avisos e dicas, com cores e ícones automáticos.</li>
+                    <li><strong>Table:</strong> tabelas estilizadas para dados, comparativos e exercícios, com bordas e cores inline.</li>
+                    <li><strong>Math (LaTeX):</strong> fórmulas renderizadas via KaTeX. No pacote exportado, as fórmulas ficam como HTML estático; o Moodle não precisa do KaTeX instalado.</li>
                 </ul>
+                <div class="tip">
+                    <strong>&#128161; Dica para cursos de matemática:</strong> combine <strong>Callout (theorem)</strong> para enunciados, <strong>Math</strong> para fórmulas em destaque e <strong>Callout (exercise)</strong> para exercícios. Use <strong>Table</strong> para organizar dados e comparativos.
+                </div>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">26.9 Checklist e solução de problemas</h3>
+                <table class="widget-table">
+                    <tr><th>Problema</th><th>Causa provável</th><th>Solução</th></tr>
+                    <tr><td>O botão Exportar Moodle mostra erro</td><td>Nenhuma página pública publicada</td><td>Publique ao menos uma página que não seja interna (tema/popup).</td></tr>
+                    <tr><td>O Moodle rejeita o pacote</td><td>ZIP corrompido, renomeado ou sem <code>imsmanifest.xml</code> na raiz</td><td>Baixe novamente pelo botão e envie o <code>.zip</code> sem descompactar ou renomear.</td></tr>
+                    <tr><td>Algumas páginas não aparecem</td><td>Páginas em rascunho ou internas</td><td>Publique as páginas antes de exportar. Temas e popups são incorporados no HTML, não como páginas separadas.</td></tr>
+                    <tr><td>Imagens quebradas</td><td>Arquivo local ausente ou URL externa inacessível</td><td>Use imagens públicas ou garanta que o arquivo exista em <code>storage/app/public</code>/<code>public/uploads</code> antes de exportar.</td></tr>
+                    <tr><td>Links internos quebrados</td><td>Página de destino não publicada</td><td>Publique a página e exporte novamente; links para páginas fora do pacote permanecem como <code>/p/...</code>.</td></tr>
+                    <tr><td>Formulário não envia</td><td>Pacote IMS é estático</td><td>Use URL pública/iframe para manter os formulários funcionando no Laravel.</td></tr>
+                    <tr><td>Layout diferente do site</td><td>O tema do Moodle aplica CSS ao redor do pacote</td><td>Teste o pacote no curso; para fidelidade total, use iframe da URL pública.</td></tr>
+                    <tr><td>Precisa de conclusão/nota</td><td>IMS Content Package não faz tracking</td><td>Use SCORM 1.2 em uma ferramenta externa ou acompanhe a conclusão por outro recurso do Moodle.</td></tr>
+                </table>
 
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> O fluxo mais comum é: crie a página no Page Builder &rarr; clique em "Copy HTML" &rarr; cole no Moodle no modo HTML. Simples e rápido!
+                    <strong>&#128161; Fluxo recomendado:</strong> crie e publique o projeto &rarr; clique em <strong>Exportar Moodle</strong> &rarr; importe o ZIP como <strong>Pacote de conteúdo IMS</strong> no curso &rarr; revise a navegação. Para conteúdo dinâmico ou formulários, use a URL pública/iframe.
                 </div>
             </div>
         </section>
@@ -3141,15 +3232,32 @@ $page->touch();</pre>
             <p>Pronto! Você está pronto para criar páginas com o construtor visual.</p>
             <a href="{{ route('page-builder.pages.create') }}" class="btn btn-primary">Criar sua Primeira Página &rarr;</a>
         </div>
+            </div>
+        </div>
     </div>
 
     <style>
-        .tutorial { max-width: 920px; }
+        .tutorial { max-width: 1240px; }
         .tutorial h1 { font-size: 1.8rem; }
-        .toc { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: center; }
-        .toc strong { font-size: .85rem; }
-        .toc a { font-size: .85rem; color: #007bff; text-decoration: none; }
-        .toc a:hover { text-decoration: underline; }
+        .tutorial-shell { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 2rem; align-items: start; }
+        .tutorial-toc { position: sticky; top: 84px; max-height: calc(100vh - 104px); overflow-y: auto; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); scrollbar-width: thin; }
+        .toc-head { display: flex; align-items: center; gap: .65rem; padding: .25rem .35rem .8rem; border-bottom: 1px solid #f1f5f9; margin-bottom: .65rem; }
+        .toc-head strong { display: block; font-size: .82rem; color: #0f172a; text-transform: uppercase; letter-spacing: .45px; }
+        .toc-head div > span { display: block; font-size: .7rem; color: #94a3b8; margin-top: .15rem; }
+        .toc-icon { width: 30px; height: 30px; border-radius: 8px; background: #eef2ff; color: #4f46e5; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; flex: none; }
+        .toc-nav { display: flex; flex-direction: column; gap: .9rem; }
+        .toc-group { display: flex; flex-direction: column; gap: .12rem; }
+        .toc-group-title { font-size: .66rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .7px; padding: .2rem .45rem .3rem; }
+        .toc-nav a { display: flex; align-items: flex-start; gap: .5rem; padding: .32rem .45rem; border-radius: 6px; color: #475569; font-size: .8rem; line-height: 1.35; transition: background .15s, color .15s; }
+        .toc-nav a:hover { background: #f8fafc; color: #0f172a; }
+        .toc-nav a.is-active { background: #eef2ff; color: #4338ca; font-weight: 600; }
+        .toc-nav a:focus-visible, .toc-top-link:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+        .toc-num { min-width: 25px; text-align: center; font-size: .66rem; font-weight: 700; color: #94a3b8; background: #f1f5f9; border-radius: 4px; padding: .08rem .25rem; line-height: 1.3; flex: none; margin-top: .05rem; }
+        .toc-nav a.is-active .toc-num { background: #6366f1; color: #fff; }
+        .toc-top-link { display: flex; justify-content: center; margin-top: .8rem; padding-top: .75rem; border-top: 1px solid #f1f5f9; color: #64748b; font-size: .75rem; font-weight: 600; }
+        .toc-top-link:hover { color: #4f46e5; }
+        .tutorial-content { min-width: 0; }
+        #tutorial-top, .step { scroll-margin-top: 84px; }
         .step { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); padding: 1.5rem 2rem; margin-bottom: 1.5rem; }
         .step h2 { font-size: 1.25rem; margin-bottom: .75rem; padding-bottom: .5rem; border-bottom: 2px solid #007bff; display: inline-block; }
         .step-body { font-size: .95rem; line-height: 1.6; }
@@ -3173,5 +3281,111 @@ $page->touch();</pre>
         kbd { background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; padding: .1rem .4rem; font-size: .8rem; font-family: inherit; }
         .tutorial-footer { text-align: center; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
         .tutorial-footer p { margin-bottom: 1rem; font-size: 1.05rem; }
+        @media (max-width: 1024px) {
+            .tutorial-shell { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+            .tutorial-toc { position: static; max-height: none; }
+            .toc-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem 1rem; }
+        }
+        @media (max-width: 700px) {
+            .toc-nav { grid-template-columns: minmax(0, 1fr); }
+            .tutorial-toc { padding: .85rem; }
+            .step { padding: 1.25rem 1.15rem; }
+            .page-header { align-items: flex-start; gap: .75rem; flex-wrap: wrap; }
+        }
     </style>
+
+    @push('scripts')
+        <script>
+            (() => {
+                const toc = document.querySelector('.tutorial-toc');
+                if (!toc) return;
+
+                const links = Array.from(toc.querySelectorAll('.toc-nav a[href^="#"]'));
+                const items = links.map((link) => {
+                    const id = decodeURIComponent(link.hash.slice(1));
+                    return { link, section: document.getElementById(id) };
+                }).filter((item) => item.section);
+
+                if (!items.length) return;
+
+                let activeLink = null;
+                const setActive = (active) => {
+                    if (!active || active === activeLink) return;
+
+                    activeLink = active;
+
+                    links.forEach((link) => {
+                        const isActive = link === active;
+                        link.classList.toggle('is-active', isActive);
+
+                        if (isActive) {
+                            link.setAttribute('aria-current', 'location');
+                        } else {
+                            link.removeAttribute('aria-current');
+                        }
+                    });
+
+                    if (toc.scrollHeight > toc.clientHeight) {
+                        const top = active.getBoundingClientRect().top - toc.getBoundingClientRect().top + toc.scrollTop;
+                        const bottom = top + active.offsetHeight;
+
+                        if (top < toc.scrollTop) {
+                            toc.scrollTop = Math.max(0, top - 12);
+                        } else if (bottom > toc.scrollTop + toc.clientHeight) {
+                            toc.scrollTop = bottom - toc.clientHeight + 12;
+                        }
+                    }
+                };
+
+                let frame = null;
+                const update = () => {
+                    frame = null;
+                    const offset = 100;
+                    let current = items[0].link;
+
+                    for (const item of items) {
+                        if (item.section.getBoundingClientRect().top <= offset) {
+                            current = item.link;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+                        current = items[items.length - 1].link;
+                    }
+
+                    setActive(current);
+                };
+                const schedule = () => {
+                    if (frame === null) frame = requestAnimationFrame(update);
+                };
+
+                window.addEventListener('scroll', schedule, { passive: true });
+                window.addEventListener('resize', schedule, { passive: true });
+
+                toc.querySelectorAll('a[href^="#"]').forEach((link) => {
+                    link.addEventListener('click', (event) => {
+                        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                            return;
+                        }
+
+                        const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+                        if (!target) return;
+
+                        event.preventDefault();
+                        target.scrollIntoView({
+                            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+                            block: 'start',
+                        });
+                        history.replaceState(null, '', link.hash);
+
+                        if (link.closest('.toc-nav')) setActive(link);
+                    });
+                });
+
+                update();
+            })();
+        </script>
+    @endpush
 @endsection

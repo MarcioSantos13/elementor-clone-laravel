@@ -146,6 +146,7 @@
             font-size: .875rem; font-weight: 500;
         }
         .toast-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .toast-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         .toast-close {
             background: none; border: none; font-size: 1.3rem; cursor: pointer;
             color: inherit; margin-left: auto; padding: 0 .2rem; opacity: .6; transition: opacity .15s;

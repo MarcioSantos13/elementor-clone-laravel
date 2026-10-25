@@ -14,7 +14,11 @@
                     <h1 class="pb-hero-title">Meus Projetos</h1>
                     <p class="pb-hero-sub">Selecione um projeto para gerenciar páginas, temas e popups</p>
                 </div>
-                <div style="display:flex;gap:.6rem;align-items:center;position:relative;z-index:2">
+                <div style="display:flex;gap:.6rem;align-items:center;position:relative;z-index:2;flex-wrap:wrap">
+                    <button onclick="createExampleProject()" class="pb-hero-btn-ghost" style="display:flex;align-items:center;gap:.4rem" title="Cria um projeto completo de exemplo">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg>
+                        Projeto de Exemplo
+                    </button>
                     <button onclick="document.getElementById('create-project-modal').style.display='flex'" class="pb-hero-btn-ghost" style="display:flex;align-items:center;gap:.4rem">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Novo Projeto
@@ -80,6 +84,12 @@
                                     @if($project->is_default)
                                         <span class="badge badge-published">padrão</span>
                                     @endif
+                                    @if($project->settings['is_project_template'] ?? false)
+                                        <span class="badge badge-published">modelo</span>
+                                    @endif
+                                    <button class="pb-card-more" type="button" onclick="event.preventDefault(); event.stopPropagation(); duplicateProject({{ $project->id }}, '{{ addslashes($project->name) }}')" title="Usar como modelo">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    </button>
                                     @unless($project->is_default)
                                         <button class="pb-card-more" type="button" onclick="event.preventDefault(); event.stopPropagation(); deleteProject({{ $project->id }}, '{{ addslashes($project->name) }}')" title="Excluir projeto">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -107,7 +117,10 @@
                 <div class="empty-icon">&#128193;</div>
                 <h2>Nenhum projeto</h2>
                 <p>Crie seu primeiro projeto para organizar páginas, temas e popups.</p>
-                <button onclick="document.getElementById('create-project-modal').style.display='flex'" class="btn btn-primary" style="margin-top:1rem">Criar primeiro projeto</button>
+                <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:1rem">
+                    <button onclick="document.getElementById('create-project-modal').style.display='flex'" class="btn btn-primary">Criar primeiro projeto</button>
+                    <button onclick="createExampleProject()" class="btn btn-secondary">Usar projeto de exemplo</button>
+                </div>
             </div>
         @endif
     </div>
@@ -160,6 +173,39 @@
                 else { alert(data.message || 'Erro ao criar projeto'); }
             })
             .catch(() => alert('Erro ao criar projeto'));
+        }
+
+        function createExampleProject() {
+            if (!confirm('Criar um projeto de exemplo completo com páginas, temas e popup?')) return;
+
+            fetch('{{ route('page-builder.projects.example') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                body: JSON.stringify({}),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.project) { window.location.href = '/page-builder/projects/' + data.project.id + '/dashboard'; }
+                else { alert(data.message || 'Erro ao criar projeto de exemplo'); }
+            })
+            .catch(() => alert('Erro ao criar projeto de exemplo'));
+        }
+
+        function duplicateProject(id, name) {
+            const newName = prompt('Nome do novo projeto:', 'Cópia de ' + name);
+            if (newName === null) return;
+
+            fetch('/page-builder/projects/' + id + '/duplicate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                body: JSON.stringify({ name: newName.trim() || null }),
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.project) { window.location.href = '/page-builder/projects/' + data.project.id + '/dashboard'; }
+                else { alert(data.message || 'Erro ao usar projeto como modelo'); }
+            })
+            .catch(() => alert('Erro ao usar projeto como modelo'));
         }
 
         function deleteProject(id, name) {
