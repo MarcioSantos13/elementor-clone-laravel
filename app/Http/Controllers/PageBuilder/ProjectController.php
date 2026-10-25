@@ -33,6 +33,19 @@ class ProjectController extends Controller
         return view('page-builder.projects.index', compact('projects'));
     }
 
+    public function dashboard(Project $project): View
+    {
+        $this->authorize('view', $project);
+
+        $project->loadCount(['pages', 'themeTemplates', 'popups']);
+
+        $pages = $project->pages()->latest()->limit(10)->get();
+        $themes = $project->themeTemplates()->latest()->limit(10)->get();
+        $popups = $project->popups()->latest()->limit(10)->get();
+
+        return view('page-builder.projects.show', compact('project', 'pages', 'themes', 'popups'));
+    }
+
     public function store(Request $request): JsonResponse
     {
         $this->authorize('create', Project::class);
@@ -40,9 +53,20 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'location' => 'nullable|string|max:1000',
         ]);
 
-        $project = $this->projects->create(auth()->user(), $validated);
+        $project = $this->projects->create(auth()->user(), [
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        if (!empty($validated['location'])) {
+            $settings = $project->settings ?? [];
+            $settings['location'] = $validated['location'];
+            $project->settings = $settings;
+            $project->save();
+        }
 
         return response()->json([
             'message' => 'Projeto criado com sucesso',

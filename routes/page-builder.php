@@ -17,6 +17,7 @@ use App\Http\Controllers\PageBuilder\ProjectController;
 
 Route::middleware(['web', 'auth'])->prefix('page-builder')->name('page-builder.')->group(function () {
     Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('projects/{project}/dashboard', [ProjectController::class, 'dashboard'])->name('projects.dashboard');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');

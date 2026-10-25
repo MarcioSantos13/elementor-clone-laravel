@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect('/page-builder/pages');
+        return redirect()->route('page-builder.projects.index');
     }
     return redirect('/login');
 });

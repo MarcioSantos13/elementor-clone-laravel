@@ -15,11 +15,13 @@
             <a href="#overview">Visão Geral</a>
             <a href="#license">Custo &amp; Licença</a>
             <a href="#auth">Criar Conta &amp; Acessar</a>
+            <a href="#projects-hub">Hub de Projetos (Estilo Unity)</a>
+            <a href="#project-dashboard">Dashboard do Projeto</a>
             <a href="#create-page">Criar uma Página</a>
             <a href="#build-from-zero">Construir do Zero (Passo a Passo)</a>
             <a href="#editor">Conhecendo o Novo Editor</a>
             <a href="#drag-widgets">Inserir Elementos</a>
-            <a href="#educational-widgets">Widgets Educacionais</a>
+            <a href="#educational-widgets">Elementos Educacionais</a>
             <a href="#select-settings">Editar Propriedades</a>
             <a href="#page-settings">Configurações da Página &amp; Site</a>
             <a href="#responsive">Visualização Responsiva</a>
@@ -140,7 +142,7 @@ php artisan serve</code></pre>
             <h2>1. Visão Geral</h2>
 
             <div class="step-body">
-                <p>O <strong>Laravel Page Builder</strong> é um construtor de páginas visual drag-and-drop inspirado no Elementor, usando <strong>SortableJS</strong> para um D&D fluido e preciso. Permite criar páginas web completas arrastando widgets para uma tela, editando conteúdo e estilo em tempo real, sem escrever código.</p>
+                <p>O <strong>Laravel Page Builder</strong> é um construtor de páginas visual drag-and-drop inspirado no Elementor, usando <strong>SortableJS</strong> para um D&D fluido e preciso. Permite criar páginas web completas arrastando elementos para uma tela, editando conteúdo e estilo em tempo real, sem escrever código.</p>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Stack Tecnológica</h3>
                 <table class="widget-table">
@@ -156,7 +158,7 @@ php artisan serve</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Números do Projeto</h3>
                 <table class="widget-table">
                     <tr><th>Métrica</th><th>Valor</th></tr>
-                    <tr><td>Widgets disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
+                    <tr><td>Elementos disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
                     <tr><td>Templates prontos</td><td>7 (Blank, Landing, About, Contact, Portfolio, Showcase Completo, Blog Post)</td></tr>
                     <tr><td>Rotas definidas</td><td>100+ (CRUD páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find & replace, API REST)</td></tr>
                     <tr><td>Testes automatizados</td><td>155 (61 unitários + 94 de feature)</td></tr>
@@ -171,14 +173,14 @@ php artisan serve</code></pre>
                 <ul>
                     <li>Criar páginas com título e status (rascunho / publicado)</li>
                     <li>Abrir um <strong>editor visual</strong> em tela cheia com tema escuro</li>
-                    <li>Arrastar <strong>30 widgets</strong> (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</li>
+                    <li>Arrastar <strong>30 elementos</strong> (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</li>
                     <li>Selecionar qualquer elemento e editar suas <strong>configurações</strong> no painel direito</li>
                     <li><strong>Editor de texto rich-text (WYSIWYG)</strong> com toolbar: negrito, itálico, links, imagens, vídeos YouTube, listas, código fonte</li>
                     <li><strong>Inserir imagens</strong> no texto via upload ou colar (Ctrl+V) — imagem inline no conteúdo</li>
                     <li><strong>Inserir vídeos YouTube</strong> — cole a URL e o embed responsivo 16:9 é inserido automaticamente</li>
                     <li>Inline editing — duplo-clique para editar texto diretamente no canvas (preserva HTML)</li>
                     <li>Alternar entre visualização <strong>desktop / tablet / mobile</strong> com <strong>frames de dispositivo</strong> (bezel de celular/tablet)</li>
-                    <li><strong>Busca de widgets</strong> — barra de pesquisa no painel esquerdo para encontrar widgets rapidamente</li>
+                    <li><strong>Busca de elementos</strong> — barra de pesquisa na aba Inserir para encontrar elementos rapidamente</li>
                     <li><strong>Painéis redimensionáveis</strong> — arraste a borda dos painéis esquerdo/direito para ajustar largura</li>
                     <li><strong>Multi-select</strong> — Ctrl+Click para selecionar vários elementos, duplicar ou excluir em lote</li>
                     <li><strong>Tour de onboarding</strong> — tour guiado de 10 passos na primeira vez que o editor é aberto</li>
@@ -328,7 +330,7 @@ php artisan serve</code></pre>
                             <li><strong>Confirmar Senha</strong> — repita a senha</li>
                         </ul>
                     </li>
-                    <li>Clique em <strong>"Criar Conta"</strong>. Você será autenticado automaticamente e redirecionado para a lista de páginas.</li>
+                    <li>Clique em <strong>"Criar Conta"</strong>. Você será autenticado automaticamente e redirecionado para o <strong>Hub de Projetos</strong>.</li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Entrar</h3>
@@ -348,11 +350,77 @@ php artisan serve</code></pre>
             </div>
         </section>
 
+        {{-- PROJECTS HUB --}}
+        <section id="projects-hub" class="step">
+            <h2>2b. Hub de Projetos (Estilo Unity)</h2>
+            <div class="step-body">
+                <p>Após fazer login, você agora é direcionado diretamente para o <strong>Hub de Projetos</strong>. A ideia é organizar tudo por projeto, assim como o Unity Hub faz com seus projetos de jogo.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">O que é o Hub de Projetos</h3>
+                <ul>
+                    <li><strong>Ponto de partida</strong> — Todas as criações começam a partir daqui</li>
+                    <li><strong>Visão unificada</strong> — Veja todos os seus projetos em cards com contagem de páginas, temas e popups</li>
+                    <li><strong>Navegação simples</strong> — Clique em um projeto para abrir seu Dashboard</li>
+                    <li><strong>Organização por contexto</strong> — Páginas, temas e popups ficam agrupados por projeto</li>
+                </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Criando um novo projeto</h3>
+                <ol>
+                    <li>No Hub de Projetos, clique em <strong>"+ Novo Projeto"</strong>.</li>
+                    <li>Preencha o formulário:
+                        <ul>
+                            <li><strong>Nome do projeto *</strong> — Nome obrigatório (ex.: "Site Institucional")</li>
+                            <li><strong>Local do projeto</strong> — Campo informativo (ex.: <code>D:\Projetos\Site-Institucional</code>). Não é obrigatório.</li>
+                            <li><strong>Descrição</strong> — Opcional, para identificar o objetivo do projeto</li>
+                        </ul>
+                    </li>
+                    <li>Clique em <strong>"Criar"</strong>. O projeto será criado e você poderá acessá-lo pelo card.</li>
+                </ol>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O campo "Local do projeto" é apenas informativo neste momento, seguindo a experiência do Unity Hub. Ele ajuda a organizar mentalmente onde aquele projeto "pertence".
+                </div>
+            </div>
+        </section>
+
+        {{-- PROJECT DASHBOARD --}}
+        <section id="project-dashboard" class="step">
+            <h2>2c. Dashboard do Projeto</h2>
+            <div class="step-body">
+                <p>Ao clicar em um projeto no Hub, você abre o <strong>Dashboard</strong> com tudo centralizado.</p>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Elementos do Dashboard</h3>
+                <ul>
+                    <li><strong>Cabeçalho</strong> — Nome do projeto, descrição e botão "Voltar ao Hub"</li>
+                    <li><strong>Estatísticas</strong> — Contadores rápidos de Páginas, Temas e Popups</li>
+                    <li><strong>Cards Rápidos</strong> — Atalhos diretos para gerenciar Páginas, Temas e Popups</li>
+                    <li><strong>Botão "+ Novo"</strong> — Menu dropdown com "Nova Página", "Novo Tema" e "Novo Popup"</li>
+                    <li><strong>Recentes</strong> — Últimas páginas criadas/atualizadas neste projeto para acesso rápido</li>
+                </ul>
+
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Navegação</h3>
+                <ol>
+                    <li><strong>Hub → Projeto</strong> — Clique no card do projeto para abrir o dashboard</li>
+                    <li><strong>Dashboard → Seção</strong> — Clique em "Páginas", "Temas" ou "Popups" para gerenciar</li>
+                    <li><strong>Voltar</strong> — Use "Voltar ao Hub" para trocar de projeto rapidamente</li>
+                    <li><strong>Criação rápida</strong> — Use o dropdown "+ Novo" para criar direto do dashboard</li>
+                </ol>
+
+                <div class="tip">
+                    <strong>&#128161; Dica:</strong> O dashboard mantém você sempre no contexto do projeto. Ao criar uma página pelo dropdown "+ Novo", ela já será vinculada automaticamente ao projeto atual.
+                </div>
+            </div>
+        </section>
+
         {{-- CREATE PAGE --}}
         <section id="create-page" class="step">
             <h2>3. Criar uma Página</h2>
             <div class="step-body">
-                <p>Na lista de páginas, clique em <strong>"Nova Página"</strong> na barra de navegação superior.</p>
+                <p>Existem duas formas práticas para criar uma página:</p>
+                <ol>
+                    <li><strong>Pelo Dashboard do Projeto</strong> — Abra o projeto e clique em <strong>"+ Novo → Nova Página"</strong></li>
+                    <li><strong>Pela lista de páginas</strong> — Dentro do projeto, acesse "Páginas" e clique em <strong>"Nova Página"</strong> na barra de navegação superior</li>
+                </ol>
                 <div class="illustration">
                     <div class="ill-preview" style="max-width:400px">
                         <div style="background:#f8f9fa;padding:1rem;border-radius:6px;border:1px solid #ddd;text-align:center">
@@ -735,7 +803,7 @@ php artisan serve</code></pre>
                     <li>Mostra as configurações do elemento selecionado, ou da página se nada estiver selecionado</li>
                     <li><strong>Abas de breakpoint</strong> — Desktop / Tablet / Mobile para definir valores responsivos por dispositivo</li>
                     <li>Cada configuração tem um campo de entrada (texto, cor, seleção, gradient, etc.)</li>
-                    <li>O widget de texto exibe um <strong>editor WYSIWYG</strong> com toolbar para formatação, imagens e vídeos</li>
+                    <li>O elemento de texto exibe um <strong>editor WYSIWYG</strong> com barra de ferramentas para formatação, imagens e vídeos</li>
                     <li>As mudanças são aplicadas instantaneamente ao canvas</li>
                     <li>Quando nada está selecionado, mostra um aviso para selecionar um elemento; ao selecionar, exibe as configurações (Content / Style / Advanced)</li>
                 </ul>
@@ -907,12 +975,12 @@ php artisan serve</code></pre>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Como Adicionar</h3>
                 <ol>
-                    <li>No <strong>painel esquerdo</strong>, encontre o widget desejado</li>
+                    <li>Na aba <strong>Inserir</strong> do painel esquerdo, encontre o elemento desejado</li>
                     <li><strong>Arraste</strong> (clique e segure) e <strong>solte</strong> na tela</li>
-                    <li>O widget aparece instantaneamente no canvas</li>
+                    <li>O elemento aparece instantaneamente no canvas</li>
                 </ol>
                 <div class="tip">
-                    <strong>&#128161; Dica:</strong> Comece arrastando uma <strong>Seção</strong> para a tela, depois arraste uma <strong>Coluna</strong> para dentro da seção, e então arraste widgets de conteúdo (Título, Texto, etc.) para dentro da coluna. A estrutura é: Seção → Coluna → Widget.
+                    <strong>&#128161; Dica:</strong> Comece arrastando uma <strong>Seção</strong> para a tela, depois arraste uma <strong>Coluna</strong> para dentro da seção, e então arraste elementos de conteúdo (Título, Texto, etc.) para dentro da coluna. A estrutura é: Seção → Coluna → Elemento.
                 </div>
             </div>
         </section>
