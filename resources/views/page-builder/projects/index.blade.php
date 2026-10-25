@@ -12,7 +12,7 @@
                 <div>
                     <div class="pb-hero-badge">Project Hub</div>
                     <h1 class="pb-hero-title">Meus Projetos</h1>
-                    <p class="pb-hero-sub">Selecione um projeto para gerenciar pÃ¡ginas, temas e popups</p>
+                    <p class="pb-hero-sub">Selecione um projeto para gerenciar páginas, temas e popups</p>
                 </div>
                 <div style="display:flex;gap:.6rem;align-items:center;position:relative;z-index:2">
                     <button onclick="document.getElementById('create-project-modal').style.display='flex'" class="pb-hero-btn-ghost" style="display:flex;align-items:center;gap:.4rem">
@@ -37,7 +37,7 @@
                 <div class="pb-stat-divider"></div>
                 <div class="pb-stat">
                     <span class="pb-stat-number">{{ $projects->sum('pages_count') }}</span>
-                    <span class="pb-stat-label">PÃ¡ginas</span>
+                    <span class="pb-stat-label">Páginas</span>
                 </div>
                 <div class="pb-stat-divider"></div>
                 <div class="pb-stat">
@@ -78,7 +78,7 @@
                                 <h3 class="pb-card-title">{{ $project->name }}</h3>
                                 <div style="display:flex;gap:.4rem;align-items:center">
                                     @if($project->is_default)
-                                        <span class="badge badge-published">padrÃ£o</span>
+                                        <span class="badge badge-published">padrão</span>
                                     @endif
                                     @unless($project->is_default)
                                         <button class="pb-card-more" type="button" onclick="event.preventDefault(); event.stopPropagation(); deleteProject({{ $project->id }}, '{{ addslashes($project->name) }}')" title="Excluir projeto">
@@ -90,12 +90,12 @@
                             @if($project->description)
                                 <span class="pb-card-slug">{{ Str::limit($project->description, 80) }}</span>
                             @else
-                                <span class="pb-card-slug">Sem descriÃ§Ã£o</span>
+                                <span class="pb-card-slug">Sem descrição</span>
                             @endif
                         </div>
                         <div class="pb-card-footer">
                             <div class="pb-card-status">
-                                <span class="pb-card-date">{{ $project->pages_count }} pÃ¡ginas â€¢ {{ $project->theme_templates_count }} temas â€¢ {{ $project->popups_count }} popups</span>
+                                <span class="pb-card-date">{{ $project->pages_count }} páginas • {{ $project->theme_templates_count }} temas • {{ $project->popups_count }} popups</span>
                             </div>
                             <span class="pb-card-edit-btn">Abrir</span>
                         </div>
@@ -106,7 +106,7 @@
             <div class="empty-state">
                 <div class="empty-icon">&#128193;</div>
                 <h2>Nenhum projeto</h2>
-                <p>Crie seu primeiro projeto para organizar pÃ¡ginas, temas e popups.</p>
+                <p>Crie seu primeiro projeto para organizar páginas, temas e popups.</p>
                 <button onclick="document.getElementById('create-project-modal').style.display='flex'" class="btn btn-primary" style="margin-top:1rem">Criar primeiro projeto</button>
             </div>
         @endif
@@ -129,7 +129,7 @@
                     <small style="color:#94a3b8;font-size:.75rem;display:block;margin-top:.35rem">Campo informativo, semelhante ao Unity Hub.</small>
                 </div>
                 <div class="form-group">
-                    <label for="project-description">DescriÃ§Ã£o <span class="optional">(opcional)</span></label>
+                    <label for="project-description">Descrição <span class="optional">(opcional)</span></label>
                     <textarea id="project-description" class="form-control" rows="3" placeholder="Descreva o objetivo deste projeto"></textarea>
                 </div>
             </div>
@@ -163,7 +163,7 @@
         }
 
         function deleteProject(id, name) {
-            if (!confirm('Excluir o projeto "' + name + '"? Os itens serÃ£o movidos para o projeto padrÃ£o.')) return;
+            if (!confirm('Excluir o projeto "' + name + '"? Os itens serão movidos para o projeto padrão.')) return;
             fetch('/page-builder/projects/' + id, {
                 method: 'DELETE',
                 headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
