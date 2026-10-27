@@ -97,7 +97,7 @@
                     <tr><th>Ferramenta</th><th>Versão Mínima</th><th>Como verificar</th></tr>
                     <tr><td><strong>PHP</strong></td><td>8.2+</td><td><code>php -v</code></td></tr>
                     <tr><td><strong>Composer</strong></td><td>2.0+</td><td><code>composer -V</code></td></tr>
-                    <tr><td><strong>Node.js</strong></td><td>18+</td><td><code>node -v</code></td></tr>
+                    <tr><td><strong>Node.js</strong></td><td>20.19+ ou 22.12+</td><td><code>node -v</code></td></tr>
                     <tr><td><strong>NPM</strong></td><td>9+</td><td><code>npm -v</code></td></tr>
                     <tr><td><strong>Banco de dados</strong></td><td>SQLite ou MySQL/MariaDB</td><td>SQLite é o mais fácil para começar</td></tr>
                 </table>
@@ -128,12 +128,13 @@ DB_DATABASE=./database/database.sqlite</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 4: Rodar migrações e seeders</h3>
                 <pre style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.85rem;overflow-x:auto"><code>php artisan migrate
 php artisan db:seed</code></pre>
-                <p>O seeder cria automaticamente:</p>
+                <p>O <code>DatabaseSeeder</code> cria/executa:</p>
                 <ul>
                     <li>Um usuário de teste: <code>test@example.com</code> / <code>password</code> (o banco incluído no repositório já contém <code>admin@sistema.local</code> / <code>password</code>)</li>
-                    <li>As definições de widgets disponíveis</li>
-                    <li>Os 7 templates padrão (Blank, Landing, About, Contact, Portfolio, <strong>Showcase Completo</strong>, Blog Post)</li>
+                    <li><code>MathCourseSeeder</code> — página de exemplo "Curso de Matemática - Equações do 2º Grau"</li>
+                    <li><code>ExampleProjectSeeder</code> — projeto de exemplo com páginas, temas e popup</li>
                 </ul>
+                <p>Os widgets são registrados a partir de <code>config/page-builder.php</code> (via <code>WidgetManager</code>), e os 7 templates padrão ficam definidos em código no <code>TemplateManager</code> — não são criados pelo seeder.</p>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Passo 5: Iniciar o servidor</h3>
                 <p>O Page Builder usa dois servidores que trabalham juntos. É importante entender o papel de cada um:</p>
@@ -200,11 +201,11 @@ php artisan serve</code></pre>
                     <tr><th>Métrica</th><th>Valor</th></tr>
                     <tr><td>Elementos disponíveis</td><td>30 (Heading, Text, Image, Button, Section, Column, Inner Section, Callout, Table, Math, Video, Divider, Spacer, Icon, Gallery, Form, Tabs, Accordion, Counter, Progress Bar, Social Icons, Icon Box, Image Box, Testimonial, Price Table, Countdown, Google Maps, Carousel, Mega Menu, Lottie)</td></tr>
                     <tr><td>Templates prontos</td><td>7 (Blank, Landing, About, Contact, Portfolio, Showcase Completo, Blog Post)</td></tr>
-                    <tr><td>Rotas definidas</td><td>100+ (CRUD páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find & replace, API REST)</td></tr>
+                    <tr><td>Rotas definidas</td><td>101 com prefixo <code>/page-builder</code> (126 no total), cobrindo CRUD de páginas, elementos, revisões, templates, temas, popups, widgets globais, fontes, colaboração, HTML import, dynamic tags, find &amp; replace e API REST</td></tr>
                     <tr><td>Testes automatizados</td><td>163 (61 unitários + 102 de feature)</td></tr>
                     <tr><td>Tabelas no banco</td><td>9 principais (projects, pages, elements, revisions, form_submissions, custom_fonts, global_widgets, popups, theme_templates) + personal_access_tokens</td></tr>
-                    <tr><td>Views Blade</td><td>22 (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
-                    <tr><td>Linhas de JS do editor</td><td>~5000 (8 módulos ES em resources/js/editor/)</td></tr>
+                    <tr><td>Views Blade</td><td>24 (editor + 7 partials, pages, projects, auth, tutorial, popups, theme-templates, layouts)</td></tr>
+                    <tr><td>Linhas de JS do editor</td><td>~4400 (21 módulos ES em resources/js/editor/)</td></tr>
                     <tr><td>API REST</td><td>Sanctum (token-based) com CRUD páginas e elementos</td></tr>
                     <tr><td>Jobs (filas)</td><td>4 (ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob, ProcessFormSubmissionJob)</td></tr>
                 </table>
@@ -270,8 +271,8 @@ php artisan serve</code></pre>
 <pre style="margin:0">┌──────────────────────────────────────────────────┐
 │                  FRONTEND                         │
 │   editor.blade.php (7 partials)                   │
-│   resources/js/editor/ (8 módulos ES)              │
-│   state, utils, canvas, history, navigator, dragdrop, html-import, css
+│   resources/js/editor/ (21 módulos ES)             │
+│   state, utils, canvas, history, navigator, dragdrop, html-import, controls, ui, actions, …
 ├──────────────────────────────────────────────────┤
 │                CONTROLLERS                        │
 │   PageController │ ElementController              │
@@ -864,9 +865,9 @@ php artisan serve</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Carregamento do Editor</h3>
                 <ol>
                     <li>A página é carregada via GET para <code>/page-builder/pages/{id}/editor</code></li>
-                    <li>O JS busca <code>GET /api/page-builder/pages/{id}/elements</code> para obter a árvore de elementos</li>
+                    <li>O JS busca <code>GET /page-builder/pages/{id}/elements</code> para obter a árvore de elementos</li>
                     <li>Os elementos são renderizados recursivamente (Seção → Coluna → widgets)</li>
-                    <li>O painel de configurações é carregado via <code>GET /api/page-builder/widgets/{type}/controls</code></li>
+                    <li>O painel de configurações é carregado via <code>GET /page-builder/elements/{id}/controls</code> (a rota <code>GET /page-builder/widgets/{type}/controls</code> também existe para consultar controles por tipo)</li>
                     <li>Salvamento automático inicia a cada 60 segundos</li>
                 </ol>
             </div>
@@ -1481,33 +1482,33 @@ php artisan serve</code></pre>
                 <p>Dois botões na barra de ferramentas do editor permitem persistir seu trabalho:</p>
                 <table class="widget-table">
                     <tr><th>Botão</th><th>O que faz</th></tr>
-                    <tr><td><strong>Salvar (Save)</strong></td><td>Envia os dados atuais da página para o servidor via requisição <code>PUT /page-builder/pages/{id}</code> com status <code>draft</code>. O editor exibe um toast "Page saved!" e o badge de status permanece como "draft".</td></tr>
-                    <tr><td><strong>Publicar (Publish)</strong></td><td>Exibe uma confirmação: <em>"Publish this page?"</em>. Se confirmado, envia um <code>POST /page-builder/pages/{id}/publish</code> que altera o campo <code>status</code> da página no banco de dados para <code>published</code>. Após a resposta, exibe um toast "Page published!" e <strong>recarrega</strong> a página do editor para refletir o novo status.</td></tr>
+                    <tr><td><strong>Salvar (Save)</strong></td><td>Envia os dados atuais da página para o servidor via requisição <code>PUT /page-builder/pages/{id}</code> com <code>status: "draft"</code>. O editor exibe o toast <strong>"Pagina salva!"</strong> e o status da página passa a ser <code>draft</code>.</td></tr>
+                    <tr><td><strong>Publicar (Publish)</strong></td><td>Exibe uma confirmação: <em>"Publicar esta pagina?"</em>. Se confirmado, envia um <code>POST /page-builder/pages/{id}/publish</code> que altera o campo <code>status</code> da página no banco de dados para <code>published</code>. Após a resposta, exibe o toast <strong>"Pagina publicada!"</strong> e <strong>recarrega</strong> a página do editor para refletir o novo status.</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Fluxo detalhado do Publish</h3>
                 <ol>
                     <li>O usuário clica no botão <strong>Publish</strong> (ícone &#128752;).</li>
-                    <li>Uma caixa de diálogo <code>confirm()</code> pergunta: <em>"Publish this page?"</em>.</li>
+                    <li>Uma caixa de diálogo <code>confirm()</code> pergunta: <em>"Publicar esta pagina?"</em>.</li>
                     <li>Se o usuário cancelar, nada acontece.</li>
                     <li>Se confirmar, o JavaScript envia uma requisição <code>POST</code> para a rota <code>/page-builder/pages/{id}/publish</code> com o token CSRF.</li>
-                    <li>No servidor, o controller <code>PageController@publish()</code> (arquivo <code>app/Http/Controllers/PageBuilder/PageController.php:405</code>) executa:
+                    <li>No servidor, o controller <code>PageController@publish()</code> (arquivo <code>app/Http/Controllers/PageBuilder/PageController.php:281</code>) executa:
                         <ul>
                             <li><code>$page->status = 'published'</code> — altera o status no model Eloquent.</li>
                             <li><code>$page->save()</code> — persiste a alteração no banco de dados.</li>
                             <li>Retorna um JSON: <code>{"message": "Page published successfully", "page": {...}}</code>.</li>
                         </ul>
                     </li>
-                    <li>O JavaScript recebe a resposta, exibe um toast "Page published!" e chama <code>location.reload()</code>.</li>
+                    <li>O JavaScript recebe a resposta, exibe o toast <strong>"Pagina publicada!"</strong> e chama <code>location.reload()</code>.</li>
                     <li>Após o recarregamento, o badge na barra de ferramentas do editor mostra <strong>published</strong> em verde.</li>
                 </ol>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Diferença entre Salvar e Publicar</h3>
                 <ul>
-                    <li><strong>Salvar</strong> apenas persiste os dados. O status da página não é alterado — permanece como estava (draft ou published).</li>
+                    <li><strong>Salvar</strong> persiste os dados e envia <code>status: "draft"</code>. Portanto, salvar uma página publicada a rebaixa para <code>draft</code>; o autosave usa o mesmo fluxo.</li>
                     <li><strong>Publicar</strong> altera o status para <code>published</code> e também recarrega o editor para refletir visualmente a mudança.</li>
-                    <li>Não há diferença de visibilidade no front-end público: todas as rotas de renderização são protegidas por <code>auth</code>, então apenas usuários logados podem ver qualquer página, seja rascunho ou publicada.</li>
-                    <li>O status <code>published</code> vs <code>draft</code> serve como indicador de progresso e pode ser usado por integrações externas para saber quais páginas estão prontas para exibição.</li>
+                    <li>A rota pública <code>GET /p/{slug}</code> exibe apenas páginas com status <code>published</code>. Pré-visualizações de rascunho usam as rotas autenticadas do editor.</li>
+                    <li>O status <code>published</code> vs <code>draft</code> também serve como indicador de progresso e pode ser usado por integrações externas para saber quais páginas estão prontas para exibição.</li>
                 </ul>
 
                 <div class="tip">
@@ -1535,7 +1536,7 @@ php artisan serve</code></pre>
                     <tr><th>Ação</th><th>Como funciona</th></tr>
                     <tr><td><strong>Editar (Edit)</strong></td><td>Abre o editor visual em tela cheia para modificar o layout e conteúdo da página.</td></tr>
                     <tr><td><strong>Visualizar (View)</strong></td><td>Abre uma prévia limpa da página em uma nova aba, como os visitantes a veriam.</td></tr>
-                    <tr><td><strong>Duplicar (Duplicate)</strong></td><td>Cria uma cópia exata da página (incluindo todos os elementos) com "(cópia)" anexado ao título. A página duplicada inicia como rascunho.</td></tr>
+                    <tr><td><strong>Duplicar (Duplicate)</strong></td><td>Cria uma cópia exata da página (incluindo todos os elementos) com " (copy)" anexado ao título. A página duplicada inicia como rascunho.</td></tr>
                     <tr><td><strong>Exportar (Export)</strong></td><td>Baixa a página como um arquivo <code>.json</code> — você pode compartilhar ou fazer backup. O nome do arquivo é baseado no título da página.</td></tr>
                     <tr><td><strong>Copiar HTML (Copy HTML)</strong></td><td>Copia o HTML renderizado da página para a área de transferência. Ideal para colar o conteúdo em outras ferramentas ou sistemas (como o Moodle).</td></tr>
                     <tr><td><strong>Importar (Import)</strong></td><td>Abre um modal para selecionar um arquivo <code>.json</code> previamente exportado. A página importada é recriada no sistema com novo ID.</td></tr>
@@ -2270,11 +2271,11 @@ php artisan serve</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Diagrama de Arquitetura</h3>
                 <div style="background:#1e1e2d;color:#a6e3a1;padding:1rem;border-radius:6px;font-size:.78rem;line-height:1.5;overflow-x:auto;font-family:monospace">
 <pre style="margin:0">┌─────────────────────────────────────────────────────────────────┐
-│                        FRONTEND (8 módulos ES)                   │
+│                        FRONTEND (21 módulos ES)                  │
 │  resources/js/editor/ ← editor.blade.php (7 partials)            │
-│  state, utils, canvas, history, navigator, dragdrop (SortableJS), html-import, css │
+│  state, utils, canvas, history, navigator, dragdrop, html-import, controls, ui, … │
 ├─────────────────────────────────────────────────────────────────┤
-│                    CONTROLLERS (14 classes)                       │
+│                    CONTROLLERS (15 classes)                       │
 │  PageController        — CRUD páginas, templates, globals       │
 │  ElementController     — CRUD elementos, controles, upload      │
 │  RevisionController    — revisões, diff, restore, auto-save     │
@@ -2285,12 +2286,13 @@ php artisan serve</code></pre>
 │  CustomFontController  — upload e gestão de fontes              │
 │  GlobalWidgetController — CRUD widgets globais                  │
 │  PopupController       — CRUD popups, triggers, condições       │
+│  ProjectController     — CRUD de projetos e movimentação        │
 │  DynamicTagController  — lista de dynamic tags disponíveis      │
 │  FindReplaceController — busca e substituição em páginas        │
 │  PageApiController     — API REST (Sanctum) para páginas        │
 │  ElementApiController  — API REST (Sanctum) para elementos      │
 ├─────────────────────────────────────────────────────────────────┤
-│                     SERVICES (10 classes)                         │
+│                     SERVICES (15 classes)                         │
 │  PageBuilderService   — orquestra tudo (create, update, render) │
 │  ElementManager       — CRUD elementos, árvore, reordenação     │
 │  WidgetManager        — registra e gerencia widgets dinamicamente│
@@ -2301,6 +2303,11 @@ php artisan serve</code></pre>
 │  DynamicTagService    — substitui @{{ tags }} por valores        │
 │  HtmlSanitizer        — sanitiza CSS, JS e URLs contra XSS     │
 │  PopupService         — gerencia popups publicados com cache    │
+│  ThemeService         — temas, condições e renderização         │
+│  GlobalWidgetService  — CRUD de widgets globais                 │
+│  ProjectService       — CRUD de projetos e projeto padrão       │
+│  ProjectTemplateService — conteúdo do projeto de exemplo        │
+│  ProjectMoodleExportService — exportação IMS para Moodle        │
 ├─────────────────────────────────────────────────────────────────┤
 │                    REPOSITORIES (2 interfaces + 2 impl)           │
 │  PageRepository      — PageRepositoryInterface                  │
@@ -2338,14 +2345,15 @@ php artisan serve</code></pre>
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Árvore de Diretórios do Page Builder</h3>
                 <table class="widget-table">
                     <tr><th>Caminho</th><th>Arquivos</th><th>Descrição</th></tr>
-                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>12</td><td>PageController, ElementController, RevisionController, FormController, CollaborationController, HtmlImportController, ThemeTemplateController, CustomFontController, GlobalWidgetController, PopupController, DynamicTagController, FindReplaceController</td></tr>
+                    <tr><td><code>app/Http/Controllers/PageBuilder/</code></td><td>13</td><td>PageController, ElementController, RevisionController, FormController, CollaborationController, HtmlImportController, ThemeTemplateController, CustomFontController, GlobalWidgetController, PopupController, ProjectController, DynamicTagController, FindReplaceController</td></tr>
                     <tr><td><code>app/Http/Controllers/Api/</code></td><td>2</td><td>PageApiController, ElementApiController (REST API)</td></tr>
-                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>8</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager, CollaborationService, HtmlImportService, HtmlSanitizer</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Core/</code></td><td>7</td><td>PageBuilderService, ElementManager, WidgetManager, Renderer, TemplateManager, CollaborationService, HtmlImportService</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Widgets/</code></td><td>31</td><td>BaseWidget + 30 widgets concretos</td></tr>
                     <tr><td><code>app/Services/PageBuilder/DynamicTags/</code></td><td>1+</td><td>DynamicTagService</td></tr>
                     <tr><td><code>app/Services/PageBuilder/GlobalWidget/</code></td><td>1+</td><td>GlobalWidgetService</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Popup/</code></td><td>1+</td><td>PopupService</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Theme/</code></td><td>1+</td><td>ThemeService</td></tr>
+                    <tr><td><code>app/Services/PageBuilder/Project/</code></td><td>3</td><td>ProjectService, ProjectTemplateService, ProjectMoodleExportService</td></tr>
                     <tr><td><code>app/Services/PageBuilder/Security/</code></td><td>1+</td><td>HtmlSanitizer</td></tr>
                     <tr><td><code>app/Contracts/Repositories/</code></td><td>2</td><td>PageRepositoryInterface, ElementRepositoryInterface</td></tr>
                     <tr><td><code>app/Repositories/</code></td><td>2</td><td>PageRepository, ElementRepository</td></tr>
@@ -2353,13 +2361,13 @@ php artisan serve</code></pre>
                     <tr><td><code>app/Jobs/</code></td><td>4</td><td>ImportHtmlJob, ClearPageCacheJob, AutoSaveRevisionJob, ProcessFormSubmissionJob</td></tr>
                     <tr><td><code>app/Providers/</code></td><td>PageBuilderServiceProvider</td><td>Registra singletons, rotas, views e config</td></tr>
                     <tr><td><code>config/page-builder.php</code></td><td>1</td><td>Configuração: lista de widgets habilitados, config de cache</td></tr>
-                    <tr><td><code>database/migrations/</code></td><td>13</td><td>users, cache, jobs, pages, elements, revisions, form_submissions, add_role_to_users, personal_access_tokens, custom_fonts, global_widgets, popups, theme_templates</td></tr>
-                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>100+ rotas (pages, elements, revisions, themes, popups, global-widgets, fonts, collab, html-import, find-replace, dynamic-tags)</td></tr>
+                    <tr><td><code>database/migrations/</code></td><td>15</td><td>users, cache, jobs, pages, elements, revisions, form_submissions, add_role_to_users, personal_access_tokens, custom_fonts, global_widgets, popups, theme_templates, add_elements_to_revisions, create_projects</td></tr>
+                    <tr><td><code>routes/page-builder.php</code></td><td>1</td><td>101 rotas com prefixo <code>/page-builder</code> (pages, elements, revisions, themes, popups, global-widgets, fonts, collab, html-import, find-replace, dynamic-tags, projects)</td></tr>
                     <tr><td><code>routes/api.php</code></td><td>1</td><td>API REST com Sanctum (tokens, pages, elements)</td></tr>
-                    <tr><td><code>resources/views/</code></td><td>22</td><td>Blade views (editor + 7 partials, pages, auth, tutorial, popups, theme-templates, layouts)</td></tr>
-                    <tr><td><code>resources/js/editor/</code></td><td>8</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop (SortableJS), html-import, css</td></tr>
-                    <tr><td><code>tests/Unit/</code></td><td>4</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, ExampleTest</td></tr>
-                    <tr><td><code>tests/Feature/</code></td><td>4</td><td>PageControllerTest, ElementControllerTest, RevisionControllerTest, ExampleTest</td></tr>
+                    <tr><td><code>resources/views/</code></td><td>24</td><td>Blade views (editor + 7 partials, pages, projects, auth, tutorial, popups, theme-templates, layouts)</td></tr>
+                    <tr><td><code>resources/js/editor/</code></td><td>21</td><td>Módulos ES: state, utils, canvas, history, navigator, dragdrop, html-import, controls, ui, actions, revisions, collaboration, entre outros</td></tr>
+                    <tr><td><code>tests/Unit/</code></td><td>5</td><td>BaseWidgetTest, PageBuilderServiceTest, TemplateManagerTest, CollaborationServiceTest, ExampleTest</td></tr>
+                    <tr><td><code>tests/Feature/</code></td><td>10</td><td>PageControllerTest, ElementControllerTest, ApiTest, AuthTest, ProjectControllerTest, RevisionControllerTest, FormControllerTest, HtmlImportControllerTest, StarterTemplatesSmokeTest, ExampleTest</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Injeção de Dependências (Providers)</h3>
@@ -2428,7 +2436,7 @@ php artisan serve</code></pre>
                     <tr><td><code>deleted_at</code></td><td>softDeletes</td><td>Exclusão lógica</td></tr>
                 </table>
                 <div class="tip">
-                    <strong>&#128161; Migração de dados:</strong> A migration <code>create_projects_table</code> cria automaticamente um projeto padrão <strong>"Meus Projetos"</strong> para cada usuário e move suas páginas, temas e popups existentes para ele. Ao excluir um projeto, os itens são reatribuídos ao projeto padrão (<code>nullOnDelete</code> + reassign no service).
+                    <strong>&#128161; Migração de dados:</strong> A migration <code>create_projects_table</code> cria um projeto padrão <strong>"Meus Projetos"</strong> para usuários que já possuem páginas, temas ou popups, e move esses registros para ele. Usuários novos recebem o projeto padrão sob demanda, via <code>User::defaultProject()</code>. Ao excluir um projeto, os itens são reatribuídos ao projeto padrão (<code>nullOnDelete</code> + reassign no service).
                 </div>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Coluna <code>project_id</code></h3>
@@ -2444,7 +2452,7 @@ php artisan serve</code></pre>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug para URLs (gerado automaticamente)</td></tr>
                     <tr><td><code>status</code></td><td>string</td><td>"draft" ou "published" (padrão: draft)</td></tr>
                     <tr><td><code>content</code></td><td>longText (nullable)</td><td>Conteúdo HTML renderizado</td></tr>
-                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações: container_width, page_background, content_padding, css_custom</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações: container_width, page_background, content_padding, custom_css, global_colors, global_fonts</td></tr>
                     <tr><td><code>meta_data</code></td><td>json (nullable)</td><td>Metadados (SEO, tags, etc.)</td></tr>
                     <tr><td><code>template</code></td><td>string (nullable)</td><td>Nome do template aplicado</td></tr>
                     <tr><td><code>created_at / updated_at</code></td><td>timestamps</td><td>Datas de criação e atualização</td></tr>
@@ -2488,6 +2496,7 @@ php artisan serve</code></pre>
                     <tr><td><code>content</code></td><td>longText (nullable)</td><td>Snapshot do conteúdo HTML da página</td></tr>
                     <tr><td><code>settings</code></td><td>json (nullable)</td><td>Snapshot das configurações da página</td></tr>
                     <tr><td><code>meta_data</code></td><td>json (nullable)</td><td>Snapshot dos metadados</td></tr>
+                    <tr><td><code>elements</code></td><td>json (nullable)</td><td>Snapshot da árvore de elementos (migration <code>add_elements_to_revisions</code>)</td></tr>
                     <tr><td><code>diff</code></td><td>json (nullable)</td><td>Diff em relação à revisão anterior</td></tr>
                 </table>
 
@@ -2529,9 +2538,12 @@ php artisan serve</code></pre>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono da fonte</td></tr>
                     <tr><td><code>name</code></td><td>string</td><td>Nome da fonte</td></tr>
                     <tr><td><code>family</code></td><td>string</td><td>Família tipográfica</td></tr>
-                    <tr><td><code>weight</code></td><td>string</td><td>Peso (normal, bold, etc.)</td></tr>
+                    <tr><td><code>weight</code></td><td>string</td><td>Peso (400, 700, etc.)</td></tr>
                     <tr><td><code>style</code></td><td>string</td><td>Estilo (normal, italic)</td></tr>
-                    <tr><td><code>files</code></td><td>json</td><td>Arquivos da fonte (ttf, woff, woff2)</td></tr>
+                    <tr><td><code>file_ttf / file_woff / file_woff2</code></td><td>string (nullable)</td><td>Caminhos dos arquivos enviados</td></tr>
+                    <tr><td><code>url_ttf / url_woff / url_woff2</code></td><td>string (nullable)</td><td>URLs externas das fontes</td></tr>
+                    <tr><td><code>font_display</code></td><td>string</td><td>Estratégia de carregamento (padrão: swap)</td></tr>
+                    <tr><td><code>is_global</code></td><td>boolean</td><td>Disponível globalmente (padrão: true)</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>global_widgets</code></h3>
@@ -2539,12 +2551,13 @@ php artisan serve</code></pre>
                     <tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr>
                     <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do widget</td></tr>
+                    <tr><td><code>title</code></td><td>string</td><td>Nome do widget global</td></tr>
                     <tr><td><code>type</code></td><td>string</td><td>Tipo do widget (heading, text, etc.)</td></tr>
-                    <tr><td><code>name</code></td><td>string</td><td>Nome do widget global</td></tr>
-                    <tr><td><code>settings</code></td><td>json</td><td>Configurações do widget</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações do widget</td></tr>
                     <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do widget</td></tr>
                     <tr><td><code>styles</code></td><td>json (nullable)</td><td>Estilos do widget</td></tr>
-                    <tr><td><code>activity</code></td><td>json (nullable)</td><td>Dados de atividade</td></tr>
+                    <tr><td><code>status</code></td><td>string</td><td>draft / published (padrão: draft)</td></tr>
+                    <tr><td><code>description</code></td><td>text (nullable)</td><td>Descrição do widget</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>popups</code></h3>
@@ -2553,13 +2566,16 @@ php artisan serve</code></pre>
                     <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do popup</td></tr>
                     <tr><td><code>project_id</code></td><td>foreignId (nullable)</td><td>Projeto ao qual o popup pertence (nullOnDelete)</td></tr>
+                    <tr><td><code>page_id</code></td><td>foreignId</td><td>Página que armazena o conteúdo do popup (cascade delete)</td></tr>
                     <tr><td><code>title</code></td><td>string</td><td>Título do popup</td></tr>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
+                    <tr><td><code>type</code></td><td>string</td><td>Tipo do popup (padrão: popup)</td></tr>
                     <tr><td><code>status</code></td><td>string</td><td>draft / published</td></tr>
-                    <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do popup</td></tr>
-                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações visuais</td></tr>
                     <tr><td><code>triggers</code></td><td>json (nullable)</td><td>Gatilhos de exibição</td></tr>
+                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações visuais (largura, posição, overlay etc.)</td></tr>
                     <tr><td><code>conditions</code></td><td>json (nullable)</td><td>Condições de exibição</td></tr>
+                    <tr><td><code>order</code></td><td>integer</td><td>Ordem de exibição (padrão: 0)</td></tr>
+                    <tr><td><code>published_at</code></td><td>timestamp (nullable)</td><td>Data de publicação</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Tabela <code>theme_templates</code></h3>
@@ -2568,13 +2584,14 @@ php artisan serve</code></pre>
                     <tr><td><code>id</code></td><td>bigint (PK)</td><td>ID auto-increment</td></tr>
                     <tr><td><code>user_id</code></td><td>foreignId</td><td>Dono do template</td></tr>
                     <tr><td><code>project_id</code></td><td>foreignId (nullable)</td><td>Projeto ao qual o template pertence (nullOnDelete)</td></tr>
+                    <tr><td><code>page_id</code></td><td>foreignId</td><td>Página que armazena o conteúdo do template (cascade delete)</td></tr>
                     <tr><td><code>title</code></td><td>string</td><td>Título do template</td></tr>
                     <tr><td><code>slug</code></td><td>string (unique)</td><td>Slug único</td></tr>
                     <tr><td><code>type</code></td><td>string</td><td>Tipo (header, footer, single, archive, 404, search_results)</td></tr>
                     <tr><td><code>status</code></td><td>string</td><td>draft / published</td></tr>
-                    <tr><td><code>content</code></td><td>json (nullable)</td><td>Conteúdo do template</td></tr>
-                    <tr><td><code>settings</code></td><td>json (nullable)</td><td>Configurações</td></tr>
                     <tr><td><code>conditions</code></td><td>json (nullable)</td><td>Condições de exibição</td></tr>
+                    <tr><td><code>order</code></td><td>integer</td><td>Ordem de exibição (padrão: 0)</td></tr>
+                    <tr><td><code>published_at</code></td><td>timestamp (nullable)</td><td>Data de publicação</td></tr>
                 </table>
             </div>
         </section>
@@ -2890,14 +2907,14 @@ php artisan queue:listen --timeout=60</code></pre>
                     <tr><th>Métrica</th><th>Valor</th><th>Avaliação</th></tr>
                     <tr><td>Testes totais (PHP)</td><td>163</td><td style="color:green">Boa cobertura</td></tr>
                     <tr><td>Testes unitários</td><td>61</td><td style="color:green">Widgets, Services, Templates, Colaboração</td></tr>
-                    <tr><td>Testes de feature</td><td>94</td><td style="color:green">Controllers, Projetos, Auth, API, Fluxos</td></tr>
+                    <tr><td>Testes de feature</td><td>102</td><td style="color:green">Controllers, Projetos, Auth, API, Fluxos</td></tr>
                     <tr><td>Testes de frontend (Vitest)</td><td>7</td><td style="color:green">Módulos JS do editor</td></tr>
                     <tr><td>Cobertura de controllers</td><td>6</td><td style="color:green">Page, Element, Revision, Form, HtmlImport, Project testados</td></tr>
                     <tr><td>BaseWidgetTest</td><td>13</td><td style="color:green">Infraestrutura base do widget (getters, validação, sanitização)</td></tr>
                     <tr><td>Sanitização de XSS</td><td>Implementada</td><td style="color:green">PageBuilderService + HtmlSanitizer (central)</td></tr>
                     <tr><td>Autorização (Policy)</td><td>Implementada</td><td style="color:green">PagePolicy + ProjectPolicy + ownership em todos os controllers</td></tr>
                     <tr><td>Proteção SSRF</td><td>Implementada</td><td style="color:green">HtmlImportService::assertSafeUrl (bloqueio de IPs privados/reservados, redirects manuais)</td></tr>
-                    <tr><td>Tratamento de erros JS</td><td>14 fetch()</td><td style="color:green">Todos com .catch() + toast</td></tr>
+                    <tr><td>Tratamento de erros JS</td><td>53 chamadas (46 apiFetch + 7 fetch)</td><td style="color:green">49 com .catch() + toast</td></tr>
                 </table>
 
                 <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes Unitários (61)</h3>
@@ -2910,7 +2927,7 @@ php artisan queue:listen --timeout=60</code></pre>
                     <tr><td><code>ExampleTest</code></td><td>1</td><td>Skeleton padrão do Laravel</td></tr>
                 </table>
 
-                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (94)</h3>
+                <h3 style="font-size:1rem;margin-top:1.25rem;margin-bottom:.5rem">Testes de Feature (102)</h3>
                 <table class="widget-table">
                     <tr><th>Classe de Teste</th><th>Testes</th><th>Cobre</th></tr>
                     <tr><td><code>PageControllerTest</code></td><td>24</td><td>CRUD, auth, publish, templates, export/import, duplicate</td></tr>
@@ -2918,7 +2935,7 @@ php artisan queue:listen --timeout=60</code></pre>
                     <tr><td><code>ApiTest</code></td><td>11</td><td>Tokens Sanctum, CRUD de páginas e elementos via API</td></tr>
                     <tr><td><code>AuthTest</code></td><td>10</td><td>Registro, login, logout, rotas protegidas</td></tr>
                     <tr><td><code>RevisionControllerTest</code></td><td>9</td><td>List, show, restore, diff, delete, prune, auto-save, auth, IDOR</td></tr>
-                    <tr><td><code>ProjectControllerTest</code></td><td>9</td><td>CRUD de projetos, projeto padrão, move, autorização entre usuários</td></tr>
+                    <tr><td><code>ProjectControllerTest</code></td><td>17</td><td>CRUD de projetos, projeto padrão, move, autorização entre usuários</td></tr>
                     <tr><td><code>FormControllerTest</code></td><td>7</td><td>Envio de formulários, validação, página publicada, armazenamento</td></tr>
                     <tr><td><code>HtmlImportControllerTest</code></td><td>5</td><td>Importação de HTML via URL e textarea, jobs, validação SSRF</td></tr>
                     <tr><td><code>StarterTemplatesSmokeTest</code></td><td>4</td><td>Smoke test dos templates iniciais</td></tr>
